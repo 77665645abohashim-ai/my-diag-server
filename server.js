@@ -2,171 +2,98 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل قراءة البيانات القادمة بصيغة JSON
+// تفعيل استقبال بيانات JSON
 app.use(express.json());
 
-// مصفوفة محلية لتخزين سجلات عمليات الفحص المؤقتة داخل الذاكرة
-let diagnosticLogs = [];
+// مخزن مؤقت للبيانات في الذاكرة (سيعاد ضبطه عند إعادة تشغيل السيرفر على Render)
 let stats = {
     totalChecks: 0,
     successfulChecks: 0,
     failedChecks: 0
 };
+let diagnosticLogs = [];
 
-// 1. المسار الرئيسي (/) - لعرض لوحة التحكم الاحترافية والعدادات والجدول في المتصفح
+// السيريال الافتراضي المقبول
+const ALLOWED_SERIAL = "123456";
+
+// 1. المسار الرئيسي (GET /) - يعرض لوحة التحكم الاحترافية والعدادات والجدول
 app.get('/', (req, res) => {
-    // إنشاء واجهة HTML متجاوبة ومريحة للعين على شاشات الهواتف
-    let html = `
+    // تجهيز أسطر الجدول بناءً على السجلات الحالية
+    const logRows = diagnosticLogs.map(log => `
+        <tr style="border-bottom: 1px solid #444;">
+            <td style="padding: 12px; color: #aaa;">${log.time}</td>
+            <td style="padding: 12px; font-weight: bold; color: #fff;">${log.serial}</td>
+            <td style="padding: 12px;">
+                <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; 
+                    background-color: ${log.status === 'success' ? '#1b5e20' : '#b71c1c'}; 
+                    color: ${log.status === 'success' ? '#4caf50' : '#f44336'};">
+                    ${log.status === 'success' ? 'ناجح' : 'فاشل'}
+                </span>
+            </td>
+            <td style="padding: 12px; color: #ddd;">${log.message}</td>
+        </tr>
+    `).join('');
+
+    const htmlContent = `
     <!DOCTYPE html>
     <html lang="ar" dir="rtl">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>لوحة تحكم سيرفر التشخيص والتحقق</title>
+        <title>نظام التشخيص الذكي - لوحة التحكم</title>
         <style>
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background-color: #f4f6f9;
-                color: #333;
-                margin: 0;
-                padding: 20px;
+            body { font-family: sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 20px; }
+            .container { max-width: 1000px; margin: 0 auto; }
+            h1 { text-align: center; color: #2196f3; margin-bottom: 30px; }
+            .dashboard-grid { display: block; margin-bottom: 30px; }
+            @media(min-width: 600px) {
+                .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-gap: 20px; }
             }
-            .container {
-                max-width: 900px;
-                margin: 0 auto;
-            }
-            h1 {
-                text-align: center;
-                color: #2c3e50;
-                margin-bottom: 30px;
-            }
-            /* تصميم كروت العدادات */
-            .stats-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 20px;
-                margin-bottom: 30px;
-            }
-            .card {
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-                text-align: center;
-                border-top: 4px solid #3498db;
-            }
-            .card.success { border-top-color: #2ecc71; }
-            .card.failed { border-top-color: #e74c3c; }
-            .card-title {
-                font-size: 14px;
-                color: #7f8c8d;
-                text-transform: uppercase;
-                margin-bottom: 10px;
-            }
-            .card-value {
-                font-size: 28px;
-                font-weight: bold;
-                color: #2c3e50;
-            }
-            /* تصميم جدول البيانات */
-            .table-container {
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-                overflow-x: auto;
-            }
-            h2 {
-                color: #34495e;
-                margin-top: 0;
-                border-bottom: 2px solid #ecf0f1;
-                padding-bottom: 10px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 15px;
-                text-align: right;
-            }
-            th, td {
-                padding: 12px 15px;
-                border-bottom: 1px solid #ddd;
-            }
-            th {
-                background-color: #f8f9fa;
-                color: #34495e;
-            }
-            .status-badge {
-                padding: 5px 10px;
-                border-radius: 12px;
-                font-size: 12px;
-                font-weight: bold;
-            }
-            .status-badge.success { background-color: #d4edda; color: #155724; }
-            .status-badge.failed { background-color: #f8d7da; color: #721c24; }
-            .no-data {
-                text-align: center;
-                color: #95a5a6;
-                padding: 30px;
-            }
+            .card { background-color: #1e1e1e; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border-top: 4px solid #2196f3; margin-bottom: 15px; }
+            .card.success { border-top-color: #4caf50; }
+            .card.fail { border-top-color: #f44336; }
+            .card h3 { margin: 0 0 10px 0; color: #888; font-size: 16px; }
+            .card .value { font-size: 32px; font-weight: bold; color: #fff; }
+            .table-container { background-color: #1e1e1e; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); overflow-x: auto; }
+            h2 { color: #2196f3; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; text-align: right; }
+            th { padding: 12px; color: #2196f3; border-bottom: 2px solid #333; }
+            .no-data { text-align: center; color: #666; padding: 30px; }
         </style>
         <meta http-equiv="refresh" content="10">
     </head>
     <body>
         <div class="container">
-            <h1>Diagnostic System Server 💻</h1>
+            <h1>📊 لوحة تحكم سيرفر التشخيص (Diag Server)</h1>
             
-            <div class="stats-grid">
+            <div class="dashboard-grid">
                 <div class="card">
-                    <div class="card-title">إجمالي عمليات الفحص</div>
-                    <div class="card-value">${stats.totalChecks}</div>
+                    <h3>إجمالي العمليات</h3>
+                    <div class="value">${stats.totalChecks}</div>
                 </div>
                 <div class="card success">
-                    <div class="card-title">العمليات الناجحة</div>
-                    <div class="card-value">${stats.successfulChecks}</div>
+                    <h3>السيريلات المقبولة</h3>
+                    <div class="value" style="color: #4caf50;">${stats.successfulChecks}</div>
                 </div>
-                <div class="card failed">
-                    <div class="card-title">العمليات المرفوضة</div>
-                    <div class="card-value">${stats.failedChecks}</div>
+                <div class="card fail">
+                    <h3>السيريلات المرفوضة</h3>
+                    <div class="value" style="color: #f44336;">${stats.failedChecks}</div>
                 </div>
             </div>
 
             <div class="table-container">
-                <h2>سجل عمليات التحقق الحية (Live Logs)</h2>
+                <h2>📈 سجل العمليات الحي والمباشر</h2>
                 <table>
                     <thead>
                         <tr>
-                            <th>الوقت والتاريخ</th>
-                            <th>رقم السيريال (Serial)</th>
+                            <th>التوقيت</th>
+                            <th>رقم السيريال المعالج</th>
                             <th>الحالة</th>
-                            <th>ملاحظات الاستجابة</th>
+                            <th>استجابة النظام</th>
                         </tr>
                     </thead>
                     <tbody>
-    `;
-
-    if (diagnosticLogs.length === 0) {
-        html += `<tr><td colspan="4" class="no-data">لا توجد عمليات فحص واردة حتى الآن. السيرفر في انتظار طلبات التطبيق...</td></tr>`;
-    } else {
-        // عرض السجلات بترتيب تنازلي (الأحدث في الأعلى)
-        for (let i = diagnosticLogs.length - 1; i >= 0; i--) {
-            let log = diagnosticLogs[i];
-            html += `
-                <tr>
-                    <td>${log.time}</td>
-                    <td style="font-family: monospace; font-weight: bold;">${log.serial}</td>
-                    <td>
-                        <span class="status-badge ${log.status === 'success' ? 'success' : 'failed'}">
-                            ${log.status === 'success' ? 'مقبول ✓' : 'مرفوض ✗'}
-                        </span>
-                    </td>
-                    <td>${log.message}</td>
-                </tr>
-            `;
-        }
-    }
-
-    html += `
+                        ${logRows.length > 0 ? logRows : '<tr><td colspan="4" class="no-data">لا توجد عمليات فحص مسجلة حتى الآن. كود التطبيق جاهز بانتظار الاتصال...</td></tr>'}
                     </tbody>
                 </table>
             </div>
@@ -174,153 +101,52 @@ app.get('/', (req, res) => {
     </body>
     </html>
     `;
-    res.send(html);
+    res.send(htmlContent);
 });
 
-// 2. مسار التحقق للأجهزة (/api/check-serial) - هذا المسار الذي يرسل له التطبيق طلباته
+// 2. مسار فحص السيريال للتطبيق (POST /api/check-serial)
 app.post('/api/check-serial', (req, res) => {
     const { serial } = req.body;
+    
+    // الحصول على التوقيت المحلي الحالي في اليمن
+    const currentTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Aden', hour12: true });
+
     stats.totalChecks++;
 
-    const currentTime = new Date().toLocaleString('ar-YE', { timeZone: 'Asia/Aden' });
-
-    // التحقق من وجود السيريال في الطلب
     if (!serial) {
         stats.failedChecks++;
-        diagnosticLogs.push({
+        diagnosticLogs.unshift({
             time: currentTime,
-            serial: 'غير معروف',
+            serial: 'فارغ',
             status: 'failed',
-            message: 'طلب خاطئ: السيريال مفقود في حزمة البيانات'
+            message: 'طلب مرفوض: لم يتم إرسال أي سيريال من التطبيق.'
         });
-        return res.status(400).json({ status: "error", message: "Serial parameter is required" });
+        return res.status(400).json({ status: "failed", isAuthorized: false, message: "Serial numbers missing" });
     }
 
-    // هنا يمكنك وضع السيريالات المصرح لها، كمثال افتراضي نقبل أي سيريال يبدأ بـ "DIAG"
-    if (serial.toUpperCase().startsWith('DIAG') || serial === '123456') {
+    // التحقق: يقبل إذا كان يبدأ بـ "DIAG" أو السيريال الافتراضي المخصص
+    if (serial.toUpperCase().startsWith('DIAG') || serial === ALLOWED_SERIAL) {
         stats.successfulChecks++;
-        diagnosticLogs.push({
+        diagnosticLogs.unshift({
             time: currentTime,
             serial: serial,
             status: 'success',
-            message: 'تم التحقق بنجاح والموافقة على تشغيل النظام'
+            message: 'تم التحقق بنجاح والموافقة على تشغيل النظام وضبط الصلاحية.'
         });
         return res.json({ status: "success", isAuthorized: true, message: "Device authorized successfully" });
     } else {
         stats.failedChecks++;
-        diagnosticLogs.push({
+        diagnosticLogs.unshift({
             time: currentTime,
             serial: serial,
             status: 'failed',
-            message: 'سيريال غير مصرح به أو منتهي الصلاحية'
+            message: 'سيريال غير مصرح به أو منتهي الصلاحية.'
         });
         return res.json({ status: "failed", isAuthorized: false, message: "Unauthorized device serial" });
     }
 });
 
-// تشغيل خادم الاستماع
+// تشغيل السيرفير
 app.listen(PORT, () => {
-    console.log(`Server is running successfully on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
-dependencies:
-  flutter:
-    sdk: flutter
-  http: ^1.2.0
-import 'import:flutter/material.dart';
-import 'import:http/http.dart' as http;
-import 'import:convert/convert.dart'; // إذا كنت تحتاج لمعالجة النصوص لاحقاً
-import 'dart:convert';
-
-class DiagnosticAuthService {
-  // رابط السيرفر الخاص بك على Render والمصنع مسبقاً
-  static const String _baseUrl = 'https://my-diag-server.onrender.com/api/check-serial';
-
-  /// دالة للتحقق من السيريال نمبر الخاص بجهاز التشخيص
-  static Future<Map<String, dynamic>> verifyDeviceSerial(String serialNumber) async {
-    try {
-      // إرسال طلب POST إلى السيرفر مع تمرير السيريال في حزمة البيانات (Body)
-      final response = await http.post(
-        Uri.parse(_baseUrl),
-        headers: {
-          'Content-Type': 'application/json', // تحديد نوع البيانات المرسلة كـ JSON
-        },
-        body: jsonEncode({
-          'serial': serialNumber,
-        }),
-      ).timeout(const Duration(seconds: 15)); // وضع حد أقصى للانتظار 15 ثانية (مناسب لشبكات الهاتف)
-
-      // استقبال وتحليل استجابة السيرفر
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-        
-        // فحص متغير الصلاحية القادم من السيرفر (isAuthorized)
-        if (responseData['isAuthorized'] == true) {
-          return {
-            'success': true,
-            'message': responseData['message'] ?? 'تم تفعيل الجهاز بنجاح',
-          };
-        } else {
-          return {
-            'success': false,
-            'message': responseData['message'] ?? 'هذا السيريال غير مصرح له بالعمل',
-          };
-        }
-      } else if (response.statusCode == 400) {
-        return {
-          'success': false,
-          'message': 'خطأ في الطلب: السيريال نمبر فارغ أو مفقود',
-        };
-      } else {
-        return {
-          'success': false,
-          'message': 'السيرفر يواجه مشكلة حالياً، كود الخطأ: ${response.statusCode}',
-        };
-      }
-    } async catch (e) {
-      // التعامل مع أخطاء الشبكة أو انقطاع الاتصال
-      return {
-        'success': false,
-        'message': 'تعذر الاتصال بالسيرفر، يرجى التحقق من اتصال الإنترنت في الورشة وإعادة المحاولة',
-      };
-    }
-  }
-}
-void _handleActivation(BuildContext context, String serialInput) async {
-  // إظهار مؤشر تحميل أثناء الاتصال بالسيرفر
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => const Center(child: CircularProgressIndicator()),
-  );
-
-  // استدعاء دالة الفحص
-  final result = await DiagnosticAuthService.verifyDeviceSerial(serialInput);
-
-  // إغلاق مؤشر التحميل
-  Navigator.of(context).pop();
-
-  if (result['success'] == true) {
-    // تفعيل ناجح: الانتقال إلى واجهة فحص قراءة البيانات الحية (Live Data Stream)
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result['message']), backgroundColor: Colors.green),
-    );
-    
-    // الانتقال لواجهة نظام التشخيص الرئيسية
-    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainDiagnosticScreen()));
-  } else {
-    // تفعيل فاشل: إظهار رسالة الخطأ القادمة من السيرفر
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('تنبيه الحماية', textDirection: TextDirection.rtl),
-        content: Text(result['message'], textDirection: TextDirection.rtl),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('موافق'),
-          ),
-        ],
-      ),
-    );
-  }
-}
