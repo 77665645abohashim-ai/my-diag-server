@@ -8,30 +8,27 @@ app.use(express.json());
 let allowedSerials = ['123456', '979862374489'];
 let requestLogs = [];
 
-// 1. معالجة طلبات التطبيق (GET أو POST) التي ليست لصفحة لوحة التحكم
+// معالجة طلبات التطبيق ومنح التصريح الدائم لضمان فتح التطبيق
 app.use((req, res, next) => {
-    // إذا كان الطلب قادماً من التطبيق (يعمل بـ okhttp أو ليس متصفح ويب عادي يطلب الصفحة الرئيسية)
     if (req.headers['user-agent']?.includes('okhttp') || req.query.config_no !== undefined || req.path !== '/') {
         let serialNo = req.body.serialNo || req.body.serial || req.query.serial || 'غير متوفر';
         let time = new Date().toLocaleString();
 
-        let isAuthorized = allowedSerials.includes(serialNo);
-        let statusText = isAuthorized ? 'مقبولة' : 'مرفوضة';
-
-        // تسجيل الطلب في السجل الحي
+        // تسجيل الطلب في لوحة التحكم
         requestLogs.unshift({
             time: time,
             serial: serialNo,
-            status: statusText,
-            response: `Path: ${req.path} - ${isAuthorized ? 'صرح به' : 'غير مصرح'}`
+            status: 'مقبولة',
+            response: `Path: ${req.path} - تم السماح بالدخول`
         });
 
+        // الرد بصيغة نجاح إجبارية للتطبيق
         return res.json({
             code: 200,
             message: "success",
             data: {
-                status: isAuthorized ? 1 : 0,
-                authorized: isAuthorized,
+                status: 1,
+                authorized: true,
                 serverTime: Date.now()
             }
         });
@@ -39,7 +36,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// 2. لوحة التحكم الرئيسية (تظهر فقط عند فتح الرابط من المتصفح)
+// لوحة التحكم الرئيسية
 app.get('/', (req, res) => {
     let total = requestLogs.length;
     let successCount = requestLogs.filter(l => l.status === 'مقبولة').length;
@@ -129,7 +126,6 @@ app.get('/', (req, res) => {
     res.send(html);
 });
 
-// 3. مسارات إدارة السيريالات
 app.post('/api/add-serial', (req, res) => {
     let newSerial = req.body.serial;
     if (newSerial && !allowedSerials.includes(newSerial)) {
