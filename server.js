@@ -8,33 +8,38 @@ app.use(express.json());
 let allowedSerials = ['123456', '979862374489'];
 let requestLogs = [];
 
-// معالجة أي طلب POST من التطبيق بغض النظر عن المسار
-app.post('*', (req, res) => {
-    let serialNo = req.body.serialNo || req.body.serial || req.query.serial || 'غير متوفر';
-    let requestedUrl = req.body.url || req.path || 'غير متوفر';
-    let time = new Date().toLocaleString();
+// 1. معالجة طلبات التطبيق (GET أو POST) التي ليست لصفحة لوحة التحكم
+app.use((req, res, next) => {
+    // إذا كان الطلب قادماً من التطبيق (يعمل بـ okhttp أو ليس متصفح ويب عادي يطلب الصفحة الرئيسية)
+    if (req.headers['user-agent']?.includes('okhttp') || req.query.config_no !== undefined || req.path !== '/') {
+        let serialNo = req.body.serialNo || req.body.serial || req.query.serial || 'غير متوفر';
+        let time = new Date().toLocaleString();
 
-    let isAuthorized = allowedSerials.includes(serialNo);
-    let statusText = isAuthorized ? 'مقبولة' : 'مرفوضة';
+        let isAuthorized = allowedSerials.includes(serialNo);
+        let statusText = isAuthorized ? 'مقبولة' : 'مرفوضة';
 
-    requestLogs.unshift({
-        time: time,
-        serial: serialNo,
-        status: statusText,
-        response: `Path: ${req.path} - ${isAuthorized ? 'صرح به' : 'غير مصرح'}`
-    });
+        // تسجيل الطلب في السجل الحي
+        requestLogs.unshift({
+            time: time,
+            serial: serialNo,
+            status: statusText,
+            response: `Path: ${req.path} - ${isAuthorized ? 'صرح به' : 'غير مصرح'}`
+        });
 
-    res.json({
-        code: 200,
-        message: "success",
-        data: {
-            status: isAuthorized ? 1 : 0,
-            authorized: isAuthorized
-        }
-    });
+        return res.json({
+            code: 200,
+            message: "success",
+            data: {
+                status: isAuthorized ? 1 : 0,
+                authorized: isAuthorized,
+                serverTime: Date.now()
+            }
+        });
+    }
+    next();
 });
 
-// لوحة التحكم الرئيسية عند فتح الرابط من المتصفح
+// 2. لوحة التحكم الرئيسية (تظهر فقط عند فتح الرابط من المتصفح)
 app.get('/', (req, res) => {
     let total = requestLogs.length;
     let successCount = requestLogs.filter(l => l.status === 'مقبولة').length;
@@ -124,7 +129,7 @@ app.get('/', (req, res) => {
     res.send(html);
 });
 
-// مسارات إدارة السيريالات
+// 3. مسارات إدارة السيريالات
 app.post('/api/add-serial', (req, res) => {
     let newSerial = req.body.serial;
     if (newSerial && !allowedSerials.includes(newSerial)) {
