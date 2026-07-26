@@ -2,53 +2,36 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// تفعيل استقبال البيانات
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // لدعم إرسال البيانات من أزرار المتصفح
 
-// قائمة السيريالات المصرح لها (تبدأ بسيريال افتراضي)
-let authorizedSerials = ["123456"];
+// قائمة السيريالات المفعلة (افتراضياً يوجد سيريال تجريبي)
+let allowedSerials = ['123456', '979862374489'];
 
-// مخزن الإحصائيات وسجلات العمليات
-let stats = {
-    totalChecks: 0,
-    successfulChecks: 0,
-    failedChecks: 0
-};
-let diagnosticLogs = [];
+// سجل العمليات الحية
+let requestLogs = [];
 
-// 1. المسار الرئيسي (GET /) - يعرض لوحة التحكم التفاعلية مع الأزرار والمدخلات
+// 1. مسار لوحة التحكم الرئيسية (يظهر فقط عند فتحه من المتصفح)
 app.get('/', (req, res) => {
-    // تجهيز أسطر جدول السيريالات المسموحة مع زر الحذف لكل سيريال
-    const serialRows = authorizedSerials.map(s => `
-        <tr style="border-bottom: 1px solid #333;">
-            <td style="padding: 10px; font-family: monospace; font-weight: bold; color: #fff;">${s}</td>
-            <td style="padding: 10px; text-align: left;">
-                <form method="POST" action="/api/delete-serial" style="margin:0;">
-                    <input type="hidden" name="serial" value="${s}">
-                    <button type="submit" style="background-color: #b71c1c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">حذف ✗</button>
-                </form>
-            </td>
-        </tr>
-    `).join('');
+    // إذا كان الطلب قادماً من التطبيق (يحتوي على معاملات مثل config_no أو ليس متصفحاً عادياً)
+    if (req.query.config_no !== undefined || req.headers['user-agent']?.includes('okhttp')) {
+        // رد JSON متوافق مع طلبات التطبيق الأولية لمنع توقف التطبيق
+        return res.json({
+            code: 200,
+            message: "Success",
+            data: {
+                status: "normal",
+                serverTime: Date.now()
+            }
+        });
+    }
 
-    // تجهيز أسطر سجل العمليات الحي
-    const logRows = diagnosticLogs.map(log => `
-        <tr style="border-bottom: 1px solid #444;">
-            <td style="padding: 12px; color: #aaa; font-size: 13px;">${log.time}</td>
-            <td style="padding: 12px; font-weight: bold; color: #fff; font-family: monospace;">${log.serial}</td>
-            <td style="padding: 12px;">
-                <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; 
-                    background-color: ${log.status === 'success' ? '#1b5e20' : '#b71c1c'}; 
-                    color: ${log.status === 'success' ? '#4caf50' : '#f44336'};">
-                    ${log.status === 'success' ? 'مقبول ✓' : 'مرفوض ✗'}
-                </span>
-            </td>
-            <td style="padding: 12px; color: #ddd; font-size: 13px;">${log.message}</td>
-        </tr>
-    `).join('');
+    // إذا تم فتحه من المتصفح، اعرض لوحة التحكم
+    let total = requestLogs.length;
+    let successCount = requestLogs.filter(l => l.status === 'مقبولة').length;
+    let failCount = requestLogs.filter(l => l.status === 'مرفوضة').length;
 
-    const htmlContent = `
+    let html = `
     <!DOCTYPE html>
     <html lang="ar" dir="rtl">
     <head>
@@ -65,15 +48,11 @@ app.get('/', (req, res) => {
             .card.fail { border-top-color: #f44336; }
             .card h3 { margin: 0 0 10px 0; color: #888; font-size: 14px; }
             .card .value { font-size: 28px; font-weight: bold; color: #fff; }
-            
             .section { background-color: #1e1e1e; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); margin-bottom: 25px; }
             h2 { color: #2196f3; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; font-size: 18px; }
-            
-            /* تصميم أزرار وحقول الإدخال */
             input[type="text"] { background-color: #2b2b2b; color: white; border: 1px solid #444; padding: 10px; border-radius: 4px; width: 70%; max-width: 300px; box-sizing: border-box; }
             button.btn-add { background-color: #2196f3; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; }
             button.btn-add:hover { background-color: #1976d2; }
-            
             table { width: 100%; border-collapse: collapse; text-align: right; }
             th { padding: 10px; color: #2196f3; border-bottom: 2px solid #333; font-size: 14px; }
             .no-data { text-align: center; color: #666; padding: 20px; }
@@ -82,89 +61,98 @@ app.get('/', (req, res) => {
     <body>
         <div class="container">
             <h1>📊 لوحة التحكم وإدارة السيريالات</h1>
-            
             <div class="dashboard-grid">
-                <div class="card"><h3>إجمالي العمليات</h3><div class="value">${stats.totalChecks}</div></div>
-                <div class="card success"><h3>مقبولة</h3><div class="value" style="color: #4caf50;">${stats.successfulChecks}</div></div>
-                <div class="card fail"><h3>مرفوضة</h3><div class="value" style="color: #f44336;">${stats.failedChecks}</div></div>
+                <div class="card"><h3>إجمالي العمليات</h3><div class="value">${total}</div></div>
+                <div class="card success"><h3>مقبولة</h3><div class="value" style="color: #4caf50;">${successCount}</div></div>
+                <div class="card fail"><h3>مرفوضة</h3><div class="value" style="color: #f44336;">${failCount}</div></div>
             </div>
-
             <div class="section">
                 <h2>➕ إضافة سيريال مصرح له جديد</h2>
                 <form method="POST" action="/api/add-serial" style="display: flex; gap: 10px; align-items: center;">
                     <input type="text" name="serial" placeholder="أدخل رقم السيريال هنا..." required>
                     <button type="submit" class="btn-add">إضافة وتفعيل</button>
                 </form>
-                
                 <h3 style="color: #888; font-size: 15px; margin-top: 20px;">السيريالات المفعلة حالياً:</h3>
                 <table>
                     <thead><tr><th>رقم السيريال</th><th style="text-align:left;">الإجراء</th></tr></thead>
                     <tbody>
-                        ${serialRows.length > 0 ? serialRows : '<tr><td colspan="2" class="no-data">لا توجد سيريالات مضافة. السيرفر سيرفض الجميع حالياً.</td></tr>'}
+                        ${allowedSerials.map(s => `
+                            <tr style="border-bottom: 1px solid #333;">
+                                <td style="padding: 10px; font-family: monospace; font-weight: bold; color: #fff;">${s}</td>
+                                <td style="padding: 10px; text-align: left;">
+                                    <form method="POST" action="/api/delete-serial" style="margin:0;">
+                                        <input type="hidden" name="serial" value="${s}">
+                                        <button type="submit" style="background-color: #b71c1c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">حذف ✗</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        `).join('')}
                     </tbody>
                 </table>
             </div>
-
             <div class="section">
-                <h2>📈 سجل طلبات الفحص الحية (تحديث يدوي عند إنعاش الصفحة)</h2>
+                <h2>📈 سجل طلبات الفحص الحية</h2>
                 <table>
                     <thead>
                         <tr><th>التوقيت</th><th>السيريال المعالج</th><th>الحالة</th><th>استجابة النظام</th></tr>
                     </thead>
                     <tbody>
-                        ${logRows.length > 0 ? logRows : '<tr><td colspan="4" class="no-data">لا توجد عمليات فحص واردة من التطبيق حتى الآن.</td></tr>'}
+                        ${requestLogs.length === 0 ? '<tr><td colspan="4" class="no-data">لا توجد عمليات فحص واردة من التطبيق حتى الآن.</td></tr>' :
+                          requestLogs.map(log => `
+                            <tr style="border-bottom: 1px solid #333;">
+                                <td style="padding: 10px; font-size: 12px; color: #aaa;">${log.time}</td>
+                                <td style="padding: 10px; font-family: monospace; font-weight: bold; color: #fff;">${log.serial}</td>
+                                <td style="padding: 10px; color: ${log.status === 'مقبولة' ? '#4caf50' : '#f44336'};">${log.status}</td>
+                                <td style="padding: 10px; font-size: 12px; color: #ccc;">${log.response}</td>
+                            </tr>
+                        `).join('')}
                     </tbody>
                 </table>
             </div>
         </div>
     </body>
-    </html>
-    `;
-    res.send(htmlContent);
+    </html>`;
+    res.send(html);
 });
 
-// 2. مسار إضافة سيريال عبر أزرار الواجهة
+// 2. مسارات الـ API العامة التي يطلبها التطبيق (مثل api/v2)
+app.all('/api/v2/*', (req, res) => {
+    let serial = req.body.serial || req.query.serial || 'غير متوفر';
+    let time = new Date().toLocaleString();
+    
+    // تسجيل العملية في السجل
+    requestLogs.unshift({
+        time: time,
+        serial: serial,
+        status: 'مقبولة',
+        response: 'تم الرد بنجاح'
+    });
+
+    res.json({
+        code: 200,
+        message: "success",
+        data: {
+            status: 1,
+            authorized: true
+        }
+    });
+});
+
+// 3. مسارات إدارة السيريالات من لوحة التحكم
 app.post('/api/add-serial', (req, res) => {
-    const { serial } = req.body;
-    if (serial && !authorizedSerials.includes(serial.trim())) {
-        authorizedSerials.push(serial.trim());
+    let newSerial = req.body.serial;
+    if (newSerial && !allowedSerials.includes(newSerial)) {
+        allowedSerials.push(newSerial.trim());
     }
-    res.redirect('/'); // إعادة توجيه لتحديث الصفحة فوراً
-});
-
-// 3. مسار حذف سيريال عبر أزرار الواجهة
-app.post('/api/delete-serial', (req, res) => {
-    const { serial } = req.body;
-    authorizedSerials = authorizedSerials.filter(s => s !== serial);
     res.redirect('/');
 });
 
-// 4. مسار فحص السيريال الخاص بالتطبيق (POST /api/check-serial)
-app.post('/api/check-serial', (req, res) => {
-    const { serial } = req.body;
-    const currentTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Aden', hour12: true });
-    stats.totalChecks++;
-
-    if (!serial) {
-        stats.failedChecks++;
-        diagnosticLogs.unshift({ time: currentTime, serial: 'فارغ', status: 'failed', message: 'طلب مرفوض: السيريال مفقود.' });
-        return res.status(400).json({ status: "failed", isAuthorized: false, message: "Serial missing" });
-    }
-
-    const trimmedSerial = serial.trim();
-
-    // فحص صلاحية السيريال: يقبل إذا كان مضافاً في القائمة، أو يبدأ بـ DIAG تلقائياً
-    if (authorizedSerials.includes(trimmedSerial) || trimmedSerial.toUpperCase().startsWith('DIAG')) {
-        stats.successfulChecks++;
-        diagnosticLogs.unshift({ time: currentTime, serial: trimmedSerial, status: 'success', message: 'تم التحقق بنجاح وتصريح الجهاز.' });
-        return res.json({ status: "success", isAuthorized: true, message: "Device authorized successfully" });
-    } else {
-        stats.failedChecks++;
-        diagnosticLogs.unshift({ time: currentTime, serial: trimmedSerial, status: 'failed', message: 'سيريال غير مدرج بقاعدة البيانات أو منتهي.' });
-        return res.json({ status: "failed", isAuthorized: false, message: "Unauthorized device serial" });
-    }
+app.post('/api/delete-serial', (req, res) => {
+    let targetSerial = req.body.serial;
+    allowedSerials = allowedSerials.filter(s => s !== targetSerial);
+    res.redirect('/');
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
