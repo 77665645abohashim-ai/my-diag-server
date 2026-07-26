@@ -5,28 +5,37 @@ const PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// قائمة السيريالات المفعلة (افتراضياً يوجد سيريال تجريبي)
 let allowedSerials = ['123456', '979862374489'];
-
-// سجل العمليات الحية
 let requestLogs = [];
 
-// 1. مسار لوحة التحكم الرئيسية (يظهر فقط عند فتحه من المتصفح)
-app.get('/', (req, res) => {
-    // إذا كان الطلب قادماً من التطبيق (يحتوي على معاملات مثل config_no أو ليس متصفحاً عادياً)
-    if (req.query.config_no !== undefined || req.headers['user-agent']?.includes('okhttp')) {
-        // رد JSON متوافق مع طلبات التطبيق الأولية لمنع توقف التطبيق
-        return res.json({
-            code: 200,
-            message: "Success",
-            data: {
-                status: "normal",
-                serverTime: Date.now()
-            }
-        });
-    }
+// معالجة أي طلب POST من التطبيق بغض النظر عن المسار
+app.post('*', (req, res) => {
+    let serialNo = req.body.serialNo || req.body.serial || req.query.serial || 'غير متوفر';
+    let requestedUrl = req.body.url || req.path || 'غير متوفر';
+    let time = new Date().toLocaleString();
 
-    // إذا تم فتحه من المتصفح، اعرض لوحة التحكم
+    let isAuthorized = allowedSerials.includes(serialNo);
+    let statusText = isAuthorized ? 'مقبولة' : 'مرفوضة';
+
+    requestLogs.unshift({
+        time: time,
+        serial: serialNo,
+        status: statusText,
+        response: `Path: ${req.path} - ${isAuthorized ? 'صرح به' : 'غير مصرح'}`
+    });
+
+    res.json({
+        code: 200,
+        message: "success",
+        data: {
+            status: isAuthorized ? 1 : 0,
+            authorized: isAuthorized
+        }
+    });
+});
+
+// لوحة التحكم الرئيسية عند فتح الرابط من المتصفح
+app.get('/', (req, res) => {
     let total = requestLogs.length;
     let successCount = requestLogs.filter(l => l.status === 'مقبولة').length;
     let failCount = requestLogs.filter(l => l.status === 'مرفوضة').length;
@@ -115,30 +124,7 @@ app.get('/', (req, res) => {
     res.send(html);
 });
 
-// 2. مسارات الـ API العامة التي يطلبها التطبيق (مثل api/v2)
-app.all('/api/v2/*', (req, res) => {
-    let serial = req.body.serial || req.query.serial || 'غير متوفر';
-    let time = new Date().toLocaleString();
-    
-    // تسجيل العملية في السجل
-    requestLogs.unshift({
-        time: time,
-        serial: serial,
-        status: 'مقبولة',
-        response: 'تم الرد بنجاح'
-    });
-
-    res.json({
-        code: 200,
-        message: "success",
-        data: {
-            status: 1,
-            authorized: true
-        }
-    });
-});
-
-// 3. مسارات إدارة السيريالات من لوحة التحكم
+// مسارات إدارة السيريالات
 app.post('/api/add-serial', (req, res) => {
     let newSerial = req.body.serial;
     if (newSerial && !allowedSerials.includes(newSerial)) {
