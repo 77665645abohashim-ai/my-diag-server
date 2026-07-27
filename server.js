@@ -8,34 +8,31 @@ app.use(express.json());
 let allowedSerials = ['123456', '979862374489'];
 let requestLogs = [];
 
+// التقاط طلبات النسخة الأصلية وتجاوز فحص كلمة المرور بمنح نجاح إجباري
 app.use((req, res, next) => {
-    if (req.headers['user-agent']?.includes('okhttp') || req.query.config_no !== undefined || req.path !== '/') {
-        // إذا كان السيريال فارغاً أو غير موجود، نجعله يتبنى سيريالك الأساسي تلقائياً
-        let serialNo = req.body.serialNo || req.body.serial || req.query.serial;
-        if (!serialNo || serialNo.trim() === '') {
-            serialNo = '979862374489';
-        }
-
-        let actionUrl = req.body.url || req.query.url || 'unknown';
+    if (req.headers['user-agent']?.includes('okhttp') || req.path.includes('/api/v2/login') || req.path !== '/') {
+        let loginKey = req.body.login_key || req.body.serialNo || req.query.login_key || '979862374489';
         let time = new Date().toLocaleString();
 
         requestLogs.unshift({
             time: time,
-            serial: serialNo,
+            serial: loginKey,
             status: 'مقبولة',
-            response: `URL: ${actionUrl} - تم القبول التلقائي`
+            response: `Path: ${req.path} - تجاوز فحص كلمة المرور بنجاح`
         });
 
+        // الرد بكود 200 ورمز نجاح يتوافق مع هيكل التطبيق الأصلي تماماً
         return res.json({
             code: 200,
+            msg: "success",
             message: "success",
             data: {
                 status: 1,
                 authorized: true,
-                serialNo: serialNo,
-                token: "Bearer_Token_Active_For_979862374489",
+                login_key: loginKey,
+                token: "Bearer_Original_Bypassed_Token",
                 userId: "10088",
-                userName: "979862374489",
+                userName: loginKey,
                 expireTime: "2099-12-31 23:59:59",
                 is_active: 1,
                 serverTime: Date.now()
