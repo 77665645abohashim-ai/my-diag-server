@@ -10,32 +10,32 @@ let requestLogs = [];
 
 app.use((req, res, next) => {
     if (req.headers['user-agent']?.includes('okhttp') || req.query.config_no !== undefined || req.path !== '/') {
-        let serialNo = req.body.serialNo || req.body.serial || req.query.serial || '979862374489';
-        let username = req.body.username || req.body.user || req.query.username || '';
-        let password = req.body.password || req.body.pass || req.query.password || '';
+        // إذا كان السيريال فارغاً أو غير موجود، نجعله يتبنى سيريالك الأساسي تلقائياً
+        let serialNo = req.body.serialNo || req.body.serial || req.query.serial;
+        if (!serialNo || serialNo.trim() === '') {
+            serialNo = '979862374489';
+        }
+
         let actionUrl = req.body.url || req.query.url || 'unknown';
         let time = new Date().toLocaleString();
-
-        // التحقق من السيريال أو بيانات المستخدم الخاصة به
-        let isAuthorized = allowedSerials.includes(serialNo) || (username === '979862374489' && password === '77777770z');
 
         requestLogs.unshift({
             time: time,
             serial: serialNo,
-            status: isAuthorized ? 'مقبولة' : 'مرفوضة',
-            response: `URL: ${actionUrl} - User: ${username || 'N/A'}`
+            status: 'مقبولة',
+            response: `URL: ${actionUrl} - تم القبول التلقائي`
         });
 
         return res.json({
             code: 200,
             message: "success",
             data: {
-                status: isAuthorized ? 1 : 0,
-                authorized: isAuthorized,
-                serialNo: "979862374489",
+                status: 1,
+                authorized: true,
+                serialNo: serialNo,
                 token: "Bearer_Token_Active_For_979862374489",
                 userId: "10088",
-                userName: username || "979862374489",
+                userName: "979862374489",
                 expireTime: "2099-12-31 23:59:59",
                 is_active: 1,
                 serverTime: Date.now()
@@ -122,7 +122,7 @@ app.get('/', (req, res) => {
                             <tr style="border-bottom: 1px solid #333;">
                                 <td style="padding: 10px; font-size: 12px; color: #aaa;">${log.time}</td>
                                 <td style="padding: 10px; font-family: monospace; font-weight: bold; color: #fff;">${log.serial}</td>
-                                <td style="padding: 10px; color: ${log.status === 'مقبولة' ? '#4caf50' : '#f44336'};">${log.status}</td>
+                                <td style="padding: 10px; color: #4caf50;">${log.status}</td>
                                 <td style="padding: 10px; font-size: 12px; color: #ccc;">${log.response}</td>
                             </tr>
                         `).join('')}
