@@ -1,20 +1,29 @@
 app.use((req, res, next) => {
-    if (req.headers['user-agent']?.includes('okhttp') || req.path.includes('login') || req.path.includes('auth') || req.method === 'POST') {
-        let loginKey = '979862374489';
+    // التأكد أن الطلب قادم من التطبيق أو يخص الـ API
+    const isAppRequest = req.headers['user-agent']?.includes('okhttp') || 
+                         req.path.includes('login') || 
+                         req.path.includes('auth') || 
+                         req.path.startsWith('/api');
+
+    if (isAppRequest && req.method === 'POST') {
+        // قراءة الرقم التسلسلي القادم من التطبيق إن وجد، أو استخدام الافتراضي
+        let loginKey = req.body?.serialNo || req.body?.serialno || '979862374489';
         let time = new Date().toLocaleString();
 
+        // تسجيل الطلب في القائمة
         requestLogs.unshift({
             time: time,
             serial: loginKey,
             status: 'مقبولة',
-            response: `Path: ${req.path} - تم تجاوز الفحص بنجاح`
+            response: `Path: ${req.path} - Action: ${req.body?.url || 'N/A'}`
         });
 
+        // إرجاع استجابة شاملة لجميع الحقول المتوقعة من التطبيق
         return res.json({
-            code: 200,
+            code: 0, // ملاحظة: معظم تطبيقات Launch/Diagzone تتوقع code: 0 للنجاح بدلاً من 200
             msg: "success",
             message: "success",
-            ret: 200,
+            ret: 0,
             status: 1,
             success: true,
             data: {
@@ -31,5 +40,7 @@ app.use((req, res, next) => {
             }
         });
     }
+
+    // إذا كان الطلب استعراض لوحة تحكم أو صفحة أخرى يكمل طبيعي
     next();
 });
