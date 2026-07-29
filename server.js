@@ -13,23 +13,36 @@ app.use(bodyParser.json());
 app.use(bodyParser.text({ type: ['text/xml', 'application/xml'] }));
 
 // ==========================================
-// 2. مسار تسجيل الدخول
+// 2. مسار تسجيل الدخول مع بياناتك الخاصة
 // POST /api/v2/login
 // ==========================================
 app.post('/api/v2/login', (req, res) => {
     const { login_key, password } = req.body;
 
-    console.log(`[LOGIN REQUEST] User: ${login_key}`);
+    console.log(`[LOGIN ATTEMPT] User: ${login_key}`);
 
-    // محاكاة بيانات الدخول (الحساب الصحيح: admin / 123456)
-    if (login_key === 'admin' && password === '123456') {
+    // البيانات المعتمدة للتسجيل:
+    // اسم المستخدم / السيريال: 979862374489
+    // كلمة المرور: 77777770z
+    const VALID_USER = '979862374489';
+    const VALID_PASS = '77777770z';
+
+    if (login_key === VALID_USER && password === VALID_PASS) {
+        console.log(`[LOGIN SUCCESS] Welcome ${login_key}`);
+        
+        // رد السيرفر عند نجاح الدخول
         return res.status(200).json({
             code: 0,
             msg: "success",
-            token: "DIAG_AUTH_TOKEN_SAMPLE_12345"
+            data: {
+                token: "DIAG_AUTH_TOKEN_979862374489_SUCCESS",
+                username: VALID_USER,
+                serial_no: "979862374489",
+                expire_date: "2030-12-31" // تاريخ صلاحية الاشتراك
+            }
         });
     } else {
-        // الرد الذي يُرجعه سيرفر دياقزون عند الخطأ
+        // الرد المطابق لسيرفر Diagzone في حال كانت البيانات خاطئة
         return res.status(200).json({
             code: 100001,
             msg: "Username or password incorrect"
@@ -43,10 +56,8 @@ app.post('/api/v2/login', (req, res) => {
 // ==========================================
 app.post('/api/v2/publicsoftservice-nt', async (req, res) => {
     try {
-        const xmlData = req.body;
-        console.log('[UPDATE CHECK REQUEST RECEIVED]');
+        console.log('[UPDATE CHECK REQUEST]');
 
-        // محاكاة نفس رد الـ SOAP XML الذي يرسله سيرفر دياقزون
         const xmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
    <SOAP-ENV:Body>
@@ -74,10 +85,6 @@ app.post('/api/v2/publicsoftservice-nt', async (req, res) => {
 // POST /api/v2/url-upload
 // ==========================================
 app.post('/api/v2/url-upload', (req, res) => {
-    const { url, serialNo } = req.body;
-    console.log(`[TELEMETRY LOG] Event: ${url} | Serial: ${serialNo || 'None'}`);
-
-    // الرد القياسي لسيرفر دياقزون
     return res.status(200).json({
         code: 0,
         message: "OK"
@@ -89,8 +96,6 @@ app.post('/api/v2/url-upload', (req, res) => {
 // POST /api/v2/sysAppMessagePushService
 // ==========================================
 app.post('/api/v2/sysAppMessagePushService', (req, res) => {
-    console.log('[PUSH SERVICE LOG]');
-
     return res.status(200).json({
         code: 0,
         message: "OK"
@@ -101,5 +106,5 @@ app.post('/api/v2/sysAppMessagePushService', (req, res) => {
 // تشغيل السيرفر
 // ==========================================
 app.listen(PORT, () => {
-    console.log(`🚀 DiagServer active on port: ${PORT}`);
+    console.log(`🚀 DiagServer is running on port: ${PORT}`);
 });
