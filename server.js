@@ -1,114 +1,136 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-
 const app = express();
-const PORT = process.env.PORT || 3000;
+
+// استخدام الوسطاء (Middleware) لمعالجة البيانات القادمة
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.text({ type: ['text/xml', 'application/xml'] }));
+
+// دومين السيرفر الخاص بك على Render
+const BASE_URL = 'https://my-diag-server.onrender.com';
 
 // ==========================================
-// 1. إعدادات استقبال البيانات (Middlewares)
+// 1. مسار خريطة العناوين (GET /api/v2/urls)
 // ==========================================
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(bodyParser.text({ type: ['text/xml', 'application/xml'] }));
-
-// البيانات الخاصة بك والمعتمدة
-const VALID_USER = '979862374489';
-const VALID_PASS = '77777770z';
-
-// رد النجاح القياسي المتوافق مع التطبيق
-const getSuccessData = () => ({
+app.get('/api/v2/urls', (req, res) => {
+  console.log('--> GET /api/v2/urls called');
+  res.json({
     code: 0,
     msg: "success",
     data: {
-        token: "DIAG_AUTH_TOKEN_979862374489_SUCCESS",
-        user_id: "979862374489",
-        username: VALID_USER,
-        serial_no: "979862374489",
-        cc: "86",
-        email: "user@diagzone.com",
-        expire_date: "2030-12-31"
+      login: `${BASE_URL}/api/v2/login`,
+      publicsoftservice_nt: `${BASE_URL}/api/v2/publicsoftservice-nt`,
+      product_service: `${BASE_URL}/api/v2/product-service`,
+      getShopRemindStatus: `${BASE_URL}/api/v2/getShopRemindStatus`,
+      urls: [
+        { key: "login", url: `${BASE_URL}/api/v2/login` },
+        { key: "publicsoftservice_nt", url: `${BASE_URL}/api/v2/publicsoftservice-nt` },
+        { key: "product_service", url: `${BASE_URL}/api/v2/product-service` }
+      ]
     }
+  });
 });
 
 // ==========================================
-// 2. مسار جلب العناوين (URLs Config)
-// GET /api/v2/urls
+// 2. مسار التحديثات (publicsoftservice-nt)
 // ==========================================
-app.get('/api/v2/urls', (req, res) => {
-    const MY_SERVER_DOMAIN = "https://my-diag-server.onrender.com";
-    return res.status(200).json({
-        code: 0,
-        msg: "success",
-        data: {
-            urls: {
-                auth_url: `${MY_SERVER_DOMAIN}/api/v2/login`,
-                public_soft_url: `${MY_SERVER_DOMAIN}/api/v2/publicsoftservice-nt`,
-                upload_url: `${MY_SERVER_DOMAIN}/api/v2/url-upload`,
-                push_url: `${MY_SERVER_DOMAIN}/api/v2/sysAppMessagePushService`
-            }
-        }
-    });
-});
-
-// ==========================================
-// 3. مسار تسجيل الدخول المباشر (REST API)
-// POST /api/v2/login & /api/v2/user/login
-// ==========================================
-const handleLogin = (req, res) => {
-    const { login_key, password, username, user_name } = req.body || {};
-    const inputUser = login_key || username || user_name;
-    const inputPass = password;
-
-    console.log(`[LOGIN REQUEST RECEIVED] User: ${inputUser}`);
-
-    // قبول الدخول إذا تطابقت بياناتك، أو قبول أي دخول إذا كان الاختبار بـ 123456
-    if ((inputUser === VALID_USER && inputPass === VALID_PASS) || inputUser === '123456') {
-        console.log('[LOGIN SUCCESS]');
-        return res.status(200).json(getSuccessData());
-    } else {
-        console.log('[LOGIN FAILED]');
-        return res.status(200).json({
-            code: 100001,
-            msg: "Username or password incorrect"
-        });
-    }
+const handlePublicSoft = (req, res) => {
+  console.log('--> POST publicsoftservice-nt called');
+  res.set('Content-Type', 'text/xml; charset=utf-8');
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
+  <SOAP-ENV:Body>
+    <ns1:getMaxVersionForMobileAppCDN>
+      <return>
+        <code>0</code>
+        <message>success</message>
+        <appSoftSoftMaxVersion>2.00.027</appSoftSoftMaxVersion>
+      </return>
+    </ns1:getMaxVersionForMobileAppCDN>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`);
 };
 
-app.post('/api/v2/login', handleLogin);
-app.post('/api/v2/user/login', handleLogin);
+app.post('/api/v2/publicsoftservice-nt', handlePublicSoft);
+app.post('/publicsoftservice-nt', handlePublicSoft);
 
 // ==========================================
-// 4. مسار الخدمات والتحديثات والدخول بـ SOAP XML
-// POST /api/v2/publicsoftservice-nt
+// 3. مسار تسجيل الدخول (POST /api/v2/login)
 // ==========================================
-app.post('/api/v2/publicsoftservice-nt', (req, res) => {
-    console.log('[SOAP SERVICE REQUEST]');
-
-    // رد XML متوافق مع كافة خدمات وسيرفرات Diagzone
-    const xmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
-   <SOAP-ENV:Body>
-      <ns1:loginResponse>
-         <return>
-            <code>0</code>
-            <message>success</message>
-            <token>DIAG_AUTH_TOKEN_979862374489_SUCCESS</token>
-         </return>
-      </ns1:loginResponse>
-   </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>`;
-
-    res.set('Content-Type', 'text/xml; charset=utf-8');
-    return res.status(200).send(xmlResponse);
+app.post('/api/v2/login', (req, res) => {
+  console.log('--> POST /api/v2/login called with data:', req.body);
+  const serialNo = req.body.login_key || "979862374489";
+  
+  res.json({
+    code: 0,
+    msg: null,
+    data: {
+      xmpp: {
+        ip: "jabber.diagzone.com",
+        port: 5222,
+        domain: "diagzone.com"
+      },
+      token: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09",
+      user: {
+        user_id: "H21J4WOO",
+        sex: "1",
+        user_name: serialNo,
+        nick_name: serialNo,
+        mobile: "",
+        is_bind_mobile: "0",
+        email: "user@diagzone.com",
+        is_bind_email: "0",
+        roles: "1",
+        reg_zone: "1",
+        nation_id: "237"
+      },
+      config: null
+    }
+  });
 });
 
 // ==========================================
-// 5. مسارات التتبع والرسائل (Uploads & Push)
+// 4. مسار المنتجات والـ dzKey (POST /api/v2/product-service)
 // ==========================================
-app.post('/api/v2/url-upload', (req, res) => res.status(200).json({ code: 0, message: "OK" }));
-app.post('/api/v2/sysAppMessagePushService', (req, res) => res.status(200).json({ code: 0, message: "OK" }));
+app.post('/api/v2/product-service', (req, res) => {
+  console.log('--> POST /api/v2/product-service called');
+  res.set('Content-Type', 'text/xml; charset=utf-8');
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
+  <SOAP-ENV:Body>
+    <ns1:getRegisteredProductsForPad46>
+      <return>
+        <code>0</code>
+        <productDTOs>
+          <carLicenseTag></carLicenseTag>
+          <serialNo>979862374489</serialNo>
+          <dzKey>qOLwvILVmrmkZVZ18kfqZPuWsNnia+eC/lTWfpSLibS1esVL6NJETa7a7Yjddowo8iWr3t/IV1vTbZBYKl4ZvuEptvGX4kfx3r+bNVNKVVPVe4Z4sZpKVKRsSWHpp9VKzYogHyd2ecwFGuFiEAtRN40rR9VkrhQGhUV5nLh9x5rQfZQeGK68OsJ+VvkMN0ty</dzKey>
+          <pdtCategory>2</pdtCategory>
+        </productDTOs>
+      </return>
+    </ns1:getRegisteredProductsForPad46>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`);
+});
 
 // ==========================================
-// تشغيل السيرفر
+// 5. مسار استقبال تقارير الأخطاء (url-upload)
 // ==========================================
-app.listen(PORT, () => console.log(`🚀 DiagServer active on port: ${PORT}`));
+app.post('/api/v2/url-upload', (req, res) => {
+  console.log('--> POST /api/v2/url-upload report received');
+  res.json({ code: 0, message: "OK" });
+});
+
+// ==========================================
+// 6. مسار احتياطي عام لأي طلبات أخرى
+// ==========================================
+app.use((req, res) => {
+  console.log(`[ANY] ${req.method} ${req.url}`);
+  res.json({ code: 0, message: "success" });
+});
+
+// تشغيل السيرفر على المنفذ المطلوب
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
