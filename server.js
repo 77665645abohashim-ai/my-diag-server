@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-// 1. إعداد الوسطاء (Middleware) لقراءة مختلف أنواع البيانات
+// 1. إعداد الوسطاء (Middleware) لقراءة البيانات بجميع أنواعها
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text({ type: ['text/xml', 'application/xml', 'text/plain'] }));
@@ -51,7 +51,6 @@ const handlePublicSoft = (req, res) => {
 
   res.set('Content-Type', 'text/xml; charset=utf-8');
   
-  // استجابة SOAP مرنة تشمل رد النجاح العام ورد الدخول
   res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
   <SOAP-ENV:Body>
@@ -72,7 +71,6 @@ const handlePublicSoft = (req, res) => {
 </SOAP-ENV:Envelope>`);
 };
 
-// تغطية كافة صيغ المسار
 app.post('/publicsoftservice.nt', handlePublicSoft);
 app.post('/api/v2/publicsoftservice.nt', handlePublicSoft);
 app.post('/publicsoftservice-nt', handlePublicSoft);
@@ -81,37 +79,46 @@ app.post('/api/v2/publicsoftservice-nt', handlePublicSoft);
 // ==========================================
 // 3. مسار تسجيل الدخول REST (POST /api/v2/login)
 // ==========================================
-app.post('/api/v2/login', (req, res) => {
-  console.log('--> [POST] /api/v2/login called with payload:', req.body);
-  const serialNo = req.body.login_key || req.body.username || "979862374489";
+const handleLogin = (req, res) => {
+  console.log('--> [POST] /login called with headers:', req.headers);
+  console.log('--> [POST] /login called with payload:', req.body);
   
+  const username = req.body.login_key || req.body.username || req.body.serialNo || "979862374489";
+
   res.status(200).json({
     code: 0,
-    msg: null,
+    msg: "success",
+    message: "success",
     data: {
+      token: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09",
+      ticket: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09",
       xmpp: {
         ip: "jabber.diagzone.com",
         port: 5222,
         domain: "diagzone.com"
       },
-      token: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09",
       user: {
         user_id: "H21J4WOO",
         sex: "1",
-        user_name: serialNo,
-        nick_name: serialNo,
+        user_name: username,
+        nick_name: username,
         mobile: "",
         is_bind_mobile: "0",
         email: "user@diagzone.com",
         is_bind_email: "0",
         roles: "1",
         reg_zone: "1",
-        nation_id: "237"
+        nation_id: "237",
+        token: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09"
       },
       config: null
     }
   });
-});
+};
+
+app.post('/api/v2/login', handleLogin);
+app.post('/login', handleLogin);
+app.post('/api/v2/user/login', handleLogin);
 
 // ==========================================
 // 4. مسار المنتجات والـ dzKey (POST /api/v2/product-service)
