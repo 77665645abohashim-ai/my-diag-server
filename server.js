@@ -10,10 +10,10 @@ app.use(express.text({ type: ['text/xml', 'application/xml'] }));
 const BASE_URL = 'https://my-diag-server.onrender.com';
 
 // ==========================================
-// 1. مسار خريطة العناوين (GET /api/v2/urls)
+// 1. مسار خريطة العناوين (GET & POST /api/v2/urls)
 // ==========================================
-app.get('/api/v2/urls', (req, res) => {
-  console.log('--> GET /api/v2/urls called');
+const handleUrls = (req, res) => {
+  console.log(`--> ${req.method} /api/v2/urls called`);
   res.json({
     code: 0,
     msg: "success",
@@ -29,7 +29,10 @@ app.get('/api/v2/urls', (req, res) => {
       ]
     }
   });
-});
+};
+
+app.get('/api/v2/urls', handleUrls);
+app.post('/api/v2/urls', handleUrls);
 
 // ==========================================
 // 2. مسار التحديثات (publicsoftservice-nt)
