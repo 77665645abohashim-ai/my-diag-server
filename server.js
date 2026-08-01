@@ -14,7 +14,7 @@ const handleLogin = (req, res) => {
     msg: "success",
     message: "success",
     data: {
-      serialNo: serialNo,
+      serialNo: serialNo,. 
       token: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09",
       ticket: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09",
       dzKey: "qOLwvILVmrmkZVZ18kfqZPuWsNnia+eC/lTWfpSLibS1esVL6NJETa7a7Yjddowo8iWr3t/IV1vTbZBYKl4ZvuEptvGX4kfx3r+bNVNKVVPVe4Z4sZpKVKRsSWHpp9VKzYogHyd2ecwFGuFiEAtRN40rR9VkrhQGhUV5nLh9x5rQfZQeGK68OsJ+VvkMN0ty",
