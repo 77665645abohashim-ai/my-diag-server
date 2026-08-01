@@ -1,36 +1,43 @@
-// ==========================================
-// مسار خدمات الـ SOAP الموحد (publicsoftservice.nt)
-// ==========================================
-const handlePublicSoft = (req, res) => {
-  console.log(`--> [POST] SOAP Service called on: ${req.path}`);
-  console.log('--- BODY RECEIVED ---:', req.body);
-
-  res.set('Content-Type', 'text/xml; charset=utf-8');
+const handleLogin = (req, res) => {
+  console.log('--> [POST] /login called with body:', req.body);
   
-  // استجابة SOAP شاملة تغطي دالة الدخول ودالة الإصدارات
-  res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
-  <SOAP-ENV:Body>
-    <ns1:userLoginResponse>
-      <return>
-        <code>0</code>
-        <message>success</message>
-        <token>M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09</token>
-        <serialNo>979862374489</serialNo>
-        <user>
-          <user_id>H21J4WOO</user_id>
-          <user_name>979862374489</user_name>
-          <nick_name>979862374489</nick_name>
-          <email>user@diagzone.com</email>
-          <token>M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09</token>
-        </user>
-      </return>
-    </ns1:userLoginResponse>
-  </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>`);
-};
+  let serialNo = req.body.serialNo || req.body.login_key || req.body.username || req.query.serialNo;
+  if (!serialNo || serialNo.trim() === '') {
+    serialNo = "979862374489";
+  }
 
-app.post('/publicsoftservice.nt', handlePublicSoft);
-app.post('/api/v2/publicsoftservice.nt', handlePublicSoft);
-app.post('/publicsoftservice-nt', handlePublicSoft);
-app.post('/api/v2/publicsoftservice-nt', handlePublicSoft);
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+
+  res.status(200).json({
+    code: 0,
+    code_str: "0",
+    msg: "success",
+    message: "success",
+    data: {
+      serialNo: serialNo,
+      token: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09",
+      ticket: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09",
+      dzKey: "qOLwvILVmrmkZVZ18kfqZPuWsNnia+eC/lTWfpSLibS1esVL6NJETa7a7Yjddowo8iWr3t/IV1vTbZBYKl4ZvuEptvGX4kfx3r+bNVNKVVPVe4Z4sZpKVKRsSWHpp9VKzYogHyd2ecwFGuFiEAtRN40rR9VkrhQGhUV5nLh9x5rQfZQeGK68OsJ+VvkMN0ty",
+      xmpp: {
+        ip: "",
+        port: 0,
+        domain: ""
+      },
+      user: {
+        user_id: "H21J4WOO",
+        sex: "1",
+        user_name: serialNo,
+        nick_name: serialNo,
+        mobile: "",
+        is_bind_mobile: "0",
+        email: "user@diagzone.com",
+        is_bind_email: "0",
+        roles: "1",
+        reg_zone: "1",
+        nation_id: "237",
+        token: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09"
+      },
+      config: {}
+    }
+  });
+};
