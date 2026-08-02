@@ -11,11 +11,28 @@ app.use((req, res, next) => {
     next();
 });
 
-// 1. مسار تسجيل الدخول الرئيسي (POST /api/v2/login)
+// مسار تسجيل الدخول الرئيسي (POST /api/v2/login)
 app.post('/api/v2/login', (req, res) => {
-    console.log("Login Request Received:", req.body);
+    const { username, password } = req.body;
 
-    const mockToken = "dz_token_987654321_diagzone_session";
+    console.log(`محاولة دخول - اسم المستخدم: ${username} | كلمة المرور: ${password}`);
+
+    // البيانات المعتمدة المسموح لها بالدخول
+    const VALID_USER = "979862374489";
+    const VALID_PASS = "776656456";
+    const SERIAL_NUMBER = "979862374489"; // الرقم التسلسلي المعتمد للقطعة
+
+    // 1. التحقق من صحة بيانات الدخول
+    if (username !== VALID_USER || password !== VALID_PASS) {
+        return res.status(200).json({
+            code: 1001,
+            msg: "اسم المستخدم أو كلمة المرور غير صحيحة!",
+            data: null
+        });
+    }
+
+    // 2. إذا كانت البيانات صحيحة -> إرجاع كائن النجاح الهيكلي الكامل
+    const mockToken = "dz_token_979862374489_session";
 
     return res.status(200).json({
         code: 0,
@@ -24,15 +41,30 @@ app.post('/api/v2/login', (req, res) => {
         data: {
             token: mockToken,
             access_token: mockToken,
-            user_id: "10001",
-            username: "diag_user",
-            user_type: "1",
-            status: "1"
+            // كائن المستخدم الرئيسي
+            user: {
+                user_id: "10001",
+                user_name: username,
+                nick_name: username,
+                token: mockToken,
+                user_type: "1",
+                status: "1"
+            },
+            // بيانات الجهاز والرقم التسلسلي
+            deviceUser: {
+                serialNo: SERIAL_NUMBER,
+                serial_no: SERIAL_NUMBER,
+                serial_number: SERIAL_NUMBER
+            },
+            loginUser: {
+                user_name: username,
+                nick_name: username
+            }
         }
     });
 });
 
-// 2. مسار رفع الروابط احتياطياً في حال طلِبه (POST /api/v2/url-upload)
+// مسار رفع الروابط احتياطياً في حال طلِبه التطبيق (POST /api/v2/url-upload)
 app.post('/api/v2/url-upload', (req, res) => {
     return res.status(200).json({
         code: 0,
@@ -44,7 +76,7 @@ app.post('/api/v2/url-upload', (req, res) => {
     });
 });
 
-// 3. مسار افتراضي لاختبار عمل السيرفر
+// مسار افتراضي لاختبار عمل السيرفر
 app.get('/', (req, res) => {
     res.send("DiagZone Custom Server is Running!");
 });
