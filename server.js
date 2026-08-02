@@ -1,38 +1,78 @@
-app.get('/api/v2/urls', (req, res) => {
-  console.log('--> [GET] /api/v2/urls query:', req.query);
+const express = require('express');
+const app = express();
 
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+// إعداد خوادم القراءة لقراءة بيانات Form-Data و JSON
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-  return res.status(200).json({
-    code: 0,
-    code_str: "0",
-    msg: "success",
-    message: "success",
-    data: {
-      config_no: "0",
-      hosts: [
-        "https://my-diag-server.onrender.com"
-      ],
-      login: "https://my-diag-server.onrender.com/api/v2/login",
-      login_url: "https://my-diag-server.onrender.com/api/v2/login",
-      user_login: "https://my-diag-server.onrender.com/api/v2/login",
-      product_service: "https://my-diag-server.onrender.com/api/v2/product-service",
-      getShopRemindStatus: "https://my-diag-server.onrender.com/api/v2/getShopRemindStatus",
-      urls: [
-        {
-          key: "login",
-          url: "https://my-diag-server.onrender.com/api/v2/login"
-        },
-        {
-          key: "product_service",
-          url: "https://my-diag-server.onrender.com/api/v2/product-service"
+// طباعة كل طلب يصل للسيرفر لمتابعة الحركة (Debugging Logs)
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} -> ${req.url}`);
+    next();
+});
+
+// =========================================================================
+// 1. مسار الفحص المبدئي للأصدار والخدمات (SOAP XML)
+// =========================================================================
+app.post('/api/v2/publicsoftservice-nt', (req, res) => {
+    // الضبط الدقيق للهيدر ليطابق رد السيرفر الأصلي تماماً
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Body>
+        <ns1:getMaxVersionForMobileAppCDN>
+            <return>
+                <code>0</code>
+                <message>success</message>
+                <appSoftSoftMaxVersion></appSoftSoftMaxVersion>
+            </return>
+        </ns1:getMaxVersionForMobileAppCDN>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`;
+
+    return res.status(200).send(soapResponse);
+});
+
+// =========================================================================
+// 2. مسار التوجيه وجلب الروابط (url-upload)
+// =========================================================================
+app.post('/api/v2/url-upload', (req, res) => {
+    // طباعة البيانات القادمة من التطبيق مثل url=login
+    console.log("استلام طلب url-upload:", req.body);
+
+    return res.status(200).json({
+        code: 0,
+        msg: "action success",
+        data: {
+            url: "https://my-diag-server.onrender.com/api/v2/login"
         }
-      ],
-      config: {
-        check_ver: "0",
-        show_adv: "0",
-        url_upload: "0"
-      }
-    }
-  });
+    });
+});
+
+// =========================================================================
+// 3. مسار تسجيل الدخول الرئيسي (Login)
+// =========================================================================
+app.post('/api/v2/login', (req, res) => {
+    const { login_key, password } = req.body;
+    console.log(`محاولة تسجيل دخول للمستخدم: ${login_key}`);
+
+    return res.status(200).json({
+        code: 0,
+        msg: "success",
+        data: {
+            token: "custom_session_token_99887766554433",
+            username: login_key || "User",
+            user_id: "10001",
+            status: "active"
+        }
+    });
+});
+
+// =========================================================================
+// تشغيل السيرفر على البورت المحدد من بيئة Render
+// =========================================================================
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 السيرفر يعمل بنجاح على البورت ${PORT}`);
 });
