@@ -17,10 +17,11 @@ app.use((req, res, next) => {
 app.all('*', (req, res) => {
     console.log("-----------------------------------------");
     console.log("Request Path:", req.path);
+    console.log("Request Body/Params:", req.body);
     
     const reqBodyStr = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
 
-    // 1. معالجة طلب جلب المنتجات والتراخيص المرتبطة بالرقم التسلسلي (SOAP)
+    // 1. معالجة طلب جلب المنتجات والتراخيص (SOAP)
     if (reqBodyStr.includes('getRegisteredProductsForPad46') || reqBodyStr.includes('Envelope')) {
         console.log("[SOAP] Responding with DEMO V15.86 for Serial: 979862374489");
         
@@ -45,7 +46,17 @@ app.all('*', (req, res) => {
         return res.status(200).send(soapXmlResponse);
     }
 
-    // 2. رد تسجيل الدخول وإرجاع بيانات الجهاز والرقم التسلسلي (JSON)
+    // 2. معالجة طلبات الإحصائيات (Statistics)
+    if (req.path.includes('statistics')) {
+        console.log("[STATISTICS] Acknowledged device stats successfully.");
+        return res.status(200).json({
+            code: 0,
+            msg: "success",
+            data: true
+        });
+    }
+
+    // 3. رد تسجيل الدخول وإرجاع بيانات الجهاز والرقم التسلسلي (JSON)
     const SERIAL_NUMBER = "979862374489";
     const mockToken = "dz_token_979862374489_session";
 
