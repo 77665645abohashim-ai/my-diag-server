@@ -1,64 +1,95 @@
 const express = require('express');
 const app = express();
 
-app.use(express.json());
+// إعداد خوادم القراءة لقراءة بيانات Form-Data و JSON
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-const BASE_URL = "https://my-diag-server.onrender.com";
-
-// 1. مسار الفحص
-app.get('/', (req, res) => {
-    res.send('Diag Server is active and running!');
+// طباعة كل طلب يصل للسيرفر لمتابعة الحركة (Debugging Logs)
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} -> ${req.url}`);
+    next();
 });
 
-// 2. مسار جلب الروابط المعدل (شامل لجميع المفاتيح التي يتطلبها التطبيق)
-app.get('/api/v2/urls', (req, res) => {
-    console.log('[GET /api/v2/urls] Query:', req.query);
+// =========================================================================
+// 1. مسار الفحص المبدئي للأصدار والخدمات (SOAP XML)
+// =========================================================================
+app.post('/api/v2/publicsoftservice-nt', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Body>
+        <ns1:getMaxVersionForMobileAppCDN>
+            <return>
+                <code>0</code>
+                <message>success</message>
+                <appSoftSoftMaxVersion></appSoftSoftMaxVersion>
+            </return>
+        </ns1:getMaxVersionForMobileAppCDN>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`;
 
-    res.status(200).json({
+    return res.status(200).send(soapResponse);
+});
+
+// =========================================================================
+// 2. مسار التوجيه وجلب الروابط التشغيلية (url-upload)
+// =========================================================================
+app.post('/api/v2/url-upload', (req, res) => {
+    console.log("استلام طلب url-upload:", req.body);
+
+    return res.status(200).json({
+        code: 0,
+        msg: "action success",
+        data: {
+            url: "https://my-diag-server.onrender.com/api/v2/login"
+        }
+    });
+});
+
+// =========================================================================
+// 3. مسار تحديث ذاكرة الروابط والتكوين (الخاص بكلاس Lzb/f;)
+// =========================================================================
+app.post('/api/v2/urls', (req, res) => {
+    console.log("استلام طلب قائمة الروابط الرئيسية /api/v2/urls");
+
+    return res.status(200).json({
         code: 0,
         msg: "success",
         data: {
-            // المفاتيح المباشرة التي يبحث عنها التطبيق
-            "publicsoftservice.nt": BASE_URL,
-            "login": `${BASE_URL}/api/v2/user/login`,
-            "action_url": BASE_URL,
-            
-            // قائمة الروابط المعرفة داخل مصفوفة
+            version: "1.0.0",
+            area: "CN",
             urls: [
-                { name: "publicsoftservice.nt", url: BASE_URL },
-                { name: "login", url: `${BASE_URL}/api/v2/user/login` }
+                "https://my-diag-server.onrender.com"
             ]
         }
     });
 });
 
-// 3. مسار تسجيل الدخول المتوقع
-app.post('/api/v2/user/login', (req, res) => {
-    console.log('[POST /api/v2/user/login] Received Body:', req.body);
+// =========================================================================
+// 4. مسار تسجيل الدخول الرئيسي (Login)
+// =========================================================================
+app.post('/api/v2/login', (req, res) => {
+    const { login_key, password } = req.body;
+    console.log(`محاولة تسجيل دخول للمستخدم: ${login_key}`);
 
-    res.status(200).json({
+    return res.status(200).json({
         code: 0,
         msg: "success",
         data: {
-            token: "diag_mock_token_998877",
-            user_id: "1001",
-            username: req.body.username || "admin"
+            token: "custom_session_token_99887766554433",
+            username: login_key || "User",
+            user_id: "10001",
+            status: "active"
         }
     });
 });
 
-// 4. مسار استقبال تقارير الأخطاء والرفع
-app.post('/api/v2/url-upload', (req, res) => {
-    console.log('[POST /api/v2/url-upload] Body:', req.body);
-
-    res.status(200).json({
-        code: 0,
-        msg: "upload success"
-    });
-});
-
+// =========================================================================
+// تشغيل السيرفر على البورت المحدد من بيئة Render
+// =========================================================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+    console.log(`🚀 السيرفر يعمل بنجاح على البورت ${PORT}`);
 });
