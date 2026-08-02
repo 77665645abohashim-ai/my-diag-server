@@ -1,43 +1,16 @@
-const handleLogin = (req, res) => {
-  console.log('--> [POST] /login called with body:', req.body);
-  
-  let serialNo = req.body.serialNo || req.body.login_key || req.body.username || req.query.serialNo;
-  if (!serialNo || serialNo.trim() === '') {
-    serialNo = "979862374489";
-  }
+app.get('/api/v2/urls', (req, res) => {
+  console.log('--> [GET] /api/v2/urls called with query:', req.query);
 
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
-
+  
   res.status(200).json({
     code: 0,
     code_str: "0",
     msg: "success",
     message: "success",
     data: {
-      serialNo: serialNo,. 
-      token: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09",
-      ticket: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09",
-      dzKey: "qOLwvILVmrmkZVZ18kfqZPuWsNnia+eC/lTWfpSLibS1esVL6NJETa7a7Yjddowo8iWr3t/IV1vTbZBYKl4ZvuEptvGX4kfx3r+bNVNKVVPVe4Z4sZpKVKRsSWHpp9VKzYogHyd2ecwFGuFiEAtRN40rR9VkrhQGhUV5nLh9x5rQfZQeGK68OsJ+VvkMN0ty",
-      xmpp: {
-        ip: "",
-        port: 0,
-        domain: ""
-      },
-      user: {
-        user_id: "H21J4WOO",
-        sex: "1",
-        user_name: serialNo,
-        nick_name: serialNo,
-        mobile: "",
-        is_bind_mobile: "0",
-        email: "user@diagzone.com",
-        is_bind_email: "0",
-        roles: "1",
-        reg_zone: "1",
-        nation_id: "237",
-        token: "M1dYYWhyNHVOY1d5dmFIa1hLenlKUT09"
-      },
+      urls: [],
       config: {}
     }
   });
-};
+});
