@@ -1,39 +1,32 @@
 const express = require('express');
+const multer = require('multer');
+const upload = multer();
 const app = express();
 
-// تمكين قراءة البيانات القادمة بصيغة JSON أو Form Data
+// 1. تمكين قراءة البيانات بكافة الصيع (JSON, Form-Data, UrlEncoded)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(upload.any()); // لفك بيانات multipart/form-data من التطبيق
 
-// الهيدر العام لجعل الردود بصيغة UTF-8 JSON
+// 2. ضبط الهيدر العام للردود UTF-8 JSON
 app.use((req, res, next) => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     next();
 });
 
-// مسار تسجيل الدخول الرئيسي (POST /api/v2/login)
+// 3. مسار تسجيل الدخول الرئيسي (POST /api/v2/login)
 app.post('/api/v2/login', (req, res) => {
-    const { username, password } = req.body;
+    console.log("-----------------------------------------");
+    console.log("Received Body:", req.body);
 
-    console.log(`محاولة دخول - اسم المستخدم: ${username} | كلمة المرور: ${password}`);
-
-    // البيانات المعتمدة المسموح لها بالدخول
-    const VALID_USER = "979862374489";
-    const VALID_PASS = "776656456";
-    const SERIAL_NUMBER = "979862374489"; // الرقم التسلسلي المعتمد للقطعة
-
-    // 1. التحقق من صحة بيانات الدخول
-    if (username !== VALID_USER || password !== VALID_PASS) {
-        return res.status(200).json({
-            code: 1001,
-            msg: "اسم المستخدم أو كلمة المرور غير صحيحة!",
-            data: null
-        });
-    }
-
-    // 2. إذا كانت البيانات صحيحة -> إرجاع كائن النجاح الهيكلي الكامل
+    // استقبال اسم المستخدم المبعوث أو اعتماد الحساب الافتراضي
+    const username = req.body.login_key || req.body.username || "979862374489";
+    const SERIAL_NUMBER = "979862374489";
     const mockToken = "dz_token_979862374489_session";
 
+    console.log(`[SUCCESS] Login accepted for user: ${username}`);
+
+    // إرجاع استجابة النجاح المكتملة 100% لتفادي أي خطأ داخل التطبيق
     return res.status(200).json({
         code: 0,
         msg: "action success",
@@ -41,7 +34,7 @@ app.post('/api/v2/login', (req, res) => {
         data: {
             token: mockToken,
             access_token: mockToken,
-            // كائن المستخدم الرئيسي
+            // كائن المستخدم المباشر لدعم الدالة P
             user: {
                 user_id: "10001",
                 user_name: username,
@@ -64,7 +57,7 @@ app.post('/api/v2/login', (req, res) => {
     });
 });
 
-// مسار رفع الروابط احتياطياً في حال طلِبه التطبيق (POST /api/v2/url-upload)
+// 4. مسار رفع الروابط (POST /api/v2/url-upload)
 app.post('/api/v2/url-upload', (req, res) => {
     return res.status(200).json({
         code: 0,
@@ -76,12 +69,12 @@ app.post('/api/v2/url-upload', (req, res) => {
     });
 });
 
-// مسار افتراضي لاختبار عمل السيرفر
+// 5. مسار الصفحة الرئيسية لاختبار السيرفر
 app.get('/', (req, res) => {
-    res.send("DiagZone Custom Server is Running!");
+    res.send("DiagZone Custom Server is Running Successfully!");
 });
 
-// تشغيل السيرفر على البورت المحدد من Render أو 3000 محلياً
+// 6. تشغيل السيرفر على منفذ Render أو 3000 محلياً
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
