@@ -46,17 +46,22 @@ app.all('*', (req, res) => {
         return res.status(200).send(soapXmlResponse);
     }
 
-    // 2. معالجة طلبات الإحصائيات (Statistics)
-    if (req.path.includes('statistics')) {
-        console.log("[STATISTICS] Acknowledged device stats successfully.");
+    // 2. معالجة طلبات التحقق من التفعيل أو الحساب (إرجاع bool: "1" لتأكيد التفعيل)
+    if (req.path.includes('statistics') || req.path.includes('vci') || req.path.includes('check') || req.path.includes('device')) {
+        console.log("[VCI/Check] Confirming device activation as active (bool: 1)...");
         return res.status(200).json({
             code: 0,
             msg: "success",
-            data: true
+            data: {
+                user_id: 10001,
+                bool: "1",
+                status: "1",
+                is_active: "1"
+            }
         });
     }
 
-    // 3. رد تسجيل الدخول وإرجاع بيانات الجهاز والرقم التسلسلي (JSON)
+    // 3. رد تسجيل الدخول الافتراضي (JSON)
     const SERIAL_NUMBER = "979862374489";
     const mockToken = "dz_token_979862374489_session";
 
