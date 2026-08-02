@@ -1,19 +1,17 @@
 const express = require('express');
 const app = express();
 
-// Middleware لمعالجة البيانات القادمة بجميع الصيغ (JSON و URL-encoded)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const BASE_URL = "https://my-diag-server.onrender.com";
 
-// 1. مسار الفحص الرئيسي
+// 1. مسار الفحص
 app.get('/', (req, res) => {
     res.send('Diag Server is active and running!');
 });
 
-// 2. مسار جلب الروابط والإعدادات (GET /api/v2/urls)
-// يُرجع الهيكل الكامل الذي يطلبه التطبيق لمعرفة مسارات الخدمات
+// 2. مسار جلب الروابط المعدل (شامل لجميع المفاتيح التي يتطلبها التطبيق)
 app.get('/api/v2/urls', (req, res) => {
     console.log('[GET /api/v2/urls] Query:', req.query);
 
@@ -21,19 +19,21 @@ app.get('/api/v2/urls', (req, res) => {
         code: 0,
         msg: "success",
         data: {
-            // تقديم مسارات الخدمات كمفاتيح وداخل مصفوفة لتغطية كافة الاحتمالات
-            login: `${BASE_URL}/api/v2/user/login`,
-            action_url: BASE_URL,
-            "publicsoftservice.nt": `${BASE_URL}/api/v2/publicservice`,
+            // المفاتيح المباشرة التي يبحث عنها التطبيق
+            "publicsoftservice.nt": BASE_URL,
+            "login": `${BASE_URL}/api/v2/user/login`,
+            "action_url": BASE_URL,
+            
+            // قائمة الروابط المعرفة داخل مصفوفة
             urls: [
-                { name: "login", url: `${BASE_URL}/api/v2/user/login` },
-                { name: "publicsoftservice.nt", url: `${BASE_URL}/api/v2/publicservice` }
+                { name: "publicsoftservice.nt", url: BASE_URL },
+                { name: "login", url: `${BASE_URL}/api/v2/user/login` }
             ]
         }
     });
 });
 
-// 3. مسار تسجيل الدخول التجريبي (POST /api/v2/user/login)
+// 3. مسار تسجيل الدخول المتوقع
 app.post('/api/v2/user/login', (req, res) => {
     console.log('[POST /api/v2/user/login] Received Body:', req.body);
 
@@ -48,7 +48,7 @@ app.post('/api/v2/user/login', (req, res) => {
     });
 });
 
-// 4. مسار تقارير الأخطاء والـ Log (POST /api/v2/url-upload)
+// 4. مسار استقبال تقارير الأخطاء والرفع
 app.post('/api/v2/url-upload', (req, res) => {
     console.log('[POST /api/v2/url-upload] Body:', req.body);
 
@@ -58,16 +58,6 @@ app.post('/api/v2/url-upload', (req, res) => {
     });
 });
 
-// 5. مسار الخدمات العامة الاحتياطي
-app.post('/api/v2/publicservice', (req, res) => {
-    res.status(200).json({
-        code: 0,
-        msg: "success",
-        data: {}
-    });
-});
-
-// تحديد المنفذ وتشغيل السيرفر
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
