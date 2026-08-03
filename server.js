@@ -5,7 +5,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text({ type: '*/*' }));
 
-// تحديد نوع الرد تلقائياً بناءً على محتوى الطلب
+// تحديد نوع الرد تلقائياً بناءً على محتوى الطلب (XML أو JSON)
 app.use((req, res, next) => {
     let bodyStr = "";
     if (typeof req.body === 'string') {
@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 app.post('/api/v2/login', (req, res) => {
     let reqBodyStr = typeof req.body === 'string' ? req.body : Buffer.isBuffer(req.body) ? req.body.toString() : JSON.stringify(req.body || {});
 
-    // إذا طلب التطبيق المنتجات والتراخيص
+    // إذا طلب التطبيق المنتجات والتراخيص المسجلة
     if (reqBodyStr.includes('getRegisteredProductsForPad46')) {
         const soapXmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
@@ -49,7 +49,7 @@ app.post('/api/v2/login', (req, res) => {
         return res.status(200).send(soapXmlResponse);
     }
 
-    // إذا طلب التطبيق الاستعلام عن البرمجيات العامة (queryLatestPublicSofts)
+    // إذا طلب التطبيق الاستعلام عن البرمجيات العامة لجدول التحديثات (queryLatestPublicSofts)
     if (reqBodyStr.includes('queryLatestPublicSofts')) {
         const soapXmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
@@ -92,6 +92,28 @@ app.post('/api/v2/login', (req, res) => {
                         <versionDetailId>354418</versionDetailId>
                         <versionNo>V1.01.006</versionNo>
                     </x431PadSoft>
+                    <x431PadSoft>
+                        <fileSize>15200100</fileSize>
+                        <lanId>EN</lanId>
+                        <serverCurrentTime>2026-08-03</serverCurrentTime>
+                        <softId>1001</softId>
+                        <softName>DEMO</softName>
+                        <softPackageID>DEMO</softPackageID>
+                        <softUpdateTime>2025-05-01 00:00:00</softUpdateTime>
+                        <versionDetailId>350001</versionDetailId>
+                        <versionNo>V15.86</versionNo>
+                    </x431PadSoft>
+                    <x431PadSoft>
+                        <fileSize>55420100</fileSize>
+                        <lanId>EN</lanId>
+                        <serverCurrentTime>2026-08-03</serverCurrentTime>
+                        <softId>1050</softId>
+                        <softName>TOYOTA</softName>
+                        <softPackageID>TOYOTA</softPackageID>
+                        <softUpdateTime>2025-06-10 00:00:00</softUpdateTime>
+                        <versionDetailId>360100</versionDetailId>
+                        <versionNo>V50.20</versionNo>
+                    </x431PadSoft>
                 </x431PadSoftList>
             </return>
         </ns1:queryLatestPublicSofts>
@@ -119,17 +141,30 @@ app.post('/api/v2/login', (req, res) => {
         return res.status(200).send(soapXmlResponse);
     }
 
-    // إذا طلب التطبيق إصدار الـ CDN
-    if (reqBodyStr.includes('getMaxVersionForMobileAppCDN')) {
+    // إذا طلب التطبيق رابط تحميل ملف مباشر من السيرفر (CDN / Download Url)
+    if (reqBodyStr.includes('getMaxVersionForMobileAppCDN') || reqBodyStr.includes('getDownloadUrl')) {
+        const githubBaseUrl = "https://github.com/USERNAME/REPOSITORY/releases/download/v1.0";
+        let fileUrl = `${githubBaseUrl}/Firmware.zip`;
+
+        if (reqBodyStr.includes('DEMO')) {
+            fileUrl = `${githubBaseUrl}/DEMO.zip`;
+        } else if (reqBodyStr.includes('TOYOTA')) {
+            fileUrl = `${githubBaseUrl}/TOYOTA.zip`;
+        } else if (reqBodyStr.includes('Diagzone_PRO_V2') || reqBodyStr.includes('1015')) {
+            fileUrl = `${githubBaseUrl}/Diagzone_PRO_V2.zip`;
+        } else if (reqBodyStr.includes('AUTOSEARCH')) {
+            fileUrl = `${githubBaseUrl}/AUTOSEARCH.zip`;
+        }
+
         const soapXmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <soap:Body>
         <ns1:getMaxVersionForMobileAppCDNResponse xmlns:ns1="https://diagzone.com">
             <getMaxVersionForMobileAppCDNReturn>
-                <version>2.00.027</version>
-                <url>https://my-diag-server.onrender.com/download/dummy.zip</url>
+                <version>2.00.033</version>
+                <url>${fileUrl}</url>
                 <md5>d41d8cd98f00b204e9800998ecf8427e</md5>
-                <updateContent>Latest stable version</updateContent>
+                <updateContent>Download Ready</updateContent>
             </getMaxVersionForMobileAppCDNReturn>
         </ns1:getMaxVersionForMobileAppCDNResponse>
     </soap:Body>
@@ -137,7 +172,7 @@ app.post('/api/v2/login', (req, res) => {
         return res.status(200).send(soapXmlResponse);
     }
 
-    // الاستجابة الأصلية الكاملة لتسجيل الدخول
+    // الاستجابة الأصلية لتسجيل الدخول
     return res.status(200).json({
         code: 0,
         msg: null,
