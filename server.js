@@ -101,7 +101,7 @@ app.post('/api/v2/login', (req, res) => {
                         <softPackageID>DEMO</softPackageID>
                         <softUpdateTime>2025-05-01 00:00:00</softUpdateTime>
                         <versionDetailId>350001</versionDetailId>
-                        <versionNo>V15.86</versionNo>
+                        <versionNo>V10.66</versionNo>
                     </x431PadSoft>
                     <x431PadSoft>
                         <fileSize>55420100</fileSize>
@@ -132,7 +132,7 @@ app.post('/api/v2/login', (req, res) => {
                 <item>
                     <softCode>DEMO</softCode>
                     <subPackName>Demo Package</subPackName>
-                    <version>15.68</version>
+                    <version>10.66</version>
                 </item>
             </queryPDTDiagSoftSubPackReturn>
         </ns1:queryPDTDiagSoftSubPackResponse>
