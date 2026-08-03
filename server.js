@@ -49,6 +49,57 @@ app.post('/api/v2/login', (req, res) => {
         return res.status(200).send(soapXmlResponse);
     }
 
+    // إذا طلب التطبيق الاستعلام عن البرمجيات العامة (queryLatestPublicSofts)
+    if (reqBodyStr.includes('queryLatestPublicSofts')) {
+        const soapXmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Body>
+        <ns1:queryLatestPublicSofts>
+            <return>
+                <code>0</code>
+                <message>success</message>
+                <x431PadSoftList>
+                    <x431PadSoft>
+                        <fileSize>68365802</fileSize>
+                        <lanId>EN</lanId>
+                        <serverCurrentTime>2026-08-03</serverCurrentTime>
+                        <softId>1015</softId>
+                        <softName>Diagzone PRO V2</softName>
+                        <softPackageID>Diagzone_PRO_V2</softPackageID>
+                        <softUpdateTime>2025-03-08 00:00:00</softUpdateTime>
+                        <versionDetailId>359645</versionDetailId>
+                        <versionNo>V2.00.033</versionNo>
+                    </x431PadSoft>
+                    <x431PadSoft>
+                        <fileSize>393300</fileSize>
+                        <lanId>EN</lanId>
+                        <serverCurrentTime>2026-08-03</serverCurrentTime>
+                        <softId>873</softId>
+                        <softName>Firmware</softName>
+                        <softPackageID>DOWNLOAD</softPackageID>
+                        <softUpdateTime>2023-03-27 00:00:00</softUpdateTime>
+                        <versionDetailId>343730</versionDetailId>
+                        <versionNo>V11.91</versionNo>
+                    </x431PadSoft>
+                    <x431PadSoft>
+                        <fileSize>6166636</fileSize>
+                        <lanId>EN</lanId>
+                        <serverCurrentTime>2026-08-03</serverCurrentTime>
+                        <softId>880</softId>
+                        <softName>VIN Recognition App</softName>
+                        <softPackageID>VIN_RECOGNITION_APP</softPackageID>
+                        <softUpdateTime>2024-05-02 00:00:00</softUpdateTime>
+                        <versionDetailId>354418</versionDetailId>
+                        <versionNo>V1.01.006</versionNo>
+                    </x431PadSoft>
+                </x431PadSoftList>
+            </return>
+        </ns1:queryLatestPublicSofts>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`;
+        return res.status(200).send(soapXmlResponse);
+    }
+
     // إذا طلب التطبيق الحزم الفرعية (queryPDTDiagSoftSubPack)
     if (reqBodyStr.includes('queryPDTDiagSoftSubPack')) {
         const soapXmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
