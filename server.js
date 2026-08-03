@@ -24,7 +24,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// 1. مسار تسجيل الدخول الرئيسي (يقوم بالرد بناءً على محتوى طلب الـ SOAP أو الـ JSON)
+// 1. مسار تسجيل الدخول والطلبات المرتبطة به
 app.post('/api/v2/login', (req, res) => {
     let reqBodyStr = typeof req.body === 'string' ? req.body : Buffer.isBuffer(req.body) ? req.body.toString() : JSON.stringify(req.body || {});
 
@@ -46,6 +46,25 @@ app.post('/api/v2/login', (req, res) => {
         </ns1:getRegisteredProductsForPad46>
     </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`;
+        return res.status(200).send(soapXmlResponse);
+    }
+
+    // إذا طلب التطبيق الحزم الفرعية (queryPDTDiagSoftSubPack)
+    if (reqBodyStr.includes('queryPDTDiagSoftSubPack')) {
+        const soapXmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <soap:Body>
+        <ns1:queryPDTDiagSoftSubPackResponse xmlns:ns1="https://diagzone.com">
+            <queryPDTDiagSoftSubPackReturn>
+                <item>
+                    <softCode>DEMO</softCode>
+                    <subPackName>Demo Package</subPackName>
+                    <version>15.68</version>
+                </item>
+            </queryPDTDiagSoftSubPackReturn>
+        </ns1:queryPDTDiagSoftSubPackResponse>
+    </soap:Body>
+</soap:Envelope>`;
         return res.status(200).send(soapXmlResponse);
     }
 
