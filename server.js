@@ -112,7 +112,7 @@ app.post('/api/v2/login', (req, res) => {
                         <softPackageID>TOYOTA</softPackageID>
                         <softUpdateTime>2025-06-10 00:00:00</softUpdateTime>
                         <versionDetailId>360100</versionDetailId>
-                        <versionNo>V50.20</versionNo>
+                        <versionNo>V10.62</versionNo>
                     </x431PadSoft>
                 </x431PadSoftList>
             </return>
