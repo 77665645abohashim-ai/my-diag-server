@@ -33,13 +33,11 @@ app.use((req, res, next) => {
 app.post('/api/v2/login', (req, res) => {
     const reqBodyStr = req.rawBodyStr || '';
     
-    // استخراج السيريال والتوكن بأمان من الـ Body سواء كان Object أو Text
+    // استخراج السيريال بأمان من الـ Body
     let serialNoParam = "979862374489";
-    let tokenParam = "TzUxQ1FtejQvYmNqZEt4OGRsMUlxZz09";
 
     if (typeof req.body === 'object' && req.body !== null) {
         serialNoParam = req.body.serialNo || req.body['cc-serialNo'] || serialNoParam;
-        tokenParam = req.body.token || tokenParam;
     }
 
     // أ: إذا كان الطلب استعلام SOAP عن المنتجات والتراخيص
@@ -116,62 +114,33 @@ app.post('/api/v2/login', (req, res) => {
         return res.status(200).send(soapXmlResponse);
     }
 
-    // ج: الاستجابة القياسية لـ JSON لتفعيل الحساب
+    // ج: الاستجابة القياسية لـ JSON (مطابقة 100% للسيرفر الأصلي)
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
 
     return res.status(200).json({
         code: 0,
-        msg: null,
-        data: {
-            xmpp: {
-                ip: "jabber.diagzone.com",
-                port: 5222,
-                domain: "diagzone.com"
-            },
-            token: tokenParam,
-            user: {
-                user_id: "H21J4WOO",
-                sex: "1",
-                user_name: serialNoParam,
-                nick_name: serialNoParam,
-                mobile: "",
-                is_bind_mobile: "0",
-                email: "mistery4_ever@mail.ru",
-                is_bind_email: "0",
-                signature: "",
-                set_face_time: "0",
-                roles: "1",
-                reg_zone: "1",
-                reg_source: "0",
-                is_agree_clause: "0",
-                pub_id: "",
-                face_url: null,
-                is_365: true,
-                tech_status: "1",
-                country: "IT",
-                province: null,
-                city: null,
-                nation_id: "237"
-            },
-            config: null
-        }
+        message: "OK"
     });
 });
 
 // ==========================================
-// 2. مسار فحص وتنشيط الوصلة (Device Verification Handshake)
+// 2. مسارات التقارير وفحص الوصلة (Handshake & State Reports)
 // ==========================================
-app.post(['/api/v2/check', '/api/v2/diagnostic', '/api/v2/handshake'], (req, res) => {
-    const encryptedPayload = "AgAAAAAACAAEAAAAEAAGAAMAcQAAAARsWT1D357sEZgy9KR/cczvOBURWFP+bBGYMvSkf3HM7zgVEVhT";
-
+app.post([
+    '/api/v2/check', 
+    '/api/v2/diagnostic', 
+    '/api/v2/handshake', 
+    '/api/v2/td-report-state'
+], (req, res) => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
 
     return res.status(200).json({
         code: 0,
-        message: "OK",
-        data: encryptedPayload
+        message: "OK"
     });
 });
 
@@ -180,10 +149,10 @@ app.post(['/api/v2/check', '/api/v2/diagnostic', '/api/v2/handshake'], (req, res
 // ==========================================
 app.use((req, res) => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     return res.status(200).json({
         code: 0,
-        message: "OK",
-        data: null
+        message: "OK"
     });
 });
 
