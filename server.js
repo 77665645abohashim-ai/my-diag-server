@@ -1,65 +1,38 @@
 const express = require('express');
+const cors = require('cors');
+
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.text({ type: '*/*' }));
+// ==========================================
+// Middleware لمعالجة البيانات وتجهيز النص الخام
+// ==========================================
+app.use(cors());
 
-// Middleware لمعالجة النصوص ونوع المحتوى
+// حفظ النص الخام للطلب لمعالجة استعلامات الـ SOAP والروابط
+app.use(express.text({ type: '*/*', limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
+
 app.use((req, res, next) => {
-    let bodyStr = "";
     if (typeof req.body === 'string') {
-        bodyStr = req.body;
-    } else if (Buffer.isBuffer(req.body)) {
-        bodyStr = req.body.toString();
+        req.rawBodyStr = req.body;
     } else {
-        bodyStr = JSON.stringify(req.body || {});
+        req.rawBodyStr = JSON.stringify(req.body || {});
     }
-    req.rawBodyStr = bodyStr;
     next();
 });
 
 // ==========================================
-// 1. مسار الفحص والتنشيط (/api/v2/check)
-// ==========================================
-app.post('/api/v2/check', (req, res) => {
-    const encryptedPayload = "AgAAAAAACAAEAAAAEAAGAAMAcQAAAARsWT1D357sEZgy9KR/cczvOBURWFP+bBGYMvSkf3HM7zgVEVhT";
-
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-
-    return res.status(200).json({
-        code: 0,
-        message: "OK",
-        data: encryptedPayload
-    });
-});
-
-// ==========================================
-// 2. مسارات التشخيص والـ Handshake المشفرة
-// ==========================================
-app.post(['/api/v2/diagnostic', '/api/v2/handshake'], (req, res) => {
-    const encryptedPayload = "AgAAAAAACAAEAAAAEAAGAAMAcQAAAARsWT1D357sEZgy9KR/cczvOBURWFP+bBGYMvSkf3HM7zgVEVhT";
-
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-
-    return res.status(200).json({
-        code: 0,
-        message: "OK",
-        data: encryptedPayload
-    });
-});
-
-// ==========================================
-// 3. مسار تسجيل الدخول والطلبات المرافقة (/api/v2/login)
+// 1. مسار تسجيل الدخول والتحقق الرئيسي (/api/v2/login)
 // ==========================================
 app.post('/api/v2/login', (req, res) => {
-    const reqBodyStr = req.rawBodyStr;
-    const serialNoParam = req.body.serialNo || "979862374489";
+    const reqBodyStr = req.rawBodyStr || '';
+    
+    // استخراج رقم السيريال من الطلب سواء جاء كـ serialNo أو cc-serialNo
+    const serialNoParam = req.body.serialNo || req.body['cc-serialNo'] || "979862374489";
 
-    // أ) إذا كان الطلب استعلام XML / SOAP عن المنتجات والتراخيص
+    // أ: إذا كان الطلب استعلام SOAP عن المنتجات والتراخيص
     if (reqBodyStr.includes('getRegisteredProductsForPad46')) {
         res.setHeader('Content-Type', 'text/xml; charset=utf-8');
         const soapXmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
@@ -81,7 +54,7 @@ app.post('/api/v2/login', (req, res) => {
         return res.status(200).send(soapXmlResponse);
     }
 
-    // ب) إذا كان الطلب استعلام SOAP عن تحديثات البرمجيات
+    // ب: إذا كان الطلب استعلام SOAP عن التحديثات وحزم البرامج
     if (reqBodyStr.includes('queryLatestPublicSofts')) {
         res.setHeader('Content-Type', 'text/xml; charset=utf-8');
         const soapXmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
@@ -133,18 +106,10 @@ app.post('/api/v2/login', (req, res) => {
         return res.status(200).send(soapXmlResponse);
     }
 
-    // ج) إذا كان الطلب يتضمن فحص الجلسة المباشر كـ Encrypted Payload داخل login
-    if (reqBodyStr.includes('action=check') || reqBodyStr.includes('verify')) {
-        res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        return res.status(200).json({
-            code: 0,
-            message: "OK",
-            data: "AgAAAAAACAAEAAAAEAAGAAMAcQAAAARsWT1D357sEZgy9KR/cczvOBURWFP+bBGYMvSkf3HM7zgVEVhT"
-        });
-    }
-
-    // د) الرد المباشر ببيانات الحساب والـ Token
+    // ج: الاستجابة القياسية لـ JSON لتفعيل الحساب والوصلة
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+
     return res.status(200).json({
         code: 0,
         msg: null,
@@ -172,8 +137,8 @@ app.post('/api/v2/login', (req, res) => {
                 is_agree_clause: "0",
                 pub_id: "",
                 face_url: null,
-                is_365: false,
-                tech_status: "-1",
+                is_365: true,      // تم التفعيل إلى true
+                tech_status: "1",  // تم التفعيل إلى "1"
                 country: "IT",
                 province: null,
                 city: null,
@@ -185,21 +150,34 @@ app.post('/api/v2/login', (req, res) => {
 });
 
 // ==========================================
-// 4. بقية مسارات الخدمات
+// 2. مسار فحص وتنشيط الوصلة (Device Verification Handshake)
 // ==========================================
-app.post('/api/v2/product-service', (req, res) => {
-    res.setHeader('Content-Type', 'text/xml; charset=utf-8');
-    return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><return><code>0</code></return></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
-});
+app.post(['/api/v2/check', '/api/v2/diagnostic', '/api/v2/handshake'], (req, res) => {
+    const encryptedPayload = "AgAAAAAACAAEAAAAEAAGAAMAcQAAAARsWT1D357sEZgy9KR/cczvOBURWFP+bBGYMvSkf3HM7zgVEVhT";
 
-app.post(['/api/v2/statistics', '/api/v2/url-upload'], (req, res) => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    return res.status(200).json({ code: 0, msg: null, data: { user_id: 0, bool: "0", status: "1" } });
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+
+    return res.status(200).json({
+        code: 0,
+        message: "OK",
+        data: encryptedPayload
+    });
 });
 
-app.get('/', (req, res) => {
-    res.send("DiagZone Server is Running!");
+// ==========================================
+// 3. المسار الافتراضي لمعالجة باقي طلبات التطبيق
+// ==========================================
+app.use((req, res) => {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    return res.status(200).json({
+        code: 0,
+        message: "OK",
+        data: null
+    });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// تشغيل السيرفر
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
