@@ -5,6 +5,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ==========================================
+// البيانات المشفرة (Payload) القادمة من السيرفر
+// ==========================================
+// استبدل النص أدناه بنص الـ Base64 الكامل الخاص بك
+const ENCRYPTED_DATA_PAYLOAD = "c3O84FRFYU/5sEZgy9KR/f..."; 
+
+// ==========================================
 // Middleware لمعالجة البيانات بشكل صحيح
 // ==========================================
 app.use(cors());
@@ -114,13 +120,14 @@ app.post('/api/v2/login', (req, res) => {
         return res.status(200).send(soapXmlResponse);
     }
 
-    // ج: الاستجابة القياسية لـ JSON (مطابقة 100% للسيرفر الأصلي)
+    // ج: الاستجابة القياسية لـ JSON
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     res.setHeader('Pragma', 'no-cache');
 
     return res.status(200).json({
         code: 0,
+        data: ENCRYPTED_DATA_PAYLOAD,
         message: "OK"
     });
 });
@@ -138,8 +145,10 @@ app.post([
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     res.setHeader('Pragma', 'no-cache');
 
+    // تزويد الرد بحقل data لتمرير التفعيل أو بيانات الفحص للتطبيق
     return res.status(200).json({
         code: 0,
+        data: ENCRYPTED_DATA_PAYLOAD,
         message: "OK"
     });
 });
@@ -152,6 +161,7 @@ app.use((req, res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     return res.status(200).json({
         code: 0,
+        data: ENCRYPTED_DATA_PAYLOAD,
         message: "OK"
     });
 });
