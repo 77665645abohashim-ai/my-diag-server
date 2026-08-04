@@ -114,6 +114,17 @@ app.post('/api/v2/login', (req, res) => {
                         <versionDetailId>343730</versionDetailId>
                         <versionNo>V11.91</versionNo>
                     </x431PadSoft>
+                    <x431PadSoft>
+                        <fileSize>15200100</fileSize>
+                        <lanId>EN</lanId>
+                        <serverCurrentTime>2026-08-04</serverCurrentTime>
+                        <softId>1001</softId>
+                        <softName>DEMO</softName>
+                        <softPackageID>DEMO</softPackageID>
+                        <softUpdateTime>2025-05-01 00:00:00</softUpdateTime>
+                        <versionDetailId>350001</versionDetailId>
+                        <versionNo>V10.66</versionNo>
+                    </x431PadSoft>
                 </x431PadSoftList>
             </return>
         </ns1:queryLatestPublicSofts>
@@ -132,7 +143,7 @@ app.post('/api/v2/login', (req, res) => {
         });
     }
 
-    // د) الرد المباشر ببيانات الحساب والـ Token (الرد الحالي الخاص بك)
+    // د) الرد المباشر ببيانات الحساب والـ Token
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     return res.status(200).json({
         code: 0,
