@@ -5,20 +5,24 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ==========================================
-// Middleware لمعالجة البيانات وتجهيز النص الخام
+// Middleware لمعالجة البيانات بشكل صحيح
 // ==========================================
 app.use(cors());
 
-// حفظ النص الخام للطلب لمعالجة استعلامات الـ SOAP والروابط
-app.use(express.text({ type: '*/*', limit: '50mb' }));
+// معالجة النصوص الخام لطلبات SOAP أولاً بدون كسر طلبات الـ JSON والـ Form
+app.use(express.text({ type: 'text/xml', limit: '50mb' }));
+app.use(express.text({ type: 'application/soap+xml', limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 
+// حارس لتأمين وجود النص الخام وحفظه
 app.use((req, res, next) => {
     if (typeof req.body === 'string') {
         req.rawBodyStr = req.body;
+    } else if (req.body && typeof req.body === 'object') {
+        req.rawBodyStr = JSON.stringify(req.body);
     } else {
-        req.rawBodyStr = JSON.stringify(req.body || {});
+        req.rawBodyStr = '';
     }
     next();
 });
@@ -29,8 +33,14 @@ app.use((req, res, next) => {
 app.post('/api/v2/login', (req, res) => {
     const reqBodyStr = req.rawBodyStr || '';
     
-    // استخراج رقم السيريال من الطلب سواء جاء كـ serialNo أو cc-serialNo
-    const serialNoParam = req.body.serialNo || req.body['cc-serialNo'] || "979862374489";
+    // استخراج السيريال والتوكن بأمان من الـ Body سواء كان Object أو Text
+    let serialNoParam = "979862374489";
+    let tokenParam = "TzUxQ1FtejQvYmNqZEt4OGRsMUlxZz09";
+
+    if (typeof req.body === 'object' && req.body !== null) {
+        serialNoParam = req.body.serialNo || req.body['cc-serialNo'] || serialNoParam;
+        tokenParam = req.body.token || tokenParam;
+    }
 
     // أ: إذا كان الطلب استعلام SOAP عن المنتجات والتراخيص
     if (reqBodyStr.includes('getRegisteredProductsForPad46')) {
@@ -106,7 +116,7 @@ app.post('/api/v2/login', (req, res) => {
         return res.status(200).send(soapXmlResponse);
     }
 
-    // ج: الاستجابة القياسية لـ JSON لتفعيل الحساب والوصلة
+    // ج: الاستجابة القياسية لـ JSON لتفعيل الحساب
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
 
@@ -119,7 +129,7 @@ app.post('/api/v2/login', (req, res) => {
                 port: 5222,
                 domain: "diagzone.com"
             },
-            token: req.body.token || "TzUxQ1FtejQvYmNqZEt4OGRsMUlxZz09",
+            token: tokenParam,
             user: {
                 user_id: "H21J4WOO",
                 sex: "1",
@@ -137,8 +147,8 @@ app.post('/api/v2/login', (req, res) => {
                 is_agree_clause: "0",
                 pub_id: "",
                 face_url: null,
-                is_365: true,      // تم التفعيل إلى true
-                tech_status: "1",  // تم التفعيل إلى "1"
+                is_365: true,
+                tech_status: "1",
                 country: "IT",
                 province: null,
                 city: null,
