@@ -5,7 +5,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text({ type: '*/*' }));
 
-// تحديد نوع الرد تلقائياً بناءً على محتوى الطلب (XML أو JSON)
+// 0. تحديد نوع الرد تلقائياً بناءً على محتوى الطلب (XML أو JSON)
 app.use((req, res, next) => {
     let bodyStr = "";
     if (typeof req.body === 'string') {
@@ -22,6 +22,40 @@ app.use((req, res, next) => {
         res.setHeader('Content-Type', 'application/json; charset=utf-8');
     }
     next();
+});
+
+// ==========================================
+// مسار التنشيط والتحقق من الوصلة والجلسة (Check Endpoint)
+// ==========================================
+app.post('/api/v2/check', (req, res) => {
+    const encryptedPayload = "AgAAAAAACAAEAAAAEAAGAAMAcQAAAARsWT1D357sEZgy9KR/cczvOBURWFP+bBGYMvSkf3HM7zgVEVhT";
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+
+    return res.status(200).json({
+        code: 0,
+        message: "OK",
+        data: encryptedPayload
+    });
+});
+
+// ==========================================
+// مسار طلبات التشخيص المشفرة (Diagnostic / Handshake)
+// ==========================================
+app.post(['/api/v2/diagnostic', '/api/v2/handshake'], (req, res) => {
+    const encryptedPayload = "AgAAAAAACAAEAAAAEAAGAAMAcQAAAARsWT1D357sEZgy9KR/cczvOBURWFP+bBGYMvSkf3HM7zgVEVhT";
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+
+    return res.status(200).json({
+        code: 0,
+        message: "OK",
+        data: encryptedPayload
+    });
 });
 
 // 1. مسار تسجيل الدخول والطلبات المرتبطة به
