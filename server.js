@@ -8,7 +8,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text({ type: '*/*' }));
 
-// 1. الاستجابة الرسمية بالمسارات
+// منع الكاش نهائياً
+app.use((req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    next();
+});
+
+// 1. خريطة المسارات الكاملة (Routing Table)
 const fullRoutingResponse = {
     "code": 0,
     "msg": "success",
@@ -115,10 +124,8 @@ const fullRoutingResponse = {
     }
 };
 
-// 2. معالجة مسار تسجيل الدخول تحديداً
-{
-    console.log('[API] Login request received');
-
+// 2. استجابة تسجيل الدخول الدقيقة والمطابقة لـ Diagzone
+app.all('/api/v2/login', (req, res) => {
     res.json({
         "code": 0,
         "msg": null,
@@ -158,12 +165,13 @@ const fullRoutingResponse = {
     });
 });
 
-// 3. أي طلب آخر يصله السيرفر، يرجع له خريطة الـ urls كاملة!
+// 3. مسار الصفحة الرئيسية وقائمة الإعدادات
+app.all('/', (req, res) => res.json(fullRoutingResponse));
+app.all('/api/v2/config', (req, res) => res.json(fullRoutingResponse));
+
+// 4. أي طلب آخر يرجع نجاح لمنع التوقف
 app.all('*', (req, res) => {
-    console.log(`[REQUEST RECEIVED] Path: ${req.path}`);
-    res.json(fullRoutingResponse);
+    res.json({ "code": 0, "msg": "success", "data": [] });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server ready on port ${PORT}`));
