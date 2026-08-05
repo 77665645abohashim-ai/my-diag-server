@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.text({ type: '*/*' }));
 
 // 1. تقديم خريطة التوجيه الديناميكية عند طلب الجذر أو طلب الإعدادات
-app.all('/', (req, res, next) => {
+app.all('api/v2/urls?config_no=0&app_id=3/', (req, res, next) => {
     // إرجاع قائمة الروابط الشاملة للتطبيق
     return res.json({
         "code": 0,
