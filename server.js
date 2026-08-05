@@ -167,7 +167,7 @@ app.all('/api/v2/login', (req, res) => {
     });
 });
 
-// 4. مسار استلام السجلات والأخطاء (Upload Logging) - بصيغة JSON
+// 4. مسار استلام السجلات والأخطاء (Upload Logging)
 app.all(['/api/v2/url-upload', '/api/v2/log-service-upload'], (req, res) => {
     console.log('[API] Log/URL Upload Accepted');
     res.json({
@@ -176,7 +176,7 @@ app.all(['/api/v2/url-upload', '/api/v2/log-service-upload'], (req, res) => {
     });
 });
 
-// 5. مسار خدمات المنتجات (Product Service) - بصيغة SOAP XML الدقيقة
+// 5. مسار خدمات المنتجات (Product Service) - SOAP XML
 app.all('/api/v2/product-service', (req, res) => {
     console.log('[API] SOAP Product Service Request Received');
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
@@ -184,11 +184,19 @@ app.all('/api/v2/product-service', (req, res) => {
     res.status(200).send(soapResponse);
 });
 
-// 6. مسارات الـ Config والتوجيه الرئيسي
+// 6. مسار خدمات برامج التشخيص (diagsoftservice) - SOAP XML
+app.all('/api/v2/diagsoftservice', (req, res) => {
+    console.log('[API] SOAP DiagSoft Service Request Received');
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+    res.status(200).send(soapResponse);
+});
+
+// 7. مسارات الـ Config والتوجيه الرئيسي
 app.all('/', (req, res) => res.json(fullRoutingResponse));
 app.all('/api/v2/config', (req, res) => res.json(fullRoutingResponse));
 
-// 7. أي مسار آخر يرجع success بدلاً من مصفوفة فارغة لمنع الـ Stack Trace
+// 8. المعالج العام لأي مسار آخر
 app.all('*', (req, res) => {
     console.log(`[REQUEST RECEIVED] Path: ${req.path}`);
     res.json({
