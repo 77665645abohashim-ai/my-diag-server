@@ -1,82 +1,40 @@
 const express = require('express');
-const { createProxyMiddleware, responseInterceptor } = require('http-proxy-middleware');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
-// استخدام المنفذ المخصص من منصة Render تلقائياً
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 
-// النطاق الأصلي المراد التوجيه إليه
+// السيرفر الأصلي المستهدف
 const TARGET_SERVER = 'https://diagboss.ch';
 
-// ==========================================
-// إعداد السيرفر الوسيط (Proxy Middleware)
-// ==========================================
+// طباعة كل طلب يصل إلى Render لمعاينته في شاشة الـ Logs
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] Incoming Request: ${req.method} ${req.url}`);
+    next();
+});
+
+// توجيه كافة الطلبات (بما فيها /api/v2/login)
 app.use('/', createProxyMiddleware({
     target: TARGET_SERVER,
     changeOrigin: true,
-    secure: false, // تجاوز مشاكل شهادات SSL
-    selfHandleResponse: true, // يتيح اعتراض الاستجابة وتعديلها
-
+    secure: true,
     on: {
-        // اعتراض وتعديل الاستجابة القادمة من السيرفر الأصلي
-        proxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
-            const requestPath = req.path;
-
-            // 1. اعتراض طلبات تسجيل الدخول والتحقق (/login)
-            if (requestPath.includes('/login')) {
-                const responseString = responseBuffer.toString('utf8');
-
-                try {
-                    let json = JSON.parse(responseString);
-
-                    // تفعيل اشتراك المستخدم وحساب التقني
-                    if (json && json.data && json.data.user) {
-                        json.data.user.is_365 = true;     
-                        json.data.user.tech_status = "1"; 
-                    }
-
-                    return JSON.stringify(json);
-                } catch (err) {
-                    return responseBuffer;
-                }
-            }
-
-            // 2. اعتراض طلبات الفحص والـ Handshake لتمرير الـ Payload
-            if (requestPath.includes('/check') || requestPath.includes('/handshake')) {
-                const responseString = responseBuffer.toString('utf8');
-
-                try {
-                    let json = JSON.parse(responseString);
-                    
-                    // إذا أرجع السيرفر الأصلي كود خطأ، يتم تجهيز payload التفعيل
-                    if (!json.data || json.code !== 0) {
-                        json.code = 0;
-                        json.message = "OK";
-                        json.data = "AgAAAAAACAAEAAAAEAAGAAMAcQAAAARsWT1D357sEZgy9KR/cczvOBURWFP+bBGYMvSkf3HM7zgVEVhT";
-                    }
-
-                    return JSON.stringify(json);
-                } catch (err) {
-                    return responseBuffer;
-                }
-            }
-
-            // 3. باقي الطلبات تمر كما هي من السيرفر الأصلي
-            return responseBuffer;
-        }),
         proxyReq: (proxyReq, req, res) => {
-            // ضبط الهيدرات لتطابق السيرفر الأصلي
+            // ضبط الهيدرات ليتعرف عليها السيرفر الأصلي
             proxyReq.setHeader('Host', 'diagboss.ch');
             proxyReq.setHeader('Origin', TARGET_SERVER);
+            console.log(`[PROXY] Forwarding ${req.method} request to: ${TARGET_SERVER}${req.url}`);
+        },
+        proxyRes: (proxyRes, req, res) => {
+            console.log(`[PROXY] Received response from ${TARGET_SERVER} with Status: ${proxyRes.statusCode}`);
         },
         error: (err, req, res) => {
-            console.error('Proxy Error:', err.message);
-            res.status(500).json({ code: -1, message: "Proxy Connection Error" });
+            console.error('[PROXY ERROR]:', err.message);
+            res.status(502).json({ error: "Bad Gateway - Proxy error connecting to target" });
         }
     }
 }));
 
-// تشغيل السيرفر
 app.listen(PORT, () => {
-    console.log(`Proxy Server active and forwarding to ${TARGET_SERVER} on port ${PORT}`);
+    console.log(`Proxy server listening on port ${PORT}`);
 });
