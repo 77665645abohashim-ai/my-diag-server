@@ -2,14 +2,13 @@ const express = require('express');
 const app = express();
 
 const PORT = process.env.PORT || 10000;
-// استبدل هذا العنوان برابط سيرفرك الحقيقي على Render
 const MY_DOMAIN = 'https://my-diag-server.onrender.com';
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text({ type: '*/*' }));
 
-// 1. القائمة الكاملة الخاصة بالتوجيه Dynamic Route Map
+// 1. الاستجابة الرسمية بالمسارات
 const fullRoutingResponse = {
     "code": 0,
     "msg": "success",
@@ -116,20 +115,18 @@ const fullRoutingResponse = {
     }
 };
 
-// 2. توجيه الصفحة الرئيسية وقائمة الإعدادات لإرجاع الخريطة كاملة
-app.all('/', (req, res) => res.json(fullRoutingResponse));
-app.all('/api/v2/config', (req, res) => res.json(fullRoutingResponse));
-
-// 3. نقاط نهاية محددة كأمثلة
+// 2. معالجة مسار تسجيل الدخول تحديداً
 app.all('/api/v2/login', (req, res) => {
-    res.json({ code: 0, msg: "success", data: { token: "mock_token_123" } });
+    console.log('[API] Login request');
+    res.json({ code: 0, msg: "success", data: { token: "token_12345" } });
 });
 
-// 4. معالج شامل للخدمات المتبقية منعاً لأخطاء 404
+// 3. أي طلب آخر يصله السيرفر، يرجع له خريطة الـ urls كاملة!
 app.all('*', (req, res) => {
-    res.json({ code: 0, msg: "success", data: [] });
+    console.log(`[REQUEST RECEIVED] Path: ${req.path}`);
+    res.json(fullRoutingResponse);
 });
 
 app.listen(PORT, () => {
-    console.log(`Diagnostic server is running on port ${PORT}`);
+    console.log(`Server listening on port ${PORT}`);
 });
