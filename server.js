@@ -116,9 +116,46 @@ const fullRoutingResponse = {
 };
 
 // 2. معالجة مسار تسجيل الدخول تحديداً
-app.all('/api/v2/login', (req, res) => {
-    console.log('[API] Login request');
-    res.json({ code: 0, msg: "success", data: { token: "token_12345" } });
+{
+    console.log('[API] Login request received');
+
+    res.json({
+        "code": 0,
+        "msg": null,
+        "data": {
+            "xmpp": {
+                "ip": "jabber.diagzone.com",
+                "port": 5222,
+                "domain": "diagzone.com"
+            },
+            "token": "YmxrVCtaaEVJNWUrWWhhcVY5VHIvdz09",
+            "user": {
+                "user_id": "H21J4WOO",
+                "sex": "1",
+                "user_name": "979862374489",
+                "nick_name": "979862374489",
+                "mobile": "",
+                "is_bind_mobile": "0",
+                "email": "mistery4_ever@mail.ru",
+                "is_bind_email": "0",
+                "signature": "",
+                "set_face_time": "0",
+                "roles": "1",
+                "reg_zone": "1",
+                "reg_source": "0",
+                "is_agree_clause": "0",
+                "pub_id": "",
+                "face_url": null,
+                "is_365": false,
+                "tech_status": "-1",
+                "country": "IT",
+                "province": null,
+                "city": null,
+                "nation_id": "237"
+            },
+            "config": null
+        }
+    });
 });
 
 // 3. أي طلب آخر يصله السيرفر، يرجع له خريطة الـ urls كاملة!
