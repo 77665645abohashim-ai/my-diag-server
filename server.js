@@ -4,11 +4,12 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 const MY_DOMAIN = 'https://my-diag-server.onrender.com';
 
+// إعدادات قراءة البيانات القادمة من التطبيق
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text({ type: '*/*' }));
 
-// منع الكاش نهائياً
+// 1. منع التخزين المؤقت (Cache) نهائياً لمنع ردود Cloudflare القديمة
 app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -17,7 +18,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// 1. خريطة المسارات الكاملة (Routing Table)
+// 2. خريطة توجيه المسارات الكاملة (Full Routing Table)
 const fullRoutingResponse = {
     "code": 0,
     "msg": "success",
@@ -124,8 +125,9 @@ const fullRoutingResponse = {
     }
 };
 
-// 2. استجابة تسجيل الدخول الدقيقة والمطابقة لـ Diagzone
+// 3. مسار تسجيل الدخول (مطابق للسيرفر الأصلي)
 app.all('/api/v2/login', (req, res) => {
+    console.log('[API] Login Request Received');
     res.json({
         "code": 0,
         "msg": null,
@@ -165,13 +167,29 @@ app.all('/api/v2/login', (req, res) => {
     });
 });
 
-// 3. مسار الصفحة الرئيسية وقائمة الإعدادات
+// 4. مسار استلام السجلات والأخطاء (Upload Logging)
+app.all(['/api/v2/url-upload', '/api/v2/log-service-upload'], (req, res) => {
+    console.log('[API] Log/URL Upload Accepted');
+    res.json({
+        "code": 0,
+        "message": "OK"
+    });
+});
+
+// 5. مسارات الـ Config والتوجيه الرئيسي
 app.all('/', (req, res) => res.json(fullRoutingResponse));
 app.all('/api/v2/config', (req, res) => res.json(fullRoutingResponse));
 
-// 4. أي طلب آخر يرجع نجاح لمنع التوقف
+// 6. أي مسار آخر يرجع success بدلاً من مصفوفة فارغة لمنع الـ Stack Trace
 app.all('*', (req, res) => {
-    res.json({ "code": 0, "msg": "success", "data": [] });
+    console.log(`[REQUEST RECEIVED] Path: ${req.path}`);
+    res.json({
+        "code": 0,
+        "msg": "success",
+        "data": {}
+    });
 });
 
-app.listen(PORT, () => console.log(`Server ready on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+});
