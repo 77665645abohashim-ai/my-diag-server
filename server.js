@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text({ type: '*/*' }));
 
-// 1. منع التخزين المؤقت (Cache) نهائياً لمنع ردود Cloudflare القديمة
+// 1. منع التخزين المؤقت (Cache) نهائياً
 app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -125,7 +125,7 @@ const fullRoutingResponse = {
     }
 };
 
-// 3. مسار تسجيل الدخول (مطابق للسيرفر الأصلي)
+// 3. مسار تسجيل الدخول
 app.all('/api/v2/login', (req, res) => {
     console.log('[API] Login Request Received');
     res.json({
@@ -167,7 +167,7 @@ app.all('/api/v2/login', (req, res) => {
     });
 });
 
-// 4. مسار استلام السجلات والأخطاء (Upload Logging)
+// 4. مسار استلام السجلات والأخطاء (Upload Logging) - بصيغة JSON
 app.all(['/api/v2/url-upload', '/api/v2/log-service-upload'], (req, res) => {
     console.log('[API] Log/URL Upload Accepted');
     res.json({
@@ -176,11 +176,19 @@ app.all(['/api/v2/url-upload', '/api/v2/log-service-upload'], (req, res) => {
     });
 });
 
-// 5. مسارات الـ Config والتوجيه الرئيسي
+// 5. مسار خدمات المنتجات (Product Service) - بصيغة SOAP XML الدقيقة
+app.all('/api/v2/product-service', (req, res) => {
+    console.log('[API] SOAP Product Service Request Received');
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getRegisteredProductsForPad46><return><code>0</code><productDTOs><carLicenseTag></carLicenseTag><serialNo>979862374489</serialNo><dzKey>qOLwvILVmrmkZVZ18kfqZPuWsNnia+eC/lTWfpSLibS1esVL6NJETa7a7Yjddowo8iWr3t/IV1vTbZBYKl4ZvuEptvGX4kfx3r+bNVNKVVPVe4Z4sZpKVKRsSWHpp9VKzYogHyd2ecwFGuFiEAtRN40rR9VkrhQGhUV5nLh9x5rQfZQeGK68OsJ+VvkMN0ty</dzKey><pdtCategory>2</pdtCategory></productDTOs></return></ns1:getRegisteredProductsForPad46></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+    res.status(200).send(soapResponse);
+});
+
+// 6. مسارات الـ Config والتوجيه الرئيسي
 app.all('/', (req, res) => res.json(fullRoutingResponse));
 app.all('/api/v2/config', (req, res) => res.json(fullRoutingResponse));
 
-// 6. أي مسار آخر يرجع success بدلاً من مصفوفة فارغة لمنع الـ Stack Trace
+// 7. أي مسار آخر يرجع success بدلاً من مصفوفة فارغة لمنع الـ Stack Trace
 app.all('*', (req, res) => {
     console.log(`[REQUEST RECEIVED] Path: ${req.path}`);
     res.json({
