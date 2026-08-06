@@ -17,14 +17,14 @@ app.use('/files', express.static(path.join(__dirname, 'public/files')));
 
 const MY_SERVER_URL = process.env.SERVER_URL || "https://my-diag-server.onrender.com";
 
-// طباعة الطلبات الواردة في الـ Console للتبع
+// طباعة الطلبات الواردة في الـ Console للمتابعة
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} -> ${req.url}`);
     next();
 });
 
 // ----------------------------------------------------
-// 2. مسار البرامج العامة المدمج مع الماركات (x431PadSoft)
+// 2. مسار البرامج والماركات المدمج المصحح (queryLatestPublicSofts)
 // ----------------------------------------------------
 app.all([
     '/api/v2/publicsoftservice-nt', 
@@ -34,7 +34,7 @@ app.all([
 ], (req, res) => {
     res.setHeader('Content-Type', 'text/xml; charset=utf-8');
 
-    console.log("✅ [PUBLICSOFT REQUEST]: Serving Firmware & Brands in x431PadSoft structure");
+    console.log("✅ [PUBLICSOFT REQUEST]: Serving Firmware & Brands with softType tags");
 
     const xmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
@@ -44,19 +44,7 @@ app.all([
                 <code>0</code>
                 <message>success</message>
                 <x431PadSoftList>
-                    <!-- التطبيقات والتحديثات الأساسية -->
-                    <x431PadSoft>
-                        <softId>1015</softId>
-                        <softName>Diagzone PRO V2</softName>
-                        <softPackageID>Diagzone_PRO_V2</softPackageID>
-                        <versionNo>V2.00.033</versionNo>
-                        <versionDetailId>359645</versionDetailId>
-                        <fileSize>68365802</fileSize>
-                        <lanId>EN</lanId>
-                        <serverCurrentTime>2026-08-06</serverCurrentTime>
-                        <softUpdateTime>2025-03-08 00:00:00</softUpdateTime>
-                        <url>${MY_SERVER_URL}/files/DiagPro_V2.apk</url>
-                    </x431PadSoft>
+                    <!-- 1. Firmware -->
                     <x431PadSoft>
                         <softId>873</softId>
                         <softName>Firmware</softName>
@@ -64,25 +52,44 @@ app.all([
                         <versionNo>V11.91</versionNo>
                         <versionDetailId>343730</versionDetailId>
                         <fileSize>393300</fileSize>
+                        <softType>0</softType>
                         <lanId>EN</lanId>
                         <serverCurrentTime>2026-08-06</serverCurrentTime>
                         <softUpdateTime>2023-03-27 00:00:00</softUpdateTime>
                         <url>${MY_SERVER_URL}/files/Firmware_V11.91.zip</url>
                     </x431PadSoft>
 
-                    <!-- الماركات مضافة بنظام x431PadSoft -->
+                    <!-- 2. Diagzone App -->
+                    <x431PadSoft>
+                        <softId>1015</softId>
+                        <softName>Diagzone PRO V2</softName>
+                        <softPackageID>Diagzone_PRO_V2</softPackageID>
+                        <versionNo>V2.00.033</versionNo>
+                        <versionDetailId>359645</versionDetailId>
+                        <fileSize>68365802</fileSize>
+                        <softType>0</softType>
+                        <lanId>EN</lanId>
+                        <serverCurrentTime>2026-08-06</serverCurrentTime>
+                        <softUpdateTime>2025-03-08 00:00:00</softUpdateTime>
+                        <url>${MY_SERVER_URL}/files/DiagPro_V2.apk</url>
+                    </x431PadSoft>
+
+                    <!-- 3. DEMO -->
                     <x431PadSoft>
                         <softId>2001</softId>
-                        <softName>DEMO Program</softName>
+                        <softName>DEMO</softName>
                         <softPackageID>DEMO</softPackageID>
                         <versionNo>V15.00</versionNo>
                         <versionDetailId>500001</versionDetailId>
                         <fileSize>1024567</fileSize>
+                        <softType>2</softType>
                         <lanId>EN</lanId>
                         <serverCurrentTime>2026-08-06</serverCurrentTime>
                         <softUpdateTime>2026-01-01 00:00:00</softUpdateTime>
                         <url>${MY_SERVER_URL}/files/DEMO_V15.00.zip</url>
                     </x431PadSoft>
+
+                    <!-- 4. EOBD2 -->
                     <x431PadSoft>
                         <softId>2002</softId>
                         <softName>EOBD2 Protocol</softName>
@@ -90,11 +97,14 @@ app.all([
                         <versionNo>V22.80</versionNo>
                         <versionDetailId>500002</versionDetailId>
                         <fileSize>2048567</fileSize>
+                        <softType>2</softType>
                         <lanId>EN</lanId>
                         <serverCurrentTime>2026-08-06</serverCurrentTime>
                         <softUpdateTime>2026-01-01 00:00:00</softUpdateTime>
                         <url>${MY_SERVER_URL}/files/EOBD2_V22.80.zip</url>
                     </x431PadSoft>
+
+                    <!-- 5. TOYOTA -->
                     <x431PadSoft>
                         <softId>2003</softId>
                         <softName>TOYOTA / LEXUS</softName>
@@ -102,23 +112,29 @@ app.all([
                         <versionNo>V50.10</versionNo>
                         <versionDetailId>500003</versionDetailId>
                         <fileSize>5048567</fileSize>
+                        <softType>2</softType>
                         <lanId>EN</lanId>
                         <serverCurrentTime>2026-08-06</serverCurrentTime>
                         <softUpdateTime>2026-01-01 00:00:00</softUpdateTime>
                         <url>${MY_SERVER_URL}/files/TOYOTA_V50.10.zip</url>
                     </x431PadSoft>
+
+                    <!-- 6. VOLKSWAGEN -->
                     <x431PadSoft>
                         <softId>2004</softId>
-                        <softName>VW / AUDI</softName>
+                        <softName>VOLKSWAGEN</softName>
                         <softPackageID>VOLKSWAGEN</softPackageID>
                         <versionNo>V28.50</versionNo>
                         <versionDetailId>500004</versionDetailId>
                         <fileSize>4048567</fileSize>
+                        <softType>2</softType>
                         <lanId>EN</lanId>
                         <serverCurrentTime>2026-08-06</serverCurrentTime>
                         <softUpdateTime>2026-01-01 00:00:00</softUpdateTime>
                         <url>${MY_SERVER_URL}/files/VW_V28.50.zip</url>
                     </x431PadSoft>
+
+                    <!-- 7. BENZ -->
                     <x431PadSoft>
                         <softId>2005</softId>
                         <softName>MERCEDES-BENZ</softName>
@@ -126,11 +142,14 @@ app.all([
                         <versionNo>V49.90</versionNo>
                         <versionDetailId>500005</versionDetailId>
                         <fileSize>6048567</fileSize>
+                        <softType>2</softType>
                         <lanId>EN</lanId>
                         <serverCurrentTime>2026-08-06</serverCurrentTime>
                         <softUpdateTime>2026-01-01 00:00:00</softUpdateTime>
                         <url>${MY_SERVER_URL}/files/BENZ_V49.90.zip</url>
                     </x431PadSoft>
+
+                    <!-- 8. BMW -->
                     <x431PadSoft>
                         <softId>2006</softId>
                         <softName>BMW / MINI</softName>
@@ -138,6 +157,7 @@ app.all([
                         <versionNo>V50.00</versionNo>
                         <versionDetailId>500006</versionDetailId>
                         <fileSize>5548567</fileSize>
+                        <softType>2</softType>
                         <lanId>EN</lanId>
                         <serverCurrentTime>2026-08-06</serverCurrentTime>
                         <softUpdateTime>2026-01-01 00:00:00</softUpdateTime>
