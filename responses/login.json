@@ -4,6 +4,10 @@
   "data": {
     "token": "mock-token-123456",
     "uid": "12345",
-    "status": "ACTIVE"
+    "username": "Admin",
+    "nickname": "Diagnostic User",
+    "status": "ACTIVE",
+    "expiryDate": "2027-12-31",
+    "userType": 1
   }
 }
