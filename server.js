@@ -36,6 +36,7 @@ app.all('/urls', (req, res) => {
         "data": {
             "publicsoft.download": `${MY_SERVER_URL}/files`,
             "downloaddiagsoftws.action": `${MY_SERVER_URL}/diagsoftservice`,
+            "publicsoftws.action": `${MY_SERVER_URL}/publicsoftservice`,
             "login.action": `${MY_SERVER_URL}/login`,
             "register.action": `${MY_SERVER_URL}/register`,
             "queryPDTDiagSoftSubPack": `${MY_SERVER_URL}/diagsoftservice`
@@ -61,23 +62,38 @@ app.all('/login', (req, res) => {
 });
 
 // ----------------------------------------------------
-// 5. مسار خدمات الماركات والتحديثات (/diagsoftservice)
+// 5. مسار التحديثات الشامل (الماركات + الـ Firmware والتطبيق)
 // ----------------------------------------------------
-app.all('/diagsoftservice', (req, res) => {
+app.all(['/publicsoftservice', '/publicsoftservice-nt', '/diagsoftservice'], (req, res) => {
     res.set('Content-Type', 'text/xml; charset=utf-8');
 
-    // كود XML يرجع قائمة الماركات مع روابط التحميل المباشرة
+    // كود XML يدمج الماركات مع البرمجيات العامة ليراها التطبيق في جدول التحديثات
     const xmlResponse = `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Body>
-        <queryPDTDiagSoftSubPackResponse xmlns="http://service.publicsoft.cc.com">
+        <queryLatestVersionResponse xmlns="http://service.publicsoft.cc.com">
             <out>
                 <code>0</code>
                 <message>success</message>
                 <result>
+                    <!-- التحديثات الأساسية -->
+                    <item>
+                        <softPackageId>Firmware</softPackageId>
+                        <softPackageName>Firmware</softPackageName>
+                        <version>V11.91</version>
+                        <url>${MY_SERVER_URL}/files/Firmware_V11.91.zip</url>
+                    </item>
+                    <item>
+                        <softPackageId>Diagzone PRO V2</softPackageId>
+                        <softPackageName>Diagzone PRO V2</softPackageName>
+                        <version>V2.00.033</version>
+                        <url>${MY_SERVER_URL}/files/DiagPro_V2.apk</url>
+                    </item>
+
+                    <!-- ماركات السيارات -->
                     <item>
                         <softPackageId>DEMO</softPackageId>
-                        <softPackageName>DEMO Program</softPackageName>
+                        <softPackageName>DEMO</softPackageName>
                         <version>V15.00</version>
                         <url>${MY_SERVER_URL}/files/DEMO_V15.00.zip</url>
                     </item>
@@ -88,32 +104,44 @@ app.all('/diagsoftservice', (req, res) => {
                         <url>${MY_SERVER_URL}/files/EOBD2_V22.80.zip</url>
                     </item>
                     <item>
-                        <softPackageId>VW</softPackageId>
-                        <softPackageName>Volkswagen</softPackageName>
-                        <version>V28.50</version>
-                        <url>${MY_SERVER_URL}/files/VW_V28.50.zip</url>
-                    </item>
-                    <item>
                         <softPackageId>TOYOTA</softPackageId>
-                        <softPackageName>Toyota / Lexus</softPackageName>
+                        <softPackageName>TOYOTA / LEXUS</softPackageName>
                         <version>V50.10</version>
                         <url>${MY_SERVER_URL}/files/TOYOTA_V50.10.zip</url>
                     </item>
                     <item>
+                        <softPackageId>VOLKSWAGEN</softPackageId>
+                        <softPackageName>VW / AUDI</softPackageName>
+                        <version>V28.50</version>
+                        <url>${MY_SERVER_URL}/files/VW_V28.50.zip</url>
+                    </item>
+                    <item>
                         <softPackageId>BENZ</softPackageId>
-                        <softPackageName>Mercedes-Benz</softPackageName>
-                        <version> V49.90</version>
+                        <softPackageName>MERCEDES-BENZ</softPackageName>
+                        <version>V49.90</version>
                         <url>${MY_SERVER_URL}/files/BENZ_V49.90.zip</url>
                     </item>
                     <item>
                         <softPackageId>BMW</softPackageId>
-                        <softPackageName>BMW / Mini</softPackageName>
+                        <softPackageName>BMW / MINI</softPackageName>
                         <version>V50.00</version>
                         <url>${MY_SERVER_URL}/files/BMW_V50.00.zip</url>
                     </item>
+                    <item>
+                        <softPackageId>HYUNDAI</softPackageId>
+                        <softPackageName>HYUNDAI</softPackageName>
+                        <version>V51.00</version>
+                        <url>${MY_SERVER_URL}/files/HYUNDAI_V51.00.zip</url>
+                    </item>
+                    <item>
+                        <softPackageId>KIA</softPackageId>
+                        <softPackageName>KIA</softPackageName>
+                        <version>V45.00</version>
+                        <url>${MY_SERVER_URL}/files/KIA_V45.00.zip</url>
+                    </item>
                 </result>
             </out>
-        </queryPDTDiagSoftSubPackResponse>
+        </queryLatestVersionResponse>
     </soap:Body>
 </soap:Envelope>`;
 
@@ -121,30 +149,7 @@ app.all('/diagsoftservice', (req, res) => {
 });
 
 // ----------------------------------------------------
-// 6. مسار تحديث التطبيق الرئيسي (/publicsoftservice)
-// ----------------------------------------------------
-app.all(['/publicsoftservice', '/publicsoftservice-nt'], (req, res) => {
-    res.set('Content-Type', 'text/xml; charset=utf-8');
-
-    const xmlResponse = `<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-    <soap:Body>
-        <getLatestVersionResponse xmlns="http://service.publicsoft.cc.com">
-            <out>
-                <code>0</code>
-                <message>success</message>
-                <version>2.00.000</version>
-                <downloadUrl>${MY_SERVER_URL}/files/DiagPro_V2.apk</downloadUrl>
-            </out>
-        </getLatestVersionResponse>
-    </soap:Body>
-</soap:Envelope>`;
-
-    res.send(xmlResponse);
-});
-
-// ----------------------------------------------------
-// 7. مسار الفحص، الإحصائيات ورصد الأخطاء
+// 6. مسار الفحص والإحصائيات وتأكيد الحساب
 // ----------------------------------------------------
 app.all(['/product-service', '/statistics', '/url-upload', '/register'], (req, res) => {
     res.json({
@@ -158,7 +163,7 @@ app.all(['/product-service', '/statistics', '/url-upload', '/register'], (req, r
 });
 
 // ----------------------------------------------------
-// 8. تشغيل الاستماع على البورت المحدد
+// 7. تشغيل الاستماع على البورت المحدد
 // ----------------------------------------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
