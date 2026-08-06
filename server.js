@@ -125,7 +125,7 @@ const fullRoutingResponse = {
     }
 };
 
-// 3. مسارات تسجيل الدخول الشاملة
+// 3. مسار تسجيل الدخول
 app.all(['/api/v2/login', '/login.action', '/api/v2/user/login'], (req, res) => {
     console.log('[API] Login Request Received on Path:', req.path);
     res.json({
@@ -215,13 +215,15 @@ app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res
     res.status(200).send(soapResponse);
 });
 
-// 8. مسارات الـ Config والتوجيه الرئيسي
-app.all('/', (req, res) => res.json(fullRoutingResponse));
-app.all('/api/v2/config', (req, res) => res.json(fullRoutingResponse));
+// 8. مسارات جلب الخريطة الأساسية والـ Config والـ urls
+app.all(['/', '/api/v2/config', '/api/v2/urls'], (req, res) => {
+    console.log('[API] Routing Table Requested on:', req.originalUrl);
+    res.json(fullRoutingResponse);
+});
 
-// 9. المعالج الشامل لأي مسار غير معرف مسبقاً
+// 9. المعالج الشامل لأي مسار آخر
 app.all('*', (req, res) => {
-    console.log(`[UNKNOWN REQUEST] Path: ${req.path} | Method: ${req.method}`);
+    console.log(`[UNKNOWN REQUEST] Path: ${req.path} | Query:`, req.query);
     res.json({
         "code": 0,
         "msg": "success",
