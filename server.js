@@ -19,7 +19,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// المسار الرئيسي الشامل الذي يستجيب لـ queryLatestPublicSofts وكل مسارات الـ Softwares
+// المسار المسؤول عن استقبال queryLatestPublicSofts والرد عليها بالهيكلية الصحيحة
 app.all([
     '/api/v2/publicsoftservice-nt', 
     '/publicsoftservice-nt', 
@@ -31,7 +31,7 @@ app.all([
     '/x431paddiagsoftservice'
 ], (req, res) => {
     res.setHeader('Content-Type', 'text/xml; charset=utf-8');
-    console.log("✅ [MASTER SERVICE]: Responding with queryLatestPublicSofts including all brands");
+    console.log("✅ [PUBLICSOFT]: Responding to queryLatestPublicSofts with all packages");
 
     const xmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
@@ -83,7 +83,7 @@ app.all([
                         <url>${MY_SERVER_URL}/files/VIN_App.zip</url>
                     </x431PadSoft>
 
-                    <!-- 4. DEMO (ماركة تجريبية) -->
+                    <!-- 4. DEMO -->
                     <x431PadSoft>
                         <fileSize>1024567</fileSize>
                         <lanId>EN</lanId>
@@ -175,7 +175,7 @@ app.all([
     return res.status(200).send(xmlResponse);
 });
 
-// مسار خريطة الروابط الأساسية (/urls)
+// مسار خريطة الروابط (/urls)
 app.all(['/urls', '/api/v2/urls'], (req, res) => {
     res.json({
         "code": 0,
@@ -222,5 +222,5 @@ app.all('*', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Perfect Diag Server Online on Port ${PORT}`);
+    console.log(`🚀 Final Diag Server Online on Port ${PORT}`);
 });
