@@ -1,1 +1,29 @@
+{
+  "softwares": [
+    {
+      "softId": 1015,
+      "softName": "Diagzone PRO V2",
+      "softPackageID": "Diagzone_PRO_V2",
+      "versionNo": "V2.00.033",
+      "versionDetailId": 359645,
+      "fileSize": 68365802,
+      "lanId": "EN",
+      "serverCurrentTime": "2026-08-06",
+      "softUpdateTime": "2025-03-08 00:00:00",
+      "fileName": "DiagPro_V2.apk"
+    },
+    {
+      "softId": 873,
+      "softName": "Firmware",
+      "softPackageID": "DOWNLOAD",
+      "versionNo": "V11.91",
+      "versionDetailId": 343730,
+      "fileSize": 393300,
+      "lanId": "EN",
+      "serverCurrentTime": "2026-08-06",
+      "softUpdateTime": "2023-03-27 00:00:00",
+      "fileName": "Firmware_V11.91.zip"
+    }
+  ]
+}
 
