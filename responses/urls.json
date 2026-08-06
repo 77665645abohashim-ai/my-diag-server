@@ -1,1 +1,31 @@
+{
+  "code": 0,
+  "msg": "success",
+  "version": "74",
+  "area": "2",
+  "data": {
+    "urls": [
+      {
+        "key": "login",
+        "value": "https://my-diag-server.onrender.com/api/v2/login"
+      },
+      {
+        "key": "publicsoftservice.*",
+        "value": "https://my-diag-server.onrender.com/api/v2/publicsoftservice"
+      },
+      {
+        "key": "diagsoftservice.*",
+        "value": "https://my-diag-server.onrender.com/api/v2/diagsoftservice"
+      },
+      {
+        "key": "x431paddiagsoftservice.*",
+        "value": "https://my-diag-server.onrender.com/api/v2/x431paddiagsoftservice"
+      },
+      {
+        "key": "publicsoft.download",
+        "value": "https://my-diag-server.onrender.com/api/v2/download"
+      }
+    ]
+  }
+}
 
