@@ -184,7 +184,7 @@ app.all('/api/v2/product-service', (req, res) => {
     res.status(200).send(soapResponse);
 });
 
-// 6. مسار خدمات برامج التشخيص (diagsoftservice) - ديناميكي لمطابقة أسلوب ksoap2
+// 6. مسار خدمات برامج التشخيص (diagsoftservice)
 app.all('/api/v2/diagsoftservice', (req, res) => {
     console.log('[API] SOAP DiagSoft Service Request Received');
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
@@ -203,11 +203,21 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
     res.status(200).send(soapResponse);
 });
 
-// 7. مسارات الـ Config والتوجيه الرئيسي
+// 7. مسار خدمات البرامج العامة (publicsoftservice) - مطابق للسيرفر الأصلي
+app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res) => {
+    console.log('[API] SOAP PublicSoft Service Request Received');
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>68365802</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1015</softId><softName>Diagzone PRO V2</softName><softPackageID>Diagzone_PRO_V2</softPackageID><softUpdateTime>2025-03-08 00:00:00</softUpdateTime><versionDetailId>359645</versionDetailId><versionNo>V2.00.033</versionNo></x431PadSoft><x431PadSoft><fileSize>393300</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2023-03-27 00:00:00</softUpdateTime><versionDetailId>343730</versionDetailId><versionNo>V11.91</versionNo></x431PadSoft><x431PadSoft><fileSize>6166636</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>880</softId><softName>VIN Recognition App</softName><softPackageID>VIN_RECOGNITION_APP</softPackageID><softUpdateTime>2024-05-02 00:00:00</softUpdateTime><versionDetailId>354418</versionDetailId><versionNo>V1.01.006</versionNo></x431PadSoft></x431PadSoftList></return></ns1:queryLatestPublicSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+    
+    res.status(200).send(soapResponse);
+});
+
+// 8. مسارات الـ Config والتوجيه الرئيسي
 app.all('/', (req, res) => res.json(fullRoutingResponse));
 app.all('/api/v2/config', (req, res) => res.json(fullRoutingResponse));
 
-// 8. المعالج الشامل لأي مسار آخر
+// 9. المعالج الشامل لأي مسار آخر
 app.all('*', (req, res) => {
     console.log(`[REQUEST RECEIVED] Path: ${req.path}`);
     res.json({
