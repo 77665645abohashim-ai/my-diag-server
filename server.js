@@ -4,12 +4,12 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 const MY_DOMAIN = 'https://my-diag-server.onrender.com';
 
-// إعدادات قراءة البيانات القادمة من التطبيق
+// إعدادات قراءة البيانات
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text({ type: '*/*' }));
 
-// 1. منع التخزين المؤقت (Cache) نهائياً
+// 1. منع التخزين المؤقت (Cache)
 app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -167,7 +167,7 @@ app.all('/api/v2/login', (req, res) => {
     });
 });
 
-// 4. مسار استلام السجلات والأخطاء (Upload Logging)
+// 4. مسار استلام السجلات والملفات
 app.all(['/api/v2/url-upload', '/api/v2/log-service-upload'], (req, res) => {
     console.log('[API] Log/URL Upload Accepted');
     res.json({
@@ -184,11 +184,22 @@ app.all('/api/v2/product-service', (req, res) => {
     res.status(200).send(soapResponse);
 });
 
-// 6. مسار خدمات برامج التشخيص (diagsoftservice) - SOAP XML
+// 6. مسار خدمات برامج التشخيص (diagsoftservice) - ديناميكي لمطابقة أسلوب ksoap2
 app.all('/api/v2/diagsoftservice', (req, res) => {
     console.log('[API] SOAP DiagSoft Service Request Received');
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+
+    const bodyStr = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '');
+    let methodName = 'getMaxVersionForMobileAppCDN';
+
+    if (bodyStr.includes('queryLatestDiagSoftsIncrCdn')) {
+        methodName = 'queryLatestDiagSoftsIncrCdn';
+    } else if (bodyStr.includes('getMaxVersionForMobileAppCDN')) {
+        methodName = 'getMaxVersionForMobileAppCDN';
+    }
+
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:${methodName}><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:${methodName}></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+    
     res.status(200).send(soapResponse);
 });
 
@@ -196,7 +207,7 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
 app.all('/', (req, res) => res.json(fullRoutingResponse));
 app.all('/api/v2/config', (req, res) => res.json(fullRoutingResponse));
 
-// 8. المعالج العام لأي مسار آخر
+// 8. المعالج الشامل لأي مسار آخر
 app.all('*', (req, res) => {
     console.log(`[REQUEST RECEIVED] Path: ${req.path}`);
     res.json({
