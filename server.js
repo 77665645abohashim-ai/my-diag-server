@@ -4,28 +4,25 @@ const path = require('path');
 
 const app = express();
 
-// ----------------------------------------------------
-// 1. الإعدادات والوسائط (Middlewares)
-// ----------------------------------------------------
 app.use(cors());
 app.use(express.json());
-// قراءة أي محتوى نصي أو XML قادم في جسم الطلب (Body)
 app.use(express.text({ type: '*/*' }));
 app.use(express.urlencoded({ extended: true }));
 
-// مجلد الملفات العامة (لتنزيل ملفات الـ ZIP و الـ APK)
 app.use('/files', express.static(path.join(__dirname, 'public/files')));
 
 const MY_SERVER_URL = process.env.SERVER_URL || "https://my-diag-server.onrender.com";
 
-// طباعة الطلبات الواردة للمراقبة والديباج
+// ----------------------------------------------------
+// دالة طباعة جبارة لكشف كل طلب يدخل السيرفر
+// ----------------------------------------------------
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} -> ${req.url}`);
+    console.log(`🚨 [INCOMING REQUEST] Method: ${req.method} | URL: ${req.url} | Content-Type: ${req.headers['content-type']}`);
     next();
 });
 
 // ----------------------------------------------------
-// 2. مسار الروابط الأساسية (/urls)
+// 1. مسار الروابط الأساسية (/urls)
 // ----------------------------------------------------
 app.all(['/urls', '/api/v2/urls'], (req, res) => {
     res.json({
@@ -42,7 +39,7 @@ app.all(['/urls', '/api/v2/urls'], (req, res) => {
 });
 
 // ----------------------------------------------------
-// 3. مسار تسجيل الدخول (/login)
+// 2. مسار تسجيل الدخول (/login)
 // ----------------------------------------------------
 app.all('/login', (req, res) => {
     res.json({
@@ -57,7 +54,7 @@ app.all('/login', (req, res) => {
 });
 
 // ----------------------------------------------------
-// 4. مسار البرامج العامة (/api/v2/publicsoftservice-nt)
+// 3. مسار البرامج العامة (/api/v2/publicsoftservice-nt)
 // ----------------------------------------------------
 app.all(['/api/v2/publicsoftservice-nt', '/publicsoftservice-nt', '/publicsoftservice'], (req, res) => {
     res.setHeader('Content-Type', 'text/xml; charset=utf-8');
@@ -92,22 +89,18 @@ app.all(['/api/v2/publicsoftservice-nt', '/publicsoftservice-nt', '/publicsoftse
 });
 
 // ----------------------------------------------------
-// 5. مسار الماركات والبرمجيات الفرعية الصريح (/api/v2/diagsoftservice)
+// 4. الرد الموحد الشامل لكل طلبات الماركات والـ SOAP (مهما كان المسار!)
 // ----------------------------------------------------
-app.all(['/api/v2/diagsoftservice', '/diagsoftservice'], (req, res) => {
+const sendBrandsXml = (req, res) => {
     res.setHeader('Content-Type', 'text/xml; charset=utf-8');
 
-    console.log("=== DIAGSOFTSERVICE REQUEST RECEIVED ===");
+    console.log(`✅ [SOAP SERVED SUCCESSFULLY] Matched on route: ${req.url}`);
 
-    const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '');
-
-    // 1️⃣ معالجة طلب queryPDTDiagSoftSubPack الفعلي
-    if (rawBody.includes("queryPDTDiagSoftSubPack")) {
-        const subPackResponse = `<?xml version="1.0" encoding="UTF-8"?>
+    const xmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <SOAP-ENV:Body>
         <ns1:queryPDTDiagSoftSubPackResponse>
-            <return xsi:type="SOAP-ENC:Array" SOAP-ENC:arrayType="ns1:DiagSoftSubPack[6]">
+            <return xsi:type="SOAP-ENC:Array" SOAP-ENC:arrayType="ns1:DiagSoftSubPack[4]">
                 <item>
                     <spfId xsi:type="xsd:string">1001</spfId>
                     <softPackageId xsi:type="xsd:string">DEMO</softPackageId>
@@ -144,73 +137,23 @@ app.all(['/api/v2/diagsoftservice', '/diagsoftservice'], (req, res) => {
                     <fileSize xsi:type="xsd:string">4048567</fileSize>
                     <url xsi:type="xsd:string">${MY_SERVER_URL}/files/VW_V28.50.zip</url>
                 </item>
-                <item>
-                    <spfId xsi:type="xsd:string">1005</spfId>
-                    <softPackageId xsi:type="xsd:string">BENZ</softPackageId>
-                    <softPackageName xsi:type="xsd:string">MERCEDES-BENZ</softPackageName>
-                    <version xsi:type="xsd:string">V49.90</version>
-                    <vNum xsi:type="xsd:string">4990</vNum>
-                    <fileSize xsi:type="xsd:string">6048567</fileSize>
-                    <url xsi:type="xsd:string">${MY_SERVER_URL}/files/BENZ_V49.90.zip</url>
-                </item>
-                <item>
-                    <spfId xsi:type="xsd:string">1006</spfId>
-                    <softPackageId xsi:type="xsd:string">BMW</softPackageId>
-                    <softPackageName xsi:type="xsd:string">BMW / MINI</softPackageName>
-                    <version xsi:type="xsd:string">V50.00</version>
-                    <vNum xsi:type="xsd:string">5000</vNum>
-                    <fileSize xsi:type="xsd:string">5548567</fileSize>
-                    <url xsi:type="xsd:string">${MY_SERVER_URL}/files/BMW_V50.00.zip</url>
-                </item>
             </return>
         </ns1:queryPDTDiagSoftSubPackResponse>
     </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`;
-        return res.status(200).send(subPackResponse);
-    }
 
-    // 2️⃣ الرد الاحتياطي لأي طلب SOAP آخر قادم للمسار
-    const defaultResponse = `<?xml version="1.0" encoding="UTF-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
-    <SOAP-ENV:Body>
-        <ns1:queryLatestDiagSoftsResponse>
-            <return>
-                <code>0</code>
-                <message>success</message>
-                <result>
-                    <item>
-                        <softPackageId>DEMO</softPackageId>
-                        <softPackageName>DEMO</softPackageName>
-                        <version>V15.00</version>
-                        <url>${MY_SERVER_URL}/files/DEMO_V15.00.zip</url>
-                    </item>
-                    <item>
-                        <softPackageId>TOYOTA</softPackageId>
-                        <softPackageName>TOYOTA / LEXUS</softPackageName>
-                        <version>V50.10</version>
-                        <url>${MY_SERVER_URL}/files/TOYOTA_V50.10.zip</url>
-                    </item>
-                </result>
-            </return>
-        </ns1:queryLatestDiagSoftsResponse>
-    </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>`;
+    res.status(200).send(xmlResponse);
+};
 
-    return res.status(200).send(defaultResponse);
-});
+// التقاط أي مسار قد يطلبه التطبيق للماركات
+app.all('/api/v2/diagsoftservice', sendBrandsXml);
+app.all('/diagsoftservice', sendBrandsXml);
+app.all('/downloaddiagsoftws.action', sendBrandsXml);
 
 // ----------------------------------------------------
-// 6. مسارات الدعم الفردية (بدون استخدام Wildcards عشوائية)
+// 5. مسارات JSON العادية
 // ----------------------------------------------------
-app.all([
-    '/product-service', 
-    '/api/v2/product-service', 
-    '/statistics', 
-    '/api/v2/statistics', 
-    '/url-upload', 
-    '/api/v2/url-upload', 
-    '/register'
-], (req, res) => {
+app.all(['/product-service', '/statistics', '/url-upload', '/register'], (req, res) => {
     res.json({
         "code": 0,
         "msg": "success",
@@ -221,10 +164,7 @@ app.all([
     });
 });
 
-// ----------------------------------------------------
-// 7. تشغيل السيرفر
-// ----------------------------------------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Diag Server Online on Port ${PORT}`);
+    console.log(`🚀 Emergency Diag Server Online on Port ${PORT}`);
 });
