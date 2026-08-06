@@ -12,40 +12,36 @@ app.use(express.json());
 app.use(express.text({ type: ['text/xml', 'application/xml', 'text/plain'] }));
 app.use(express.urlencoded({ extended: true }));
 
-// مجلد الملفات العامة (لتخزين ملفات الـ ZIP الخاصة بالماركات والـ APK)
+// مجلد الملفات العامة لتنزيل التحديثات والماركات
 app.use('/files', express.static(path.join(__dirname, 'public/files')));
 
-// ضع هنا رابط سيرفرك الأساسي على Render أو أي استضافة أخرى
 const MY_SERVER_URL = process.env.SERVER_URL || "https://my-diag-server.onrender.com";
 
-// ----------------------------------------------------
-// 2. طباعة الطلبات الواردة للمراقبة (Logging)
-// ----------------------------------------------------
+// طباعة الطلبات الواردة للمراقبة
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} -> ${req.url}`);
     next();
 });
 
 // ----------------------------------------------------
-// 3. مسار توجيه الروابط الأساسية (/urls)
+// 2. مسار توجيه الروابط الأساسية (/urls)
 // ----------------------------------------------------
-app.all('/urls', (req, res) => {
+app.all(['/urls', '/api/v2/urls'], (req, res) => {
     res.json({
         "code": 0,
         "msg": "success",
         "data": {
             "publicsoft.download": `${MY_SERVER_URL}/files`,
-            "downloaddiagsoftws.action": `${MY_SERVER_URL}/diagsoftservice`,
-            "publicsoftws.action": `${MY_SERVER_URL}/publicsoftservice`,
+            "downloaddiagsoftws.action": `${MY_SERVER_URL}/api/v2/diagsoftservice`,
+            "publicsoftws.action": `${MY_SERVER_URL}/api/v2/publicsoftservice`,
             "login.action": `${MY_SERVER_URL}/login`,
-            "register.action": `${MY_SERVER_URL}/register`,
-            "queryPDTDiagSoftSubPack": `${MY_SERVER_URL}/diagsoftservice`
+            "register.action": `${MY_SERVER_URL}/register`
         }
     });
 });
 
 // ----------------------------------------------------
-// 4. مسار تسجيل الدخول والمصادقة (/login)
+// 3. مسار تسجيل الدخول (/login)
 // ----------------------------------------------------
 app.all('/login', (req, res) => {
     res.json({
@@ -54,43 +50,26 @@ app.all('/login', (req, res) => {
         "data": {
             "token": "YmxrVCtaaEVJNWUrWWhhcVY5VHIvdz09",
             "user_id": "10001",
-            "username": "DiagZoneVIP",
-            "xmpp_host": "jabber.diagzone.com",
-            "xmpp_port": 5222
+            "username": "DiagZoneVIP"
         }
     });
 });
 
 // ----------------------------------------------------
-// 5. مسار التحديثات الشامل (الماركات + الـ Firmware والتطبيق)
+// 4. مسار الماركات والتحديثات (/api/v2/diagsoftservice)
 // ----------------------------------------------------
-app.all(['/publicsoftservice', '/publicsoftservice-nt', '/diagsoftservice'], (req, res) => {
+app.all(['/api/v2/diagsoftservice', '/diagsoftservice'], (req, res) => {
     res.set('Content-Type', 'text/xml; charset=utf-8');
 
-    // كود XML يدمج الماركات مع البرمجيات العامة ليراها التطبيق في جدول التحديثات
-    const xmlResponse = `<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-    <soap:Body>
-        <queryLatestVersionResponse xmlns="http://service.publicsoft.cc.com">
-            <out>
+    // الهيكل الصحيح تماماً الذي ينتظره التطبيق لتفكيك حزم الماركات
+    const xmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Body>
+        <ns1:queryPDTDiagSoftSubPackResponse>
+            <queryPDTDiagSoftSubPackResult>
                 <code>0</code>
                 <message>success</message>
                 <result>
-                    <!-- التحديثات الأساسية -->
-                    <item>
-                        <softPackageId>Firmware</softPackageId>
-                        <softPackageName>Firmware</softPackageName>
-                        <version>V11.91</version>
-                        <url>${MY_SERVER_URL}/files/Firmware_V11.91.zip</url>
-                    </item>
-                    <item>
-                        <softPackageId>Diagzone PRO V2</softPackageId>
-                        <softPackageName>Diagzone PRO V2</softPackageName>
-                        <version>V2.00.033</version>
-                        <url>${MY_SERVER_URL}/files/DiagPro_V2.apk</url>
-                    </item>
-
-                    <!-- ماركات السيارات -->
                     <item>
                         <softPackageId>DEMO</softPackageId>
                         <softPackageName>DEMO</softPackageName>
@@ -140,18 +119,41 @@ app.all(['/publicsoftservice', '/publicsoftservice-nt', '/diagsoftservice'], (re
                         <url>${MY_SERVER_URL}/files/KIA_V45.00.zip</url>
                     </item>
                 </result>
-            </out>
-        </queryLatestVersionResponse>
-    </soap:Body>
-</soap:Envelope>`;
+            </queryPDTDiagSoftSubPackResult>
+        </ns1:queryPDTDiagSoftSubPackResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`;
 
-    res.send(xmlResponse);
+    res.status(200).send(xmlResponse);
 });
 
 // ----------------------------------------------------
-// 6. مسار الفحص والإحصائيات وتأكيد الحساب
+// 5. مسار البرامج العامة والتطبيق (/api/v2/publicsoftservice)
 // ----------------------------------------------------
-app.all(['/product-service', '/statistics', '/url-upload', '/register'], (req, res) => {
+app.all(['/api/v2/publicsoftservice', '/publicsoftservice', '/publicsoftservice-nt'], (req, res) => {
+    res.set('Content-Type', 'text/xml; charset=utf-8');
+
+    const xmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SOAP-ENV:Body>
+        <ns1:getLatestVersionResponse>
+            <getLatestVersionResult>
+                <code>0</code>
+                <message>success</message>
+                <version>2.00.033</version>
+                <downloadUrl>${MY_SERVER_URL}/files/DiagPro_V2.apk</downloadUrl>
+            </getLatestVersionResult>
+        </ns1:getLatestVersionResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`;
+
+    res.status(200).send(xmlResponse);
+});
+
+// ----------------------------------------------------
+// 6. مسارات الخدمات المساندة
+// ----------------------------------------------------
+app.all(['/product-service', '/statistics', '/url-upload', '/register', '/api/v2/*'], (req, res) => {
     res.json({
         "code": 0,
         "msg": "success",
@@ -163,12 +165,11 @@ app.all(['/product-service', '/statistics', '/url-upload', '/register'], (req, r
 });
 
 // ----------------------------------------------------
-// 7. تشغيل الاستماع على البورت المحدد
+// 7. تشغيل السيرفر
 // ----------------------------------------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`=================================`);
-    console.log(`🚀 Diag Server Running on Port: ${PORT}`);
-    console.log(`🌐 Base URL: ${MY_SERVER_URL}`);
+    console.log(`🚀 Diag Server Active on Port: ${PORT}`);
     console.log(`=================================`);
 });
