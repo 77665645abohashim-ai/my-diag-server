@@ -9,11 +9,11 @@ const app = express();
 // ----------------------------------------------------
 app.use(cors());
 app.use(express.json());
-// قراءة الـ XML والـ SOAP Plain Text بجميع أنواعه
+// قراءة أي محتوى نصي أو XML قادم في جسم الطلب (Body)
 app.use(express.text({ type: '*/*' }));
 app.use(express.urlencoded({ extended: true }));
 
-// مجلد الملفات العامة لتنزيل الـ ZIP/APK
+// مجلد الملفات العامة (لتنزيل ملفات الـ ZIP و الـ APK)
 app.use('/files', express.static(path.join(__dirname, 'public/files')));
 
 const MY_SERVER_URL = process.env.SERVER_URL || "https://my-diag-server.onrender.com";
@@ -92,10 +92,12 @@ app.all(['/api/v2/publicsoftservice-nt', '/publicsoftservice-nt', '/publicsoftse
 });
 
 // ----------------------------------------------------
-// 5. مسار الماركات والبرمجيات الفرعية (/api/v2/diagsoftservice)
+// 5. مسار الماركات والبرمجيات الفرعية الصريح (/api/v2/diagsoftservice)
 // ----------------------------------------------------
 app.all(['/api/v2/diagsoftservice', '/diagsoftservice'], (req, res) => {
     res.setHeader('Content-Type', 'text/xml; charset=utf-8');
+
+    console.log("=== DIAGSOFTSERVICE REQUEST RECEIVED ===");
 
     const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '');
 
@@ -167,7 +169,7 @@ app.all(['/api/v2/diagsoftservice', '/diagsoftservice'], (req, res) => {
         return res.status(200).send(subPackResponse);
     }
 
-    // 2️⃣ الرد الاحتياطي للطلبات العامة الأخرى (مثل queryLatestDiagSofts)
+    // 2️⃣ الرد الاحتياطي لأي طلب SOAP آخر قادم للمسار
     const defaultResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
     <SOAP-ENV:Body>
@@ -198,9 +200,17 @@ app.all(['/api/v2/diagsoftservice', '/diagsoftservice'], (req, res) => {
 });
 
 // ----------------------------------------------------
-// 6. مسارات الدعم (Product Service / Registration / Statistics)
+// 6. مسارات الدعم الفردية (بدون استخدام Wildcards عشوائية)
 // ----------------------------------------------------
-app.all(['/product-service', '/statistics', '/url-upload', '/register', '/api/v2/*'], (req, res) => {
+app.all([
+    '/product-service', 
+    '/api/v2/product-service', 
+    '/statistics', 
+    '/api/v2/statistics', 
+    '/url-upload', 
+    '/api/v2/url-upload', 
+    '/register'
+], (req, res) => {
     res.json({
         "code": 0,
         "msg": "success",
