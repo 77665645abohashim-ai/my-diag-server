@@ -4,8 +4,8 @@
   "data": {
     "token": "mock-token-123456",
     "uid": "12345",
-    "username": "Admin",
+    "username": "1234",
+    "password": "1234",
     "status": "ACTIVE"
   }
 }
-
