@@ -1,1 +1,11 @@
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "token": "mock-token-123456",
+    "uid": "12345",
+    "username": "Admin",
+    "status": "ACTIVE"
+  }
+}
 
