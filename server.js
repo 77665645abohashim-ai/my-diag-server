@@ -125,9 +125,9 @@ const fullRoutingResponse = {
     }
 };
 
-// 3. مسار تسجيل الدخول
-app.all('/api/v2/login', (req, res) => {
-    console.log('[API] Login Request Received');
+// 3. مسارات تسجيل الدخول الشاملة
+app.all(['/api/v2/login', '/login.action', '/api/v2/user/login'], (req, res) => {
+    console.log('[API] Login Request Received on Path:', req.path);
     res.json({
         "code": 0,
         "msg": null,
@@ -192,7 +192,9 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
     const bodyStr = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '');
     let methodName = 'getMaxVersionForMobileAppCDN';
 
-    if (bodyStr.includes('queryLatestDiagSoftsIncrCdn')) {
+    if (bodyStr.includes('queryPDTDiagSoftSubPack')) {
+        methodName = 'queryPDTDiagSoftSubPack';
+    } else if (bodyStr.includes('queryLatestDiagSoftsIncrCdn')) {
         methodName = 'queryLatestDiagSoftsIncrCdn';
     } else if (bodyStr.includes('getMaxVersionForMobileAppCDN')) {
         methodName = 'getMaxVersionForMobileAppCDN';
@@ -203,7 +205,7 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
     res.status(200).send(soapResponse);
 });
 
-// 7. مسار خدمات البرامج العامة (publicsoftservice) - مطابق للسيرفر الأصلي
+// 7. مسار خدمات البرامج العامة (publicsoftservice)
 app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res) => {
     console.log('[API] SOAP PublicSoft Service Request Received');
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
@@ -217,9 +219,9 @@ app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res
 app.all('/', (req, res) => res.json(fullRoutingResponse));
 app.all('/api/v2/config', (req, res) => res.json(fullRoutingResponse));
 
-// 9. المعالج الشامل لأي مسار آخر
+// 9. المعالج الشامل لأي مسار غير معرف مسبقاً
 app.all('*', (req, res) => {
-    console.log(`[REQUEST RECEIVED] Path: ${req.path}`);
+    console.log(`[UNKNOWN REQUEST] Path: ${req.path} | Method: ${req.method}`);
     res.json({
         "code": 0,
         "msg": "success",
