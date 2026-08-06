@@ -18,7 +18,7 @@ app.use('/api/v2/download', express.static(path.join(__dirname, 'public/files'))
 
 const MY_SERVER_URL = process.env.SERVER_URL || "https://my-diag-server.onrender.com";
 
-// طباعة الطلبات الواردة للـ Debugging
+// طباعة الطلبات الواردة للمتابعة
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} -> ${req.url}`);
     next();
@@ -82,80 +82,89 @@ app.all([
 });
 
 // ----------------------------------------------------
-// 3. مسار الماركات والبرمجيات (المسار الصحيح حسب الـ URLs: /api/v2/diagsoftservice)
+// 3. مسار الماركات المشتركة (queryPDTDiagSoftSubPack)
 // ----------------------------------------------------
 app.all([
     '/api/v2/diagsoftservice',
-    '/diagsoftservice'
+    '/diagsoftservice',
+    '/api/v2/x431paddiagsoftservice',
+    '/x431paddiagsoftservice'
 ], (req, res) => {
     res.setHeader('Content-Type', 'text/xml; charset=utf-8');
-    console.log("✅ [DIAGSOFT SERVICE]: Serving Car Brands List");
+    console.log("✅ [DIAGSOFT]: Responding with correct SOAP Envelope for queryPDTDiagSoftSubPack");
 
     const xmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <SOAP-ENV:Body>
-        <ns1:queryLatestDiagSoftsIncrCdnResponse>
-            <return>
-                <code>0</code>
-                <message>success</message>
-                <diagSoftList>
-                    <item>
-                        <softId>2001</softId>
-                        <softPackageId>DEMO</softPackageId>
-                        <softPackageName>DEMO</softPackageName>
-                        <version>V15.00</version>
-                        <versionDetailId>500001</versionDetailId>
-                        <fileSize>1024567</fileSize>
-                        <url>${MY_SERVER_URL}/files/DEMO_V15.00.zip</url>
-                    </item>
-                    <item>
-                        <softId>2002</softId>
-                        <softPackageId>EOBD2</softPackageId>
-                        <softPackageName>EOBD2 Protocol</softPackageName>
-                        <version>V22.80</version>
-                        <versionDetailId>500002</versionDetailId>
-                        <fileSize>2048567</fileSize>
-                        <url>${MY_SERVER_URL}/files/EOBD2_V22.80.zip</url>
-                    </item>
-                    <item>
-                        <softId>2003</softId>
-                        <softPackageId>TOYOTA</softPackageId>
-                        <softPackageName>TOYOTA / LEXUS</softPackageName>
-                        <version>V50.10</version>
-                        <versionDetailId>500003</versionDetailId>
-                        <fileSize>5048567</fileSize>
-                        <url>${MY_SERVER_URL}/files/TOYOTA_V50.10.zip</url>
-                    </item>
-                    <item>
-                        <softId>2004</softId>
-                        <softPackageId>VOLKSWAGEN</softPackageId>
-                        <softPackageName>VOLKSWAGEN</softPackageName>
-                        <version>V28.50</version>
-                        <versionDetailId>500004</versionDetailId>
-                        <fileSize>4048567</fileSize>
-                        <url>${MY_SERVER_URL}/files/VW_V28.50.zip</url>
-                    </item>
-                    <item>
-                        <softId>2005</softId>
-                        <softPackageId>BENZ</softPackageId>
-                        <softPackageName>MERCEDES-BENZ</softPackageName>
-                        <version>V49.90</version>
-                        <versionDetailId>500005</versionDetailId>
-                        <fileSize>6048567</fileSize>
-                        <url>${MY_SERVER_URL}/files/BENZ_V49.90.zip</url>
-                    </item>
-                    <item>
-                        <softId>2006</softId>
-                        <softPackageId>BMW</softPackageId>
-                        <softPackageName>BMW / MINI</softPackageName>
-                        <version>V50.00</version>
-                        <versionDetailId>500006</versionDetailId>
-                        <fileSize>5548567</fileSize>
-                        <url>${MY_SERVER_URL}/files/BMW_V50.00.zip</url>
-                    </item>
-                </diagSoftList>
+        <ns1:queryPDTDiagSoftSubPackResponse SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <return xsi:type="ns1:ResponseModel">
+                <code xsi:type="xsd:int">0</code>
+                <message xsi:type="xsd:string">success</message>
+                <diagSoftList href="#id1"/>
             </return>
-        </ns1:queryLatestDiagSoftsIncrCdnResponse>
+        </ns1:queryPDTDiagSoftSubPackResponse>
+        <SOAP-ENC:Array id="id1" xsi:type="SOAP-ENC:Array" SOAP-ENC:arrayType="ns1:DiagSoft[6]">
+            <item href="#id2"/>
+            <item href="#id3"/>
+            <item href="#id4"/>
+            <item href="#id5"/>
+            <item href="#id6"/>
+            <item href="#id7"/>
+        </SOAP-ENC:Array>
+        <ns1:DiagSoft id="id2" xsi:type="ns1:DiagSoft">
+            <softId xsi:type="xsd:int">2001</softId>
+            <softPackageId xsi:type="xsd:string">DEMO</softPackageId>
+            <softPackageName xsi:type="xsd:string">DEMO</softPackageName>
+            <version xsi:type="xsd:string">V15.00</version>
+            <versionDetailId xsi:type="xsd:int">500001</versionDetailId>
+            <fileSize xsi:type="xsd:long">1024567</fileSize>
+            <url xsi:type="xsd:string">${MY_SERVER_URL}/files/DEMO_V15.00.zip</url>
+        </ns1:DiagSoft>
+        <ns1:DiagSoft id="id3" xsi:type="ns1:DiagSoft">
+            <softId xsi:type="xsd:int">2002</softId>
+            <softPackageId xsi:type="xsd:string">EOBD2</softPackageId>
+            <softPackageName xsi:type="xsd:string">EOBD2 Protocol</softPackageName>
+            <version xsi:type="xsd:string">V22.80</version>
+            <versionDetailId xsi:type="xsd:int">500002</versionDetailId>
+            <fileSize xsi:type="xsd:long">2048567</fileSize>
+            <url xsi:type="xsd:string">${MY_SERVER_URL}/files/EOBD2_V22.80.zip</url>
+        </ns1:DiagSoft>
+        <ns1:DiagSoft id="id4" xsi:type="ns1:DiagSoft">
+            <softId xsi:type="xsd:int">2003</softId>
+            <softPackageId xsi:type="xsd:string">TOYOTA</softPackageId>
+            <softPackageName xsi:type="xsd:string">TOYOTA / LEXUS</softPackageName>
+            <version xsi:type="xsd:string">V50.10</version>
+            <versionDetailId xsi:type="xsd:int">500003</versionDetailId>
+            <fileSize xsi:type="xsd:long">5048567</fileSize>
+            <url xsi:type="xsd:string">${MY_SERVER_URL}/files/TOYOTA_V50.10.zip</url>
+        </ns1:DiagSoft>
+        <ns1:DiagSoft id="id5" xsi:type="ns1:DiagSoft">
+            <softId xsi:type="xsd:int">2004</softId>
+            <softPackageId xsi:type="xsd:string">VOLKSWAGEN</softPackageId>
+            <softPackageName xsi:type="xsd:string">VOLKSWAGEN</softPackageName>
+            <version xsi:type="xsd:string">V28.50</version>
+            <versionDetailId xsi:type="xsd:int">500004</versionDetailId>
+            <fileSize xsi:type="xsd:long">4048567</fileSize>
+            <url xsi:type="xsd:string">${MY_SERVER_URL}/files/VW_V28.50.zip</url>
+        </ns1:DiagSoft>
+        <ns1:DiagSoft id="id6" xsi:type="ns1:DiagSoft">
+            <softId xsi:type="xsd:int">2005</softId>
+            <softPackageId xsi:type="xsd:string">BENZ</softPackageId>
+            <softPackageName xsi:type="xsd:string">MERCEDES-BENZ</softPackageName>
+            <version xsi:type="xsd:string">V49.90</version>
+            <versionDetailId xsi:type="xsd:int">500005</versionDetailId>
+            <fileSize xsi:type="xsd:long">6048567</fileSize>
+            <url xsi:type="xsd:string">${MY_SERVER_URL}/files/BENZ_V49.90.zip</url>
+        </ns1:DiagSoft>
+        <ns1:DiagSoft id="id7" xsi:type="ns1:DiagSoft">
+            <softId xsi:type="xsd:int">2006</softId>
+            <softPackageId xsi:type="xsd:string">BMW</softPackageId>
+            <softPackageName xsi:type="xsd:string">BMW / MINI</softPackageName>
+            <version xsi:type="xsd:string">V50.00</version>
+            <versionDetailId xsi:type="xsd:int">500006</versionDetailId>
+            <fileSize xsi:type="xsd:long">5548567</fileSize>
+            <url xsi:type="xsd:string">${MY_SERVER_URL}/files/BMW_V50.00.zip</url>
+        </ns1:DiagSoft>
     </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`;
 
@@ -163,7 +172,7 @@ app.all([
 });
 
 // ----------------------------------------------------
-// 4. مسار الروابط الأساسية (/urls - نفس الـ JSON الذي أرسلته)
+// 4. مسار الروابط الأساسية (/urls)
 // ----------------------------------------------------
 app.all(['/urls', '/api/v2/urls'], (req, res) => {
     res.json({
@@ -178,19 +187,17 @@ app.all(['/urls', '/api/v2/urls'], (req, res) => {
                 { "key": "productservice.*", "value": `${MY_SERVER_URL}/api/v2/product-service` },
                 { "key": "publicsoftservice.*", "value": `${MY_SERVER_URL}/api/v2/publicsoftservice` },
                 { "key": "publicsoftservice.nt", "value": `${MY_SERVER_URL}/api/v2/publicsoftservice-nt` },
-                { "key": "x431padpublicsoftservice.*", "value": `${MY_SERVER_URL}/api/v2/publicsoftservice` },
                 { "key": "x431paddiagsoftservice.*", "value": `${MY_SERVER_URL}/api/v2/diagsoftservice` },
                 { "key": "diagsoftservice.*", "value": `${MY_SERVER_URL}/api/v2/diagsoftservice` },
                 { "key": "publicsoft.download", "value": `${MY_SERVER_URL}/api/v2/download` },
-                { "key": "downloaddiagsoftws.action", "value": `${MY_SERVER_URL}/api/v2/download` },
-                { "key": "dlDiagSoftPack.action", "value": `${MY_SERVER_URL}/api/v2/download` }
+                { "key": "downloaddiagsoftws.action", "value": `${MY_SERVER_URL}/api/v2/download` }
             ]
         }
     });
 });
 
 // ----------------------------------------------------
-// 5. مسار تسجيل الدخول (/api/v2/login)
+// 5. تسجيل الدخول (/login)
 // ----------------------------------------------------
 app.all(['/login', '/api/v2/login'], (req, res) => {
     res.json({
@@ -217,5 +224,5 @@ app.all('*', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Master Diag Server Online on Port ${PORT}`);
+    console.log(`🚀 Complete Diag Server Online on Port ${PORT}`);
 });
