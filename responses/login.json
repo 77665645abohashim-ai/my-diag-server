@@ -1,11 +1,15 @@
-{
-  "code": 0,
-  "msg": "success",
-  "data": {
-    "token": "mock-token-123456",
-    "uid": "12345",
-    "username": "1234",
-    "password": "1234",
-    "status": "ACTIVE"
-  }
-}
+يفرHTTP/2 200
+date: Wed, 05 Aug 2026 17:08:33 GMT
+content-type: application/json
+server: cloudflare
+cache-control: no-store, no-cache, must-revalidate, max-age=0
+cache-control: post-check=0, pre-check=0
+pragma: no-cache
+cf-cache-status: DYNAMIC
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=cKZbpxK%2Fgp6RL%2BVvhh1k%2FLy4KsAcNbmiq%2Fp7AUvzHnduTag6gALVMsCtpJO3PPCUW8Tm8eO%2B6Yn5jbeINW6oMgabSB5N3SNBRAAicv3ongKWL0vasesUmDrKhXIIOA%3D%3D"}]}
+content-encoding: gzip
+cf-ray: a267678cfc79be60-FRA
+alt-svc: h3=":443"; ma=86400
+
+{"code":0,"msg":null,"data":{"xmpp":{"ip":"jabber.diagzone.com","port":5222,"domain":"diagzone.com"},"token":"YmxrVCtaaEVJNWUrWWhhcVY5VHIvdz09","user":{"user_id":"H21J4WOO","sex":"1","user_name":"979862374489","nick_name":"979862374489","mobile":"","is_bind_mobile":"0","email":"mistery4_ever@mail.ru","is_bind_email":"0","signature":"","set_face_time":"0","roles":"1","reg_zone":"1","reg_source":"0","is_agree_clause":"0","pub_id":"","face_url":null,"is_365":false,"tech_status":"-1","country":"IT","province":null,"city":null,"nation_id":"237"},"config":null}} 
