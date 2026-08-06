@@ -205,12 +205,100 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
     res.status(200).send(soapResponse);
 });
 
-// 7. مسار خدمات البرامج العامة (publicsoftservice) - يتضمن ماركة تويوتا V12.12
+// 7. مسار خدمات البرامج العامة (publicsoftservice) - يتضمن كافة البرمجيات وتويوتا
 app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res) => {
     console.log('[API] SOAP PublicSoft Service Request Received');
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
-    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>68365802</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1015</softId><softName>Diagzone PRO V2</softName><softPackageID>Diagzone_PRO_V2</softPackageID><softUpdateTime>2025-03-08 00:00:00</softUpdateTime><versionDetailId>359645</versionDetailId><versionNo>V2.00.033</versionNo></x431PadSoft><x431PadSoft><fileSize>393300</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2023-03-27 00:00:00</softUpdateTime><versionDetailId>343730</versionDetailId><versionNo>V11.91</versionNo></x431PadSoft><x431PadSoft><fileSize>6166636</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>880</softId><softName>VIN Recognition App</softName><softPackageID>VIN_RECOGNITION_APP</softPackageID><softUpdateTime>2024-05-02 00:00:00</softUpdateTime><versionDetailId>354418</versionDetailId><versionNo>V1.01.006</versionNo></x431PadSoft><x431PadSoft><fileSize>50000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1050</softId><softName>TOYOTA</softName><softPackageID>TOYOTA</softPackageID><softUpdateTime>2026-01-01 00:00:00</softUpdateTime><versionDetailId>999999</versionDetailId><versionNo>V12.12</versionNo></x431PadSoft></x431PadSoftList></return></ns1:queryLatestPublicSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList>
+        <x431PadSoft>
+            <fileSize>393300</fileSize>
+            <lanId>EN</lanId>
+            <serverCurrentTime>2026-08-06</serverCurrentTime>
+            <softId>873</softId>
+            <softName>Firmware</softName>
+            <softPackageID>DOWNLOAD</softPackageID>
+            <softUpdateTime>2023-03-27 00:00:00</softUpdateTime>
+            <versionDetailId>343730</versionDetailId>
+            <versionNo>V11.91</versionNo>
+        </x431PadSoft>
+        <x431PadSoft>
+            <fileSize>19084288</fileSize>
+            <lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime>
+            <softId>874</softId>
+            <softName>ECUAID</softName>
+            <softPackageID>ECUAID</softPackageID>
+            <softUpdateTime>2024-01-01 00:00:00</softUpdateTime>
+            <versionDetailId>345000</versionDetailId>
+            <versionNo>V12.11</versionNo>
+        </x431PadSoft>
+        <x431PadSoft>
+            <fileSize>89547520</fileSize>
+            <lanId>EN</lanId>
+            <serverCurrentTime>2026-08-06</serverCurrentTime>
+            <softId>875</softId>
+            <softName>VINSCAN Service</softName>
+            <softPackageID>VINSCAN_SERVICE</softPackageID>
+            <softUpdateTime>2024-01-01 00:00:00</softUpdateTime>
+            <versionDetailId>346000</versionDetailId>
+            <versionNo>V11.15</versionNo>
+        </x431PadSoft>
+        <x431PadSoft>
+            <fileSize>68365802</fileSize>
+            <lanId>EN</lanId>
+            <serverCurrentTime>2026-08-06</serverCurrentTime>
+            <softId>1015</softId>
+            <softName>Diagzone PRO V2</softName>
+            <softPackageID>Diagzone_PRO_V2</softPackageID>
+            <softUpdateTime>2025-03-08 00:00:00</softUpdateTime>
+            <versionDetailId>359645</versionDetailId>
+            <versionNo>V2.00.033</versionNo>
+        </x431PadSoft>
+        <x431PadSoft>
+            <fileSize>55784448</fileSize>
+            <lanId>EN</lanId>
+            <serverCurrentTime>2026-08-06</serverCurrentTime>
+            <softId>876</softId>
+            <softName>Demo</softName>
+            <softPackageID>DEMO</softPackageID>
+            <softUpdateTime>2024-01-01 00:00:00</softUpdateTime>
+            <versionDetailId>347000</versionDetailId>
+            <versionNo>V15.68</versionNo>
+        </x431PadSoft>
+        <x431PadSoft>
+            <fileSize>2306868</fileSize>
+            <lanId>EN</lanId>
+            <serverCurrentTime>2026-08-06</serverCurrentTime>
+            <softId>877</softId>
+            <softName>Demo (BMS)</softName>
+            <softPackageID>DEMO_BMS</softPackageID>
+            <softUpdateTime>2024-01-01 00:00:00</softUpdateTime>
+            <versionDetailId>348000</versionDetailId>
+            <versionNo>V15.55</versionNo>
+        </x431PadSoft>
+        <x431PadSoft>
+            <fileSize>2306868</fileSize>
+            <lanId>EN</lanId>
+            <serverCurrentTime>2026-08-06</serverCurrentTime>
+            <softId>878</softId>
+            <softName>DEMO Motor</softName>
+            <softPackageID>DEMO_MOTOR</softPackageID>
+            <softUpdateTime>2024-01-01 00:00:00</softUpdateTime>
+            <versionDetailId>349000</versionDetailId>
+            <versionNo>V10.11</versionNo>
+        </x431PadSoft>
+        <x431PadSoft>
+            <fileSize>50000000</fileSize>
+            <lanId>EN</lanId>
+            <serverCurrentTime>2026-08-06</serverCurrentTime>
+            <softId>1050</softId>
+            <softName>TOYOTA</softName>
+            <softPackageID>TOYOTA</softPackageID>
+            <softUpdateTime>2026-01-01 00:00:00</softUpdateTime>
+            <versionDetailId>999999</versionDetailId>
+            <versionNo>V12.12</versionNo>
+        </x431PadSoft>
+    </x431PadSoftList></return></ns1:queryLatestPublicSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
     
     res.status(200).send(soapResponse);
 });
