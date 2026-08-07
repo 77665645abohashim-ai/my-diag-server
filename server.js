@@ -5,9 +5,9 @@ const PORT = process.env.PORT || 10000;
 const MY_DOMAIN = 'https://my-diag-server.onrender.com';
 
 // إعدادات قراءة البيانات
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.text({ type: '*/*' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.text({ type: '*/*', limit: '50mb' }));
 
 // 1. منع التخزين المؤقت (Cache)
 app.use((req, res, next) => {
@@ -196,8 +196,17 @@ app.all(['/', '/api/v2/config', '/api/v2/urls'], (req, res) => {
     res.json(fullRoutingResponse);
 });
 
-// 8. مسارات التحقق وحالة الوصلة (تم تحديث استجابتها لتطابق الرد الأصلي {"code":0,"message":"OK"})
-app.all(['/api/v2/td-query-state', '/api/v2/td-check-locked', '/api/v2/device-verification', '/td-query-state', '/td-check-locked', '/api/v2/td-report-state'], (req, res) => {
+// 8. مسار td-check-locked (المحدث بالبيانات الضخمة الكاملة)
+app.all('/api/v2/td-check-locked', (req, res) => {
+    res.json({
+        "code": 0,
+        "message": "OK",
+        "data": "ضع_هنا_نص_البيانات_الضخمة_التي_استقبلتها_من_السيفر_الاصلي"
+    });
+});
+
+// 8.1 باقي مسارات التحقق وحالة الوصلة العادية
+app.all(['/api/v2/td-query-state', '/api/v2/device-verification', '/td-query-state', '/td-report-state'], (req, res) => {
     res.json({
         "code": 0,
         "message": "OK"
