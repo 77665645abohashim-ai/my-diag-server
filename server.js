@@ -77,7 +77,7 @@ app.all('/api/v2/product-service', (req, res) => {
     res.status(200).send(soapResponse);
 });
 
-// 5. مسار خدمات البرامج والماركات الشامل (يحتوي على كافة الماركات من الصور)
+// 5. مسار خدمات البرامج والماركات الشامل
 app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 
@@ -91,7 +91,7 @@ app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res
         <x431PadSoft><fileSize>2306868</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>877</softId><softName>Demo (BMS)</softName><softPackageID>DEMO_BMS</softPackageID><softUpdateTime>2024-01-01 00:00:00</softUpdateTime><versionDetailId>348000</versionDetailId><versionNo>V15.55</versionNo></x431PadSoft>
         <x431PadSoft><fileSize>2306868</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>878</softId><softName>DEMO Motor</softName><softPackageID>DEMO_MOTOR</softPackageID><softUpdateTime>2024-01-01 00:00:00</softUpdateTime><versionDetailId>349000</versionDetailId><versionNo>V10.11</versionNo></x431PadSoft>
 
-        <!-- ماركات السيارات والملفات من الصور -->
+        <!-- ماركات السيارات والملفات -->
         <x431PadSoft><fileSize>15000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1101</softId><softName>AUTOSEARCH</softName><softPackageID>AUTOSEARCH</softPackageID><versionDetailId>4001</versionDetailId><versionNo>V10.00</versionNo></x431PadSoft>
         <x431PadSoft><fileSize>20000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1102</softId><softName>AUSTHOLDEN</softName><softPackageID>AUSTHOLDEN</softPackageID><versionDetailId>4002</versionDetailId><versionNo>V21.20</versionNo></x431PadSoft>
         <x431PadSoft><fileSize>30000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1103</softId><softName>AUDI</softName><softPackageID>AUDI</softPackageID><versionDetailId>4003</versionDetailId><versionNo>V28.50</versionNo></x431PadSoft>
@@ -187,7 +187,22 @@ app.all(['/', '/api/v2/config', '/api/v2/urls'], (req, res) => {
     res.json(fullRoutingResponse);
 });
 
-// 8. المعالج الشامل لأي مسار فرعي آخر
+// 8. مسارات التحقق الخاصة بالوصلة وحالة الشبكة (تمت إضافتها لمنع ظهور رسالة الشبكة غير متاحة)
+app.all(['/api/v2/td-query-state', '/api/v2/td-check-locked', '/api/v2/device-verification', '/td-query-state', '/td-check-locked'], (req, res) => {
+    res.json({
+        "code": 0,
+        "msg": "success",
+        "message": "OK",
+        "data": {
+            "status": "normal",
+            "isLocked": false,
+            "available": true,
+            "success": true
+        }
+    });
+});
+
+// 9. المعالج الشامل لأي مسار فرعي آخر
 app.all('*', (req, res) => {
     res.json({
         "code": 0,
