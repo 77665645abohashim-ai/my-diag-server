@@ -19,7 +19,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// 2. خريطة توجيه المسارات الكاملة
+// 2. خريطة توجيه المسارات الكاملة (تم إضافة مسارات الفريموير والحالة هنا لتجنب 404)
 const fullRoutingResponse = {
     "code": 0,
     "msg": "success",
@@ -44,7 +44,9 @@ const fullRoutingResponse = {
             { "key": "log.upload", "value": `${MY_DOMAIN}/api/v2/log-service-upload` },
             { "key": "report_list", "value": `${MY_DOMAIN}/api/v2/httapi-report-list` },
             { "key": "programfile.download_new", "value": `${MY_DOMAIN}/api/v2/download-programming` },
-            { "key": "getVersionDetialIds", "value": `${MY_DOMAIN}/api/v2/getVersionDetialIds` }
+            { "key": "getVersionDetialIds", "value": `${MY_DOMAIN}/api/v2/getVersionDetialIds` },
+            { "key": "td-check-locked", "value": `${MY_DOMAIN}/api/v2/td-check-locked` },
+            { "key": "td-query-state", "value": `${MY_DOMAIN}/api/v2/td-query-state` }
         ]
     }
 };
@@ -99,7 +101,7 @@ app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res
     res.status(200).send(soapResponse);
 });
 
-// 6. مسار فحص قفل الفريموير (من السيرفر الأصلي diagboss.ch)
+// 6. مسار فحص قفل الفريموير (يتم جلبه من السيرفر الأصلي diagboss.ch)
 app.all('/api/v2/td-check-locked', async (req, res) => {
     try {
         const response = await axios({
@@ -121,7 +123,7 @@ app.all('/api/v2/td-check-locked', async (req, res) => {
     }
 });
 
-// 7. مسار الاستعلام عن حالة الموصل (من السيرفر الأصلي diagboss.ch)
+// 7. مسار الاستعلام عن حالة الموصل (يتم جلبه من السيرفر الأصلي diagboss.ch)
 app.all('/api/v2/td-query-state', async (req, res) => {
     try {
         const response = await axios({
