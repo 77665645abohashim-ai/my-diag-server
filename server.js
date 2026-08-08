@@ -52,7 +52,8 @@ const fullRoutingResponse = {
     }
 };
 
-app.all('/api/v2/getRoutingInfo', (req, res) => {
+// دعم المسارين معاً للتأكد تماماً (api/v2/urls و api/v2/getRoutingInfo)
+app.all(['/api/v2/urls', '/api/v2/getRoutingInfo'], (req, res) => {
     res.json(fullRoutingResponse);
 });
 
@@ -109,10 +110,7 @@ app.all('/api/v2/td-check-locked', async (req, res) => {
             method: req.method,
             url: 'https://diagboss.ch/api/v2/td-check-locked',
             data: req.body,
-            headers: {
-                ...req.headers,
-                host: 'diagboss.ch'
-            }
+            headers: { ...req.headers, host: 'diagboss.ch' }
         });
         res.status(response.status).json(response.data);
     } catch (error) {
@@ -131,10 +129,7 @@ app.all('/api/v2/td-query-state', async (req, res) => {
             method: req.method,
             url: 'https://diagboss.ch/api/v2/td-query-state',
             data: req.body,
-            headers: {
-                ...req.headers,
-                host: 'diagboss.ch'
-            }
+            headers: { ...req.headers, host: 'diagboss.ch' }
         });
         res.status(response.status).json(response.data);
     } catch (error) {
@@ -153,10 +148,7 @@ app.all('/api/v2/url-upload', async (req, res) => {
             method: req.method,
             url: 'https://diagboss.ch/api/v2/url-upload',
             data: req.body,
-            headers: {
-                ...req.headers,
-                host: 'diagboss.ch'
-            }
+            headers: { ...req.headers, host: 'diagboss.ch' }
         });
         res.status(response.status).json(response.data);
     } catch (error) {
