@@ -99,7 +99,7 @@ app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res
     res.status(200).send(soapResponse);
 });
 
-// 6. مسار فحص الفريموير (يتم جلبه حصرياً من السيرفر الأصلي diagboss.ch)
+// 6. مسار فحص قفل الفريموير (من السيرفر الأصلي diagboss.ch)
 app.all('/api/v2/td-check-locked', async (req, res) => {
     try {
         const response = await axios({
@@ -111,18 +111,34 @@ app.all('/api/v2/td-check-locked', async (req, res) => {
                 host: 'diagboss.ch'
             }
         });
-
         res.status(response.status).json(response.data);
-        
     } catch (error) {
         if (error.response) {
             res.status(error.response.status).json(error.response.data);
         } else {
-            res.status(500).json({ 
-                "code": 1, 
-                "msg": "Proxy Error", 
-                "error": error.message 
-            });
+            res.status(500).json({ "code": 1, "msg": "Proxy Error", "error": error.message });
+        }
+    }
+});
+
+// 7. مسار الاستعلام عن حالة الموصل (من السيرفر الأصلي diagboss.ch)
+app.all('/api/v2/td-query-state', async (req, res) => {
+    try {
+        const response = await axios({
+            method: req.method,
+            url: 'https://diagboss.ch/api/v2/td-query-state',
+            data: req.body,
+            headers: {
+                ...req.headers,
+                host: 'diagboss.ch'
+            }
+        });
+        res.status(response.status).json(response.data);
+    } catch (error) {
+        if (error.response) {
+            res.status(error.response.status).json(error.response.data);
+        } else {
+            res.status(500).json({ "code": 1, "msg": "Proxy Error", "error": error.message });
         }
     }
 });
