@@ -1,6 +1,4 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 const app = express();
 
 const PORT = process.env.PORT || 10000;
@@ -45,129 +43,96 @@ const fullRoutingResponse = {
             { "key": "log.upload", "value": `${MY_DOMAIN}/api/v2/log-service-upload` },
             { "key": "report_list", "value": `${MY_DOMAIN}/api/v2/httapi-report-list` },
             { "key": "programfile.download_new", "value": `${MY_DOMAIN}/api/v2/download-programming` },
-            { "key": "getVersionDetialIds", "value": `${MY_DOMAIN}/api/v2/getVersionDetialIds` },
-            { "key": "td-check-locked", "value": `${MY_DOMAIN}/api/v2/td-check-locked` },
-            { "key": "td-query-state", "value": `${MY_DOMAIN}/api/v2/td-query-state` },
-            { "key": "url-upload", "value": `${MY_DOMAIN}/api/v2/url-upload` }
+            { "key": "getVersionDetialIds", "value": `${MY_DOMAIN}/api/v2/getVersionDetialIds` }
         ]
     }
 };
 
-app.all(['/api/v2/urls', '/api/v2/getRoutingInfo'], (req, res) => {
-    res.json(fullRoutingResponse);
-});
-
-// 3. مسار تسجيل الدخول (يقرأ من responses/login.json إن وُجد)
+// 3. مسار تسجيل الدخول
 app.all(['/api/v2/login', '/login.action', '/api/v2/user/login'], (req, res) => {
-    const filePath = path.join(__dirname, 'responses', 'login.json');
-    if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.json({
-            "code": 0,
-            "msg": null,
-            "data": {
-                "xmpp": { "ip": "jabber.diagzone.com", "port": 5222, "domain": "diagzone.com" },
-                "token": "YmxrVCtaaEVJNWUrWWhhcVY5VHIvdz09",
-                "user": {
-                    "user_id": "H21J4WOO",
-                    "user_name": "979862374489",
-                    "nick_name": "979862374489",
-                    "email": "mistery4_ever@mail.ru",
-                    "roles": "1",
-                    "reg_zone": "1",
-                    "country": "IT",
-                    "nation_id": "237"
-                }
+    res.json({
+        "code": 0,
+        "msg": null,
+        "data": {
+            "xmpp": { "ip": "jabber.diagzone.com", "port": 5222, "domain": "diagzone.com" },
+            "token": "YmxrVCtaaEVJNWUrWWhhcVY5VHIvdz09",
+            "user": {
+                "user_id": "H21J4WOO",
+                "user_name": "979862374489",
+                "nick_name": "979862374489",
+                "email": "mistery4_ever@mail.ru",
+                "roles": "1",
+                "reg_zone": "1",
+                "country": "IT",
+                "nation_id": "237"
             }
-        });
-    }
+        }
+    });
 });
 
-// 4. مسار خدمات المنتجات (يقرأ من responses/product-service.xml إن وُجد)
+// 4. مسار خدمات المنتجات (Product Service)
 app.all('/api/v2/product-service', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    const filePath = path.join(__dirname, 'responses', 'product-service.xml');
-    if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getRegisteredProductsForPad46><return><code>0</code><productDTOs><carLicenseTag></carLicenseTag><serialNo>979862374489</serialNo><dzKey>qOLwvILVmrmkZVZ18kfqZPuWsNnia+eC/lTWfpSLibS1esVL6NJETa7a7Yjddowo8iWr3t/IV1vTbZBYKl4ZvuEptvGX4kfx3r+bNVNKVVPVe4Z4sZpKVKRsSWHpp9VKzYogHyd2ecwFGuFiEAtRN40rR9VkrhQGhUV5nLh9x5rQfZQeGK68OsJ+VvkMN0ty</dzKey><pdtCategory>2</pdtCategory></productDTOs></return></ns1:getRegisteredProductsForPad46></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
-    }
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getRegisteredProductsForPad46><return><code>0</code><productDTOs><carLicenseTag></carLicenseTag><serialNo>979862374489</serialNo><dzKey>qOLwvILVmrmkZVZ18kfqZPuWsNnia+eC/lTWfpSLibS1esVL6NJETa7a7Yjddowo8iWr3t/IV1vTbZBYKl4ZvuEptvGX4kfx3r+bNVNKVVPVe4Z4sZpKVKRsSWHpp9VKzYogHyd2ecwFGuFiEAtRN40rR9VkrhQGhUV5nLh9x5rQfZQeGK68OsJ+VvkMN0ty</dzKey><pdtCategory>2</pdtCategory></productDTOs></return></ns1:getRegisteredProductsForPad46></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+    res.status(200).send(soapResponse);
 });
 
-// 5. مسار البرامج والماركات (يقرأ من responses/publicsoftservice.xml إن وُجد)
+// 5. مسار خدمات البرامج والماركات الشامل (يحتوي على كافة الماركات من الصور)
 app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    const filePath = path.join(__dirname, 'responses', 'publicsoftservice.xml');
-    if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>393300</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2023-03-27 00:00:00</softUpdateTime><versionDetailId>343730</versionDetailId><versionNo>V11.91</versionNo></x431PadSoft></x431PadSoftList></return></ns1:queryLatestPublicSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
-    }
-});
 
-// 6. مسار رفع الروابط (url-upload)
-app.all('/api/v2/url-upload', (req, res) => {
-    const filePath = path.join(__dirname, 'responses', 'url-upload.json');
-    if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.status(200).json({ "code": 0, "msg": "success", "data": null });
-    }
-});
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList>
+        <!-- الأنظمة الأساسية والخدمات -->
+        <x431PadSoft><fileSize>393300</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2023-03-27 00:00:00</softUpdateTime><versionDetailId>343730</versionDetailId><versionNo>V11.91</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>19084288</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>874</softId><softName>ECUAID</softName><softPackageID>ECUAID</softPackageID><softUpdateTime>2024-01-01 00:00:00</softUpdateTime><versionDetailId>345000</versionDetailId><versionNo>V12.11</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>89547520</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>875</softId><softName>VINSCAN Service</softName><softPackageID>VINSCAN_SERVICE</softPackageID><softUpdateTime>2024-01-01 00:00:00</softUpdateTime><versionDetailId>346000</versionDetailId><versionNo>V11.15</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>68365802</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1015</softId><softName>Diagzone PRO V2</softName><softPackageID>Diagzone_PRO_V2</softPackageID><softUpdateTime>2025-03-08 00:00:00</softUpdateTime><versionDetailId>359645</versionDetailId><versionNo>V2.00.033</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>55784448</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>876</softId><softName>Demo</softName><softPackageID>DEMO</softPackageID><softUpdateTime>2024-01-01 00:00:00</softUpdateTime><versionDetailId>347000</versionDetailId><versionNo>V10.66</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>2306868</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>877</softId><softName>Demo (BMS)</softName><softPackageID>DEMO_BMS</softPackageID><softUpdateTime>2024-01-01 00:00:00</softUpdateTime><versionDetailId>348000</versionDetailId><versionNo>V15.55</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>2306868</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>878</softId><softName>DEMO Motor</softName><softPackageID>DEMO_MOTOR</softPackageID><softUpdateTime>2024-01-01 00:00:00</softUpdateTime><versionDetailId>349000</versionDetailId><versionNo>V10.11</versionNo></x431PadSoft>
 
-// 7. مسار خدمات التشخيص (diagsoftservice)
-app.all('/api/v2/diagsoftservice', (req, res) => {
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    const filePath = path.join(__dirname, 'responses', 'diagsoftservice.xml');
-    if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><ns1:queryDiagSofts xmlns:ns1="https://diagzone.com"><return><code>0</code><message>success</message></return></ns1:queryDiagSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
-    }
-});
-
-// 8. مسار تحميل الملفات بذكاء بالاعتماد على softwares.json
-app.all(['/api/v2/download', '/download', '/api/v2/publicsoft.download', '/api/v2/programfile.download_new'], (req, res) => {
-    try {
-        const softwaresPath = path.join(__dirname, 'responses', 'softwares.json');
-        if (!fs.existsSync(softwaresPath)) {
-            return res.status(404).json({ "code": 1, "msg": "softwares.json not found" });
-        }
-        
-        const rawData = fs.readFileSync(softwaresPath, 'utf8');
-        const data = JSON.parse(rawData);
-        
-        const versionDetailId = req.query.versionDetailId || req.body.versionDetailId;
-        const softPackageID = req.query.softPackageID || req.body.softPackageID;
-        
-        let targetSoftware = null;
-        
-        if (versionDetailId) {
-            targetSoftware = data.softwares.find(s => String(s.versionDetailId) === String(versionDetailId));
-        } else if (softPackageID) {
-            targetSoftware = data.softwares.find(s => s.softPackageID === softPackageID);
-        }
-        
-        if (!targetSoftware && data.softwares.length > 0) {
-            targetSoftware = data.softwares.find(s => s.softPackageID === "DOWNLOAD") || data.softwares[0];
-        }
-        
-        if (targetSoftware && targetSoftware.fileName) {
-            const filePath = path.join(__dirname, 'responses', targetSoftware.fileName);
-            if (fs.existsSync(filePath)) {
-                return res.download(filePath);
-            } else {
-                return res.status(404).send(`File ${targetSoftware.fileName} is missing in responses folder.`);
-            }
-        }
-        
-        res.status(404).json({ "code": 1, "msg": "Software not found in configuration" });
-    } catch (error) {
-        res.status(500).json({ "code": 1, "msg": "Server Error", "error": error.message });
-    }
-});
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+        <!-- ماركات السيارات والملفات من الصور -->
+        <x431PadSoft><fileSize>15000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1101</softId><softName>AUTOSEARCH</softName><softPackageID>AUTOSEARCH</softPackageID><versionDetailId>4001</versionDetailId><versionNo>V10.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>20000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1102</softId><softName>AUSTHOLDEN</softName><softPackageID>AUSTHOLDEN</softPackageID><versionDetailId>4002</versionDetailId><versionNo>V21.20</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>30000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1103</softId><softName>AUDI</softName><softPackageID>AUDI</softPackageID><versionDetailId>4003</versionDetailId><versionNo>V28.50</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>12000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1104</softId><softName>BXFIAT</softName><softPackageID>BXFIAT</softPackageID><versionDetailId>4004</versionDetailId><versionNo>V10.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>45000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1105</softId><softName>BMW</softName><softPackageID>BMW</softPackageID><versionDetailId>4005</versionDetailId><versionNo>V50.20</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>48000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1106</softId><softName>BENZ</softName><softPackageID>BENZ</softPackageID><versionDetailId>4006</versionDetailId><versionNo>V49.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>18000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1107</softId><softName>BAIC</softName><softPackageID>BAIC</softPackageID><versionDetailId>4007</versionDetailId><versionNo>V15.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>15000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1108</softId><softName>CHANGHE</softName><softPackageID>CHANGHE</softPackageID><versionDetailId>4008</versionDetailId><versionNo>V14.20</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>22000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1109</softId><softName>CHANGCHENG</softName><softPackageID>CHANGCHENG</softPackageID><versionDetailId>4009</versionDetailId><versionNo>V18.30</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>40000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1110</softId><softName>CHANGAN</softName><softPackageID>CHANGAN</softPackageID><versionDetailId>4010</versionDetailId><versionNo>V21.40</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>12000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1111</softId><softName>BXGM</softName><softPackageID>BXGM</softPackageID><versionDetailId>4011</versionDetailId><versionNo>V10.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>25000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1112</softId><softName>DAIHATSU</softName><softPackageID>DAIHATSU</softPackageID><versionDetailId>4012</versionDetailId><versionNo>V16.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>20000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1113</softId><softName>DAEWOO</softName><softPackageID>DAEWOO</softPackageID><versionDetailId>4013</versionDetailId><versionNo>V14.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>28000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1114</softId><softName>CITROEN</softName><softPackageID>CITROEN</softPackageID><versionDetailId>4014</versionDetailId><versionNo>V41.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>25000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1115</softId><softName>CHRYSLER</softName><softPackageID>CHRYSLER</softPackageID><versionDetailId>4015</versionDetailId><versionNo>V33.20</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>15000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1116</softId><softName>EUROPE</softName><softPackageID>EUROPE</softPackageID><versionDetailId>4016</versionDetailId><versionNo>V10.20</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>8000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1117</softId><softName>EOBD2</softName><softPackageID>EOBD2</softPackageID><versionDetailId>4017</versionDetailId><versionNo>V22.50</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>16000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1118</softId><softName>DONGNAN</softName><softPackageID>DONGNAN</softPackageID><versionDetailId>4018</versionDetailId><versionNo>V11.20</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>35000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1119</softId><softName>GM</softName><softPackageID>GM</softPackageID><versionDetailId>4019</versionDetailId><versionNo>V46.40</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>14000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1120</softId><softName>FUTIAN</softName><softPackageID>FUTIAN</softPackageID><versionDetailId>4020</versionDetailId><versionNo>V12.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>10000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1121</softId><softName>FLYER</softName><softPackageID>FLYER</softPackageID><versionDetailId>4021</versionDetailId><versionNo>V10.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>30000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1122</softId><softName>FIAT</softName><softPackageID>FIAT</softPackageID><versionDetailId>4022</versionDetailId><versionNo>V31.20</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>22000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1123</softId><softName>HUACHEN</softName><softPackageID>HUACHEN</softPackageID><versionDetailId>4023</versionDetailId><versionNo>V15.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>42000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1124</softId><softName>HONDA</softName><softPackageID>HONDA</softPackageID><versionDetailId>4024</versionDetailId><versionNo>V48.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>20000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1125</softId><softName>HMAZDA</softName><softPackageID>HMAZDA</softPackageID><versionDetailId>4025</versionDetailId><versionNo>V13.20</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>18000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1126</softId><softName>HAFEI</softName><softPackageID>HAFEI</softPackageID><versionDetailId>4026</versionDetailId><versionNo>V14.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>15000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1127</softId><softName>INDIANTATA</softName><softPackageID>INDIANTATA</softPackageID><versionDetailId>4027</versionDetailId><versionNo>V12.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>16000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1128</softId><softName>INDIANMARUTI</softName><softPackageID>INDIANMARUTI</softPackageID><versionDetailId>4028</versionDetailId><versionNo>V12.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>16000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1129</softId><softName>INDIANMAHINDRA</softName><softPackageID>INDIANMAHINDRA</softPackageID><versionDetailId>4029</versionDetailId><versionNo>V12.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>45000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1130</softId><softName>HYUNDAI</softName><softPackageID>HYUNDAI</softPackageID><versionDetailId>4030</versionDetailId><versionNo>V51.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>14000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1131</softId><softName>JINLONG</softName><softPackageID>JINLONG</softPackageID><versionDetailId>4031</versionDetailId><versionNo>V11.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>13000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1132</softId><softName>JIAO</softName><softPackageID>JIAO</softPackageID><versionDetailId>4032</versionDetailId><versionNo>V10.50</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>13000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1133</softId><softName>JACTY</softName><softPackageID>JACTY</softPackageID><versionDetailId>4033</versionDetailId><versionNo>V10.50</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>38000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1134</softId><softName>ISUZU</softName><softPackageID>ISUZU</softPackageID><versionDetailId>4034</versionDetailId><versionNo>V21.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>40000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1135</softId><softName>KIA</softName><softPackageID>KIA</softPackageID><versionDetailId>4035</versionDetailId><versionNo>V44.20</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>15000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1136</softId><softName>KARRY_TY</softName><softPackageID>KARRY_TY</softPackageID><versionDetailId>4036</versionDetailId><versionNo>V11.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>16000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1137</softId><softName>JPISUZU</softName><softPackageID>JPISUZU</softPackageID><versionDetailId>4037</versionDetailId><versionNo>V12.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>15000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1138</softId><softName>JOULONG</softName><softPackageID>JOULONG</softPackageID><versionDetailId>4038</versionDetailId><versionNo>V10.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>14000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1139</softId><softName>LIUWEI_TY</softName><softPackageID>LIUWEI_TY</softPackageID><versionDetailId>4039</versionDetailId><versionNo>V10.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>18000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1140</softId><softName>LIFAN</softName><softPackageID>LIFAN</softPackageID><versionDetailId>4040</versionDetailId><versionNo>V13.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>35000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1141</softId><softName>LANDROVER</softName><softPackageID>LANDROVER</softPackageID><versionDetailId>4041</versionDetailId><versionNo>V33.10</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>15000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1142</softId><softName>KINGLONGTY</softName><softPackageID>KINGLONGTY</softPackageID><versionDetailId>4042</versionDetailId><versionNo>V10.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>22000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1143</softId><softName>MALAYSIA PROTON</softName><softPackageID>MALAYSIA_PROTON</softPackageID><versionDetailId>4043</versionDetailId><versionNo>V14.00</versionNo></x431PadSoft>
+        <x431PadSoft><fileSize>20000000</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>1144</softId><softName>MALAYSIA PERODUA</softName><softPackageID>MALAYSIA_PERODUA</softPackageID><versionDetailId>4044</versio
