@@ -6,19 +6,21 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 const MY_DOMAIN = 'https://my-diag-server.onrender.com';
 
+// إعدادات قراءة البيانات
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text({ type: '*/*' }));
 
-// منع التخزين المؤقت
+// 1. منع التخزين المؤقت (Cache)
 app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
     next();
 });
 
-// 1. خريطة الروابط
+// 2. خريطة توجيه المسارات الكاملة
 const fullRoutingResponse = {
     "code": 0,
     "msg": "success",
@@ -55,7 +57,7 @@ app.all(['/api/v2/urls', '/api/v2/getRoutingInfo'], (req, res) => {
     res.json(fullRoutingResponse);
 });
 
-// 2. مسار تسجيل الدخول (يقرأ من ملف responses/login.json إذا وجد، وإلا يرد افتراضياً)
+// 3. مسار تسجيل الدخول (يقرأ من responses/login.json إن وُجد)
 app.all(['/api/v2/login', '/login.action', '/api/v2/user/login'], (req, res) => {
     const filePath = path.join(__dirname, 'responses', 'login.json');
     if (fs.existsSync(filePath)) {
@@ -82,25 +84,87 @@ app.all(['/api/v2/login', '/login.action', '/api/v2/user/login'], (req, res) => 
     }
 });
 
-// 3. مسار خدمات المنتجات (يقرأ من ملف responses/product-service.xml إذا وجد)
+// 4. مسار خدمات المنتجات (يقرأ من responses/product-service.xml إن وُجد)
 app.all('/api/v2/product-service', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     const filePath = path.join(__dirname, 'responses', 'product-service.xml');
     if (fs.existsSync(filePath)) {
         res.sendFile(filePath);
     } else {
-        res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><ns1:getRegisteredProductsForPad46 xmlns:ns1="https://diagzone.com"><return><code>0</code><productDTOs><serialNo>979862374489</serialNo><dzKey>qOLwvILVmrmkZVZ18kfqZPuWsNnia+eC/lTWfpSLibS1esVL6NJETa7a7Yjddowo8iWr3t/IV1vTbZBYKl4ZvuEptvGX4kfx3r+bNVNKVVPVe4Z4sZpKVKRsSWHpp9VKzYogHyd2ecwFGuFiEAtRN40rR9VkrhQGhUV5nLh9x5rQfZQeGK68OsJ+VvkMN0ty</dzKey><pdtCategory>2</pdtCategory></productDTOs></return></ns1:getRegisteredProductsForPad46></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
+        res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getRegisteredProductsForPad46><return><code>0</code><productDTOs><carLicenseTag></carLicenseTag><serialNo>979862374489</serialNo><dzKey>qOLwvILVmrmkZVZ18kfqZPuWsNnia+eC/lTWfpSLibS1esVL6NJETa7a7Yjddowo8iWr3t/IV1vTbZBYKl4ZvuEptvGX4kfx3r+bNVNKVVPVe4Z4sZpKVKRsSWHpp9VKzYogHyd2ecwFGuFiEAtRN40rR9VkrhQGhUV5nLh9x5rQfZQeGK68OsJ+VvkMN0ty</dzKey><pdtCategory>2</pdtCategory></productDTOs></return></ns1:getRegisteredProductsForPad46></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
     }
 });
 
-// 4. مسار البرامج والماركات (يقرأ من ملف responses/publicsoftservice.xml إذا وجد)
+// 5. مسار البرامج والماركات (يقرأ من responses/publicsoftservice.xml إن وُجد)
 app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     const filePath = path.join(__dirname, 'responses', 'publicsoftservice.xml');
     if (fs.existsSync(filePath)) {
         res.sendFile(filePath);
     } else {
-        res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts xmlns:ns1="https://diagzone.com"><return><code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>393300</fileSize><lanId>EN</lanId><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><versionNo>V11.91</versionNo></x431PadSoft></x431PadSoftList></return></ns1:queryLatestPublicSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
+        res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>393300</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2023-03-27 00:00:00</softUpdateTime><versionDetailId>343730</versionDetailId><versionNo>V11.91</versionNo></x431PadSoft></x431PadSoftList></return></ns1:queryLatestPublicSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
+    }
+});
+
+// 6. مسار رفع الروابط (url-upload)
+app.all('/api/v2/url-upload', (req, res) => {
+    const filePath = path.join(__dirname, 'responses', 'url-upload.json');
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(200).json({ "code": 0, "msg": "success", "data": null });
+    }
+});
+
+// 7. مسار خدمات التشخيص (diagsoftservice)
+app.all('/api/v2/diagsoftservice', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    const filePath = path.join(__dirname, 'responses', 'diagsoftservice.xml');
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><ns1:queryDiagSofts xmlns:ns1="https://diagzone.com"><return><code>0</code><message>success</message></return></ns1:queryDiagSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
+    }
+});
+
+// 8. مسار تحميل الملفات بذكاء بالاعتماد على softwares.json
+app.all(['/api/v2/download', '/download', '/api/v2/publicsoft.download', '/api/v2/programfile.download_new'], (req, res) => {
+    try {
+        const softwaresPath = path.join(__dirname, 'responses', 'softwares.json');
+        if (!fs.existsSync(softwaresPath)) {
+            return res.status(404).json({ "code": 1, "msg": "softwares.json not found" });
+        }
+        
+        const rawData = fs.readFileSync(softwaresPath, 'utf8');
+        const data = JSON.parse(rawData);
+        
+        const versionDetailId = req.query.versionDetailId || req.body.versionDetailId;
+        const softPackageID = req.query.softPackageID || req.body.softPackageID;
+        
+        let targetSoftware = null;
+        
+        if (versionDetailId) {
+            targetSoftware = data.softwares.find(s => String(s.versionDetailId) === String(versionDetailId));
+        } else if (softPackageID) {
+            targetSoftware = data.softwares.find(s => s.softPackageID === softPackageID);
+        }
+        
+        if (!targetSoftware && data.softwares.length > 0) {
+            targetSoftware = data.softwares.find(s => s.softPackageID === "DOWNLOAD") || data.softwares[0];
+        }
+        
+        if (targetSoftware && targetSoftware.fileName) {
+            const filePath = path.join(__dirname, 'responses', targetSoftware.fileName);
+            if (fs.existsSync(filePath)) {
+                return res.download(filePath);
+            } else {
+                return res.status(404).send(`File ${targetSoftware.fileName} is missing in responses folder.`);
+            }
+        }
+        
+        res.status(404).json({ "code": 1, "msg": "Software not found in configuration" });
+    } catch (error) {
+        res.status(500).json({ "code": 1, "msg": "Server Error", "error": error.message });
     }
 });
 
