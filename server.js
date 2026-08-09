@@ -220,6 +220,16 @@ app.all('/api/v2/activation', (req, res) => {
         }
     });
 });
+// مسار تحميل الملفات وتوجيهها إلى GitHub
+app.all('/api/v2/download', (req, res) => {
+    console.log('[API] Download Request Received for:', req.query || req.body);
+    
+    // الرابط المباشر لملف DEMO.zip من حسابك على جيت هاب
+    const githubFileUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
+    
+    // توجيه التطبيق للتحميل من الرابط المباشر
+    res.redirect(302, githubFileUrl);
+});
 
 // 10. المعالج الشامل لأي مسار فرعي آخر
 app.all('*', (req, res) => {
