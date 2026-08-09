@@ -209,6 +209,17 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
 app.all(['/', '/api/v2/config', '/api/v2/urls'], (req, res) => {
     res.json(fullRoutingResponse);
 });
+// مسار التفعيل المخصص
+app.all('/api/v2/activation', (req, res) => {
+    console.log('[API] Activation Request Received with body/query:', req.body || req.query);
+    res.json({
+        "code": 0,
+        "msg": "OK",
+        "data": {
+            "activationCode": "MVJuaTE4L3NRRUI0VVo1enBYM2dWZz09"
+        }
+    });
+});
 
 // 10. المعالج الشامل لأي مسار فرعي آخر
 app.all('*', (req, res) => {
