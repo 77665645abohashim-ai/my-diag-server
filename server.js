@@ -57,7 +57,8 @@ app.all(['/api/v2/login', '/login.action', '/api/v2/user/login'], (req, res) => 
         "msg": null,
         "data": {
             "xmpp": { "ip": "jabber.diagzone.com", "port": 5222, "domain": "diagzone.com" },
-            "token": "UFY3ZTI0YlU1OWY3d1lyZHVKZGY2Zz09",
+            "token": "MGtjNDgzMGJUhLMVN4VitXb29qQT09
+",
             "user": {
                 "user_id": "H21J4WOO",
                 "user_name": "979862374489",
@@ -247,7 +248,8 @@ app.all('/api/v2/activation', (req, res) => {
         "code": 0,
         "msg": "OK",
         "data": {
-            "activationCode": "MVJuaTE4L3NRRUI0VVo1enBYM2dWZz09"
+            "activationCode": "MGtjNDgzMGJUhLMVN4VitXb29qQT09
+"
         }
     });
 });
