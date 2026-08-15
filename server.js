@@ -113,11 +113,22 @@ app.all('/api/v2/activation', (req, res) => {
     res.json({ "code": 0, "msg": "OK", "data": { "activationCode": "bytPLzY0VWRXT1NLbjVRZ0FzOEFSdz09" } });
 });
 
-// 10. مسار التحميل المباشر المتوافق مع التطبيق (302 Redirect)
+// 10. مسار التحميل (302 Redirect) المتوافق مع التطبيق
 app.all('/api/v2/download', (req, res) => {
     console.log('[Download Request Query]:', req.query);
     const githubFileUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
     res.redirect(302, githubFileUrl);
+});
+
+// 11. مسار احتياطي لـ url-upload في حال طلبها التطبيق
+app.all('/api/v2/url-upload', (req, res) => {
+    res.json({
+        "code": 0,
+        "msg": "success",
+        "data": {
+            "url": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip"
+        }
+    });
 });
 
 app.all('*', (req, res) => {
