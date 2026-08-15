@@ -50,7 +50,7 @@ const fullRoutingResponse = {
     }
 };
 
-// 3. مسار تسجيل الدخول (تم تصحيح التوكن في سطر واحد بدون فواصل أسطر)
+// 3. مسار تسجيل الدخول
 app.all(['/api/v2/login', '/login.action', '/api/v2/user/login'], (req, res) => {
     console.log('[API] Login Request Received');
     res.json({
@@ -104,7 +104,7 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
     res.status(200).send(soapResponse);
 });
 
-// 9. الروابط العامة والتفعيل والتحميل
+// 9. الروابط العامة والتفعيل
 app.all(['/', '/api/v2/config', '/api/v2/urls'], (req, res) => {
     res.json(fullRoutingResponse);
 });
@@ -113,6 +113,18 @@ app.all('/api/v2/activation', (req, res) => {
     res.json({ "code": 0, "msg": "OK", "data": { "activationCode": "bytPLzY0VWRXT1NLbjVRZ0FzOEFSdz09" } });
 });
 
+// 10. مسار استقبال الروابط (تمت الإضافة هنا ليتوافق مع طلبات التطبيق الظاهرة في الفحص)
+app.all('/api/v2/url-upload', (req, res) => {
+    res.json({
+        "code": 0,
+        "msg": "success",
+        "data": {
+            "url": `${MY_DOMAIN}/api/v2/download`
+        }
+    });
+});
+
+// 11. مسار تحميل الحزم والملفات الفعلي
 app.all('/api/v2/download', (req, res) => {
     const githubFileUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
     res.redirect(302, githubFileUrl);
