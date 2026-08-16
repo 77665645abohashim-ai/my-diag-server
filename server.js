@@ -27,25 +27,25 @@ const fullRoutingResponse = {
     "data": {
         "urls": [
             { "key": "login", "value": "https://diagboss.ch/api/v2/login" },
-            { "key": "check-token", "value": https://diagboss.ch/api/v2/check-token` },
+            { "key": "check-token", "value": "https://diagboss.ch/api/v2/check-token" },
             { "key": "productservice.*", "value": "https://diagboss.ch/api/v2/product-service" },
             { "key": "publicsoftservice.*", "value": "https://diagboss.ch/api/v2/publicsoftservice" },
             { "key": "publicsoftservice.nt", "value": "https://diagboss.ch/api/v2/publicsoftservice-nt" },
             { "key": "x431padpublicsoftservice.*", "value": "https://diagboss.ch/api/v2/publicsoftservice" },
             { "key": "x431paddiagsoftservice.*", "value": "https://diagboss.ch/api/v2/diagsoftservice" },
-            { "key": "diagnosticLog.query", "value": https://diagboss.ch/api/v2/diagnosticLog` },
+            { "key": "diagnosticLog.query", "value": "https://diagboss.ch/api/v2/diagnosticLog" },
             { "key": "createDiagSoftOrder", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "checkProductToUpgrade", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "publicsoft.download", "value": `${MY_DOMAIN}/api/v2/download` },
-            { "key": "downloaddiagsoftws.action", "value": `${MY_DOMAIN}/api/v2/download` },
+            { "key": "doinloaddiagsoftws.action", "value": `${MY_DOMAIN}/api/v2/download` },
             { "key": "diagsoftservice.*", "value": "https://diagboss.ch/api/v2/diagsoftservice" },
-            { "key": "activation", "value": https://diagboss.ch/api/v2/activation` },
-            { "key": "log.upload", "value": https://diagboss.ch/api/v2/log-service-upload` },
+            { "key": "activation", "value": "https://diagboss.ch/api/v2/activation" },
+            { "key": "log.upload", "value": "https://diagboss.ch/api/v2/log-service-upload" },
             { "key": "report_list", "value": `${MY_DOMAIN}/api/v2/httapi-report-list` },
             { "key": "programfile.download_new", "value": `${MY_DOMAIN}/api/v2/download-programming` },
-            { "key": "td.query-state", "value": https://diagboss.ch/api/v2/td-query-state` },
+            { "key": "td.query-state", "value": "https://diagboss.ch/api/v2/td-query-state" },
             { "key": "td.check-locked", "value": "https://diagboss.ch/api/v2/td-check-locked" },
-            { "key": "getVersionDetialIds", "value":https://diagboss.ch/api/v2/getVersionDetialIds` }
+            { "key": "getVersionDetialIds", "value": "https://diagboss.ch/api/v2/getVersionDetialIds" }
         ]
     }
 };
