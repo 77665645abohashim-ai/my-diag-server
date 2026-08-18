@@ -34,7 +34,7 @@ const fullRoutingResponse = {
             { "key": "x431padpublicsoftservice.*", "value": "https://diagboss.ch/api/v2/publicsoftservice" },
             { "key": "x431paddiagsoftservice.*", "value": "https://diagboss.ch/api/v2/diagsoftservice" },
             { "key": "diagnosticLog.query", "value": "https://diagboss.ch/api/v2/diagnosticLog" },
-            { "key": "createDiagSoftOrder", "value": `${MY_DOMAIN}/api/v2/product-service` },
+            { "key": "createDiagSoftOrder", "value":"https://diagboss.ch/api/v2/product-service" },
             { "key": "checkProductToUpgrade", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "publicsoft.download", "value":"https://diagboss.ch/api/v2/download" },
             { "key": "doinloaddiagsoftws.action", "value":"https://diagboss.ch/api/v2/download" },
