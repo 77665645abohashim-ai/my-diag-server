@@ -37,7 +37,7 @@ const fullRoutingResponse = {
             { "key": "createDiagSoftOrder", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "checkProductToUpgrade", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "publicsoft.download", "value":"https://diagboss.ch/api/v2/download" },
-            { "key": "doinloaddiagsoftws.action", "value": `${MY_DOMAIN}/api/v2/download` },
+            { "key": "doinloaddiagsoftws.action", "value":"https://diagboss.ch/api/v2/download" },
             { "key": "diagsoftservice.*", "value": "https://diagboss.ch/api/v2/diagsoftservice" },
             { "key": "activation", "value": "https://diagboss.ch/api/v2/activation" },
             { "key": "log.upload", "value": "https://diagboss.ch/api/v2/log-service-upload" },
