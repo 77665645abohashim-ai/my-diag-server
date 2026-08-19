@@ -26,7 +26,7 @@ const fullRoutingResponse = {
     "area": "2",
     "data": {
         "urls": [
-            { "key": "login", "value": `${MY_DOMAIN}/api/v2/login` },
+            { "key": "login", "value":"https://diagboss.ch/api/v2/login" },
             { "key": "check-token", "value": `${MY_DOMAIN}/api/v2/check-token` },
             { "key": "productservice.*", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "publicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
