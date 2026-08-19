@@ -149,14 +149,15 @@ app.all('/api/v2/activation', (req, res) => {
 
 // مسار التحميل
 
-// مسار التحميل للتجربة: إعادة توجيه الطلب إلى السيرفر الأصلي
+// مسار التحميل الموجه إلى ملفات الـ GitHub Release الخاصة بك
 app.all('/api/v2/download', (req, res) => {
-    // أخذ جميع الباراميترات التي أرسلها التطبيق وإعادة توجيهها للسيرفر الأصلي مع نفس الversionDetailId
-    const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
-    const originalServerUrl = `https://diagboss.ch/api/v2/download${queryString}`;
+    // يمكنك هنا تخصيص التوجيه بناءً على رقم الإصدار أو اسم الملف المطلوبة من الباراميترات
+    // أو توجيه مباشر لملف DEMO.zip الموجود في الـ Release لديك:
     
-    console.log(`Redirecting download request to original server: ${originalServerUrl}`);
+    const githubFileUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
     
-    // إرسال تحويل 302 للسيرفر الأصلي
-    res.redirect(302, originalServerUrl);
+    console.log(`Redirecting download request to GitHub Release: ${githubFileUrl}`);
+    
+    // إرسال تحويل مباشر للسيرفر ليقوم التطبيق بتحميل الملف من حسابك على غيت هب
+    res.redirect(302, githubFileUrl);
 });
