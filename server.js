@@ -149,45 +149,14 @@ app.all('/api/v2/activation', (req, res) => {
 
 // مسار التحميل
 
-// معالجة مسار التحميل ليدعم GET و POST ويمنع التعليق
-app.all('/api/v2/download', async (req, res) => {
-    try {
-        // التقاط الversionDetailId من الـ Query أو الـ Body بغض النظر عن طريقة الإرسال
-        const versionDetailId = req.query.versionDetailId || req.body?.versionDetailId || req.headers['versiondetailid'];
-        
-        console.log(`Download requested for versionDetailId: ${versionDetailId}`);
-
-        // إذا كان ملف Firmware (قيمة 343730)
-        if (versionDetailId === "343730") {
-            const filePath = path.join(__dirname, 'downloads', 'DOWNLOAD.bin');
-            if (fs.existsSync(filePath)) {
-                res.setHeader('Content-Type', 'application/octet-stream');
-                res.setHeader('Content-Disposition', 'attachment; filename=DOWNLOAD.bin');
-                return fs.createReadStream(filePath).pipe(res);
-            } else {
-                // توجيه مؤقت لملف الفيرموير على جيت هاب
-                return res.redirect(302, 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DOWNLOAD.bin');
-            }
-        } else {
-            // لبقية الملفات (Demo, ECUaid, VINSCAN وغيرها) -> توجيه 302 مباشر لرابط جيت هاب
-            const githubFileUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
-            return res.redirect(302, githubFileUrl);
-        }
-    } catch (error) {
-        console.error("Download Route Error:", error);
-        res.status(500).json({ code: -1, msg: "Error processing download" });
-    }
-});
-
-// 10. المعالج الشامل لأي مسار آخر
-app.all('*', (req, res) => {
-    res.json({
-        "code": 0,
-        "msg": "success",
-        "data": {}
-    });
-});
-
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+// مسار التحميل للتجربة: إعادة توجيه الطلب إلى السيرفر الأصلي
+app.all('/api/v2/download', (req, res) => {
+    // أخذ جميع الباراميترات التي أرسلها التطبيق وإعادة توجيهها للسيرفر الأصلي مع نفس الversionDetailId
+    const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
+    const originalServerUrl = `https://diagboss.ch/api/v2/download${queryString}`;
+    
+    console.log(`Redirecting download request to original server: ${originalServerUrl}`);
+    
+    // إرسال تحويل 302 للسيرفر الأصلي
+    res.redirect(302, originalServerUrl);
 });
