@@ -39,7 +39,7 @@ const fullRoutingResponse = {
             { "key": "publicsoft.download", "value":"https://my-diag-server.onrender.com/api/v2/download" },
             { "key": "downloaddiagsoftws.action", "value":"https://my-diag-server.onrender.com/api/v2/download" },
             { "key": "diagsoftservice.*", "value": `${MY_DOMAIN}/api/v2/diagsoftservice` },
-            { "key": "activation", "value":"https://my-diag-server.onrender.com/api/v2/activation" },
+            { "key": "activation", "value":"https://diagboss.ch/api/v2/activation" },
             { "key": "log.upload", "value": `${MY_DOMAIN}/api/v2/log-service-upload` },
             { "key": "report_list", "value": `${MY_DOMAIN}/api/v2/httapi-report-list` },
             { "key": "programfile.download_new", "value":"https://my-diag-server.onrender.com/api/v2/download-programming" },
