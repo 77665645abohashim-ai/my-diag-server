@@ -148,41 +148,34 @@ app.all('/api/v2/activation', (req, res) => {
 });
 
 // مسار التحميل
-const fs = require('fs');
-const path = require('path');
-const axios = require('axios'); // تأكد من تثبيته أو استخدامه حسب الحاجة
 
-// مسار التحميل المحدث (يدعم Streaming للـ Firmware وتحويل 302 للبقية)
+// معالجة مسار التحميل ليدعم GET و POST ويمنع التعليق
 app.all('/api/v2/download', async (req, res) => {
     try {
-        // استقبال المعرف سواء كان في الـ Query أو الـ Body
-        const versionDetailId = req.query.versionDetailId || req.body?.versionDetailId;
+        // التقاط الversionDetailId من الـ Query أو الـ Body بغض النظر عن طريقة الإرسال
+        const versionDetailId = req.query.versionDetailId || req.body?.versionDetailId || req.headers['versiondetailid'];
         
-        // رقم الـ versionDetailId الخاص بملف الـ Firmware بناءً على جدولك (قيمة 343730)
-        const firmwareVersionId = "343730"; 
+        console.log(`Download requested for versionDetailId: ${versionDetailId}`);
 
-        if (versionDetailId === firmwareVersionId) {
-            // الحالة الأولى: ملف Firmware -> إرسال مباشر (Binary Stream) لكي لا يعلق التطبيق
-            const filePath = path.join(__dirname, 'downloads', 'DOWNLOAD.bin'); // تأكد من وضع ملف الـ BIN بهذا المسار على مشروعك
-            
+        // إذا كان ملف Firmware (قيمة 343730)
+        if (versionDetailId === "343730") {
+            const filePath = path.join(__dirname, 'downloads', 'DOWNLOAD.bin');
             if (fs.existsSync(filePath)) {
-                res.setHeader('Content-Type', 'application/octet-stream;charset=UTF-8');
+                res.setHeader('Content-Type', 'application/octet-stream');
                 res.setHeader('Content-Disposition', 'attachment; filename=DOWNLOAD.bin');
-                
-                const fileStream = fs.createReadStream(filePath);
-                fileStream.pipe(res);
+                return fs.createReadStream(filePath).pipe(res);
             } else {
-                // حل بديل مؤقت إذا لم ترفع الملف محلياً: توجيهه لرابط الـجيت هاب المباشر
-                res.redirect(302, 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DOWNLOAD.bin');
+                // توجيه مؤقت لملف الفيرموير على جيت هاب
+                return res.redirect(302, 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DOWNLOAD.bin');
             }
         } else {
-            // الحالة الثانية: بقية الملفات (مثل Demo أو الماركات) -> إرجاع تحويل 302 لرابط جيت هاب كما كنت تفعل
+            // لبقية الملفات (Demo, ECUaid, VINSCAN وغيرها) -> توجيه 302 مباشر لرابط جيت هاب
             const githubFileUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
-            res.redirect(302, githubFileUrl);
+            return res.redirect(302, githubFileUrl);
         }
     } catch (error) {
-        console.error("Download Error:", error);
-        res.status(500).json({ code: -1, msg: "Download failed" });
+        console.error("Download Route Error:", error);
+        res.status(500).json({ code: -1, msg: "Error processing download" });
     }
 });
 
