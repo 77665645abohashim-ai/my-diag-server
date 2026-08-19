@@ -39,12 +39,12 @@ const fullRoutingResponse = {
             { "key": "publicsoft.download", "value": `${MY_DOMAIN}/api/v2/download` },
             { "key": "downloaddiagsoftws.action", "value": `${MY_DOMAIN}/api/v2/download` },
             { "key": "diagsoftservice.*", "value": `${MY_DOMAIN}/api/v2/diagsoftservice` },
-            { "key": "activation", "value": `${MY_DOMAIN}/api/v2/activation` },
+            { "key": "activation", "value":"https://diagboss.ch/api/v2/activation" },
             { "key": "log.upload", "value": `${MY_DOMAIN}/api/v2/log-service-upload` },
             { "key": "report_list", "value": `${MY_DOMAIN}/api/v2/httapi-report-list` },
             { "key": "programfile.download_new", "value": `${MY_DOMAIN}/api/v2/download-programming` },
             { "key": "td.query-state", "value": `${MY_DOMAIN}/api/v2/td-query-state` },
-            { "key": "td.check-locked", "value": `${MY_DOMAIN}/api/v2/td-check-locked` },
+            { "key": "td.check-locked", "value":"https://diagboss.ch/api/v2/td-check-locked" },
             { "key": "getVersionDetialIds", "value": `${MY_DOMAIN}/api/v2/getVersionDetialIds` }
         ]
     }
