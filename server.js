@@ -43,9 +43,9 @@ const fullRoutingResponse = {
             { "key": "log.upload", "value": `${MY_DOMAIN}/api/v2/log-service-upload` },
             { "key": "report_list", "value": `${MY_DOMAIN}/api/v2/httapi-report-list` },
             { "key": "programfile.download_new", "value": `${MY_DOMAIN}/api/v2/download-programming` },
-            { "key": "td.query-state", "value": `${MY_DOMAIN}/api/v2/td-query-state` },
+            { "key": "td.query-state", "value":"https://diagboss.ch/api/v2/td-query-state" },
             { "key": "td.check-locked", "value":"https://diagboss.ch/api/v2/td-check-locked" },
-            { "key": "getVersionDetialIds", "value": `${MY_DOMAIN}/api/v2/getVersionDetialIds` }
+            { "key": "getVersionDetialIds", "value":"https://diagboss.ch/api/v2/getVersionDetialIds" }
         ]
     }
 };
