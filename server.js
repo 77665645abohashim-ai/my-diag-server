@@ -212,11 +212,10 @@ app.all('/api/v2/activation', (req, res) => {
     });
 });
 
-// 11. مسار التحميل الموجه ديناميكياً (محدث لمنع التعليق)
+// 11. مسار التحميل بصيغة JSON ليتوافق مع مدير التنزيل في التطبيق
 app.all('/api/v2/download', (req, res) => {
     const softPackageID = req.query.softPackageID || req.body.softPackageID || '';
     
-    // رابط افتراضي (يمكنك تخصيص روابط لكل حزمة برفعها على جيتهاب وتعديل الروابط هنا)
     let targetUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
 
     if (softPackageID.includes('DOWNLOAD') || softPackageID.includes('Firmware')) {
@@ -225,7 +224,14 @@ app.all('/api/v2/download', (req, res) => {
         targetUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/ECUAID.zip';
     }
 
-    res.redirect(302, targetUrl);
+    res.json({
+        "code": 0,
+        "msg": "success",
+        "data": {
+            "downloadUrl": targetUrl,
+            "fileSize": 55740637
+        }
+    });
 });
 
 // 12. المسارات الإضافية لمنع أخطاء 404
@@ -239,7 +245,14 @@ app.all('/api/v2/httapi-report-list', (req, res) => {
 
 app.all('/api/v2/download-programming', (req, res) => {
     const githubProgUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
-    res.redirect(302, githubProgUrl);
+    res.json({
+        "code": 0,
+        "msg": "success",
+        "data": {
+            "downloadUrl": githubProgUrl,
+            "fileSize": 55740637
+        }
+    });
 });
 
 // تشغيل السيرفر
