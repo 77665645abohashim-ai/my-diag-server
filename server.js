@@ -27,13 +27,13 @@ const fullRoutingResponse = {
     "data": {
         "urls": [
             { "key": "login", "value":"https://diagboss.ch/api/v2/login" },
-            { "key": "check-token", "value": `${MY_DOMAIN}/api/v2/check-token` },
-            { "key": "productservice.*", "value": `${MY_DOMAIN}/api/v2/product-service` },
+            { "key": "check-token", "value":"https://diagboss.ch/api/v2/check-token" },
+            { "key": "productservice.*", "value":"https://diagboss.ch/api/v2/product-service" },
             { "key": "publicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
             { "key": "publicsoftservice.nt", "value": `${MY_DOMAIN}/api/v2/publicsoftservice-nt` },
             { "key": "x431padpublicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
-            { "key": "x431paddiagsoftservice.*", "value": `${MY_DOMAIN}/api/v2/diagsoftservice` },
-            { "key": "diagnosticLog.query", "value": `${MY_DOMAIN}/api/v2/diagnosticLog` },
+            { "key": "x431paddiagsoftservice.*", "value":"https://diagboss.ch/api/v2/diagsoftservice" },
+            { "key": "diagnosticLog.query", "value":"https://diagboss.ch/api/v2/diagnosticLog" },
             { "key": "createDiagSoftOrder", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "checkProductToUpgrade", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "publicsoft.download", "value":"https://my-diag-server.onrender.com/api/v2/download" },
