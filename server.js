@@ -32,7 +32,7 @@ const fullRoutingResponse = {
             { "key": "publicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
             { "key": "publicsoftservice.nt", "value": `${MY_DOMAIN}/api/v2/publicsoftservice-nt` },
             { "key": "x431padpublicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
-            { "key": "x431paddiagsoftservice.*", "value": "https://diagboss.ch/api/v2/diagsoftservice" },
+            { "key": "x431paddiagsoftservice.*", "value": "https://my-diag-server.onrender.com/api/v2/diagsoftservice" },
             { "key": "diagnosticLog.query", "value": "https://diagboss.ch/api/v2/diagnosticLog" },
             { "key": "createDiagSoftOrder", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "checkProductToUpgrade", "value": `${MY_DOMAIN}/api/v2/product-service` },
