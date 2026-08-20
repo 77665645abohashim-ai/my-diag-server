@@ -18,7 +18,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// 2. خريطة توجيه المسارات المحدثة بالكامل بناءً على طلبك
+// 2. خريطة توجيه المسارات المحدثة بالكامل
 const fullRoutingResponse = {
     "code": 0,
     "msg": "success",
@@ -32,7 +32,7 @@ const fullRoutingResponse = {
             { "key": "publicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
             { "key": "publicsoftservice.nt", "value": `${MY_DOMAIN}/api/v2/publicsoftservice-nt` },
             { "key": "x431padpublicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
-            { "key": "x431paddiagsoftservice.*", "value": "https://my-diag-server.onrender.com/api/v2/diagsoftservice" },
+            { "key": "x431paddiagsoftservice.*", "value": `${MY_DOMAIN}/api/v2/diagsoftservice` },
             { "key": "diagnosticLog.query", "value": "https://diagboss.ch/api/v2/diagnosticLog" },
             { "key": "createDiagSoftOrder", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "checkProductToUpgrade", "value": `${MY_DOMAIN}/api/v2/product-service` },
@@ -161,14 +161,14 @@ app.all('/api/v2/getVersionDetialIds', (req, res) => {
 
 // 6. مسار خدمات المنتجات
 app.all('/api/v2/product-service', (req, res) => {
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    res.setHeader('Content-Type', 'text/xml; charset=UTF-8');
     const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getRegisteredProductsForPad46><return><code>0</code><productDTOs><carLicenseTag></carLicenseTag><serialNo>979862374489</serialNo><dzKey>qOLwvILVmrmkZVZ18kfqZPuWsNnia+eC/lTWfpSLibS1esVL6NJETa7a7Yjddowo8iWr3t/IV1vTbZBYKl4ZvuEptvGX4kfx3r+bNVNKVVPVe4Z4sZpKVKRsSWHpp9VKzYogHyd2ecwFGuFiEAtRN40rR9VkrhQGhUV5nLh9x5rQfZQeGK68OsJ+VvkMN0ty</dzKey><pdtCategory>2</pdtCategory></productDTOs></return></ns1:getRegisteredProductsForPad46></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
     res.status(200).send(soapResponse);
 });
 
 // 7. مسار خدمات البرامج والماركات الشامل
 app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res) => {
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    res.setHeader('Content-Type', 'text/xml; charset=UTF-8');
     const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList>
         <x431PadSoft><fileSize>393300</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2023-03-27 00:00:00</softUpdateTime><versionDetailId>343730</versionDetailId><versionNo>V11.91</versionNo></x431PadSoft>
         <x431PadSoft><fileSize>19084288</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-06</serverCurrentTime><softId>874</softId><softName>ECUAID</softName><softPackageID>ECUAID</softPackageID><softUpdateTime>2024-01-01 00:00:00</softUpdateTime><versionDetailId>345000</versionDetailId><versionNo>V12.11</versionNo></x431PadSoft>
@@ -181,7 +181,7 @@ app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res
 
 // 8. مسار خدمات التشخيص الشامل
 app.all('/api/v2/diagsoftservice', (req, res) => {
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    res.setHeader('Content-Type', 'text/xml; charset=UTF-8');
     const soapResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
 <SOAP-ENV:Body>
@@ -212,10 +212,20 @@ app.all('/api/v2/activation', (req, res) => {
     });
 });
 
-// 11. مسار التحميل الموجه مباشرة إلى ملف DEMO.zip على GitHub Release
+// 11. مسار التحميل الموجه ديناميكياً (محدث لمنع التعليق)
 app.all('/api/v2/download', (req, res) => {
-    const githubFileUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
-    res.redirect(302, githubFileUrl);
+    const softPackageID = req.query.softPackageID || req.body.softPackageID || '';
+    
+    // رابط افتراضي (يمكنك تخصيص روابط لكل حزمة برفعها على جيتهاب وتعديل الروابط هنا)
+    let targetUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
+
+    if (softPackageID.includes('DOWNLOAD') || softPackageID.includes('Firmware')) {
+        targetUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/Firmware.zip';
+    } else if (softPackageID.includes('ECUAID')) {
+        targetUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/ECUAID.zip';
+    }
+
+    res.redirect(302, targetUrl);
 });
 
 // 12. المسارات الإضافية لمنع أخطاء 404
