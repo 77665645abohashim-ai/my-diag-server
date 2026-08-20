@@ -47,6 +47,7 @@ const fullRoutingResponse = {
             { "key": "publicsoft_breakpoint_action", "value": `${MY_DOMAIN}/api/v2/download` },
             { "key": "diagsoft_breakpoint_action", "value": `${MY_DOMAIN}/api/v2/download` },
             { "key": "dlDiagSoftPack.action", "value": `${MY_DOMAIN}/api/v2/download` },
+            { "key": "downdsfrag", "value": `${MY_DOMAIN}/api/v2/url-upload` },
             { "key": "diagsoftservice.*", "value": `${MY_DOMAIN}/api/v2/diagsoftservice` },
             { "key": "activation", "value": "https://diagboss.ch/api/v2/activation" },
             { "key": "log.upload", "value": "https://diagboss.ch/api/v2/log-service-upload" },
@@ -56,7 +57,7 @@ const fullRoutingResponse = {
             { "key": "programfile.download_new", "value": `${MY_DOMAIN}/api/v2/download-programming` },
             { "key": "td.query-state", "value": "https://diagboss.ch/api/v2/td-query-state" },
             { "key": "td.report-state", "value": "https://my-diag-server.onrender.com/api/v2/td-report-state" },
-            { "key": "td.upload-cert", "value": "https://diagboss.ch/api/v2/td-upload-cert" },
+            { "key": "td.upload-cert", "value": "https://my-diag-server.onrender.com/api/v2/td-upload-cert" },
             { "key": "td.check-locked", "value": "https://my-diag-server.onrender.com/api/v2/td-check-locked" },
             { "key": "td2.flasher", "value": "https://my-diag-server.onrender.com/api/v2/td2-flasher" },
             { "key": "onlinelic", "value": "https://my-diag-server.onrender.com/api/v2/onlinelic" },
@@ -102,8 +103,8 @@ const fullRoutingResponse = {
             { "key": "getExpertDataFlow_new", "value": "https://my-diag-server.onrender.com/api/v2/getExpertDataFlow-new" },
             { "key": "downloaddocumentws.action", "value": "https://my-diag-server.onrender.com/api/v2/download-document" },
             { "key": "multipagecomp_html_url", "value": "https://diagboss.ch/api/v2/multipagecomp-html-url-new" },
-            { "key": "motorCardReg", "value": "https://diagboss.ch/api/v2/motorCardReg?" },
-            { "key": "getMotorUrlBySn", "value": "https://diagboss.ch/api/v2/getMotorUrlBySn" },
+            { "key": "motorCardReg", "value": "https://my-diag-server.onrender.com/api/v2/motorCardReg?" },
+            { "key": "getMotorUrlBySn", "value": "https://my-diag-server.onrender.com/api/v2/getMotorUrlBySn" },
             { "key": "query_adas_product", "value": "https://my-diag-server.onrender.com/api/v2/query-adas-product" },
             { "key": "query_adas_soft_file", "value": "https://my-diag-server.onrender.com/api/v2/query-adas-soft-file" },
             { "key": "adas_soft_file_down_loadurl", "value": "https://my-diag-server.onrender.com/api/v2/adas-soft-file-down-loadurl" },
@@ -213,15 +214,9 @@ app.all('/api/v2/activation', (req, res) => {
     });
 });
 
-// 11. مسار التحميل (مع تتبع الطلبات الواردة من التطبيق لمعرفة ماذا يطلب)
+// 11. مسار التحميل المباشر
 app.all('/api/v2/download', (req, res) => {
-    const queryData = req.query.softPackageID || req.body.softPackageID || req.query.file || req.body.file || 'Unknown';
-    console.log("--> Download Requested for Package:", queryData);
-    console.log("--> Request Query:", req.query);
-    console.log("--> Request Body:", req.body);
-
     const googleDriveUrl = 'https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5oR4I5hFPSSGc8gx_HHYHY';
-
     res.json({
         "code": 0,
         "msg": "success",
@@ -232,9 +227,20 @@ app.all('/api/v2/download', (req, res) => {
     });
 });
 
-// 12. المسارات الإضافية لمنع أخطاء 404
+// 12. مسار url-upload المحدث للتعامل مع طلب downdsfrag
 app.all('/api/v2/url-upload', (req, res) => {
-    res.json({ "code": 0, "msg": "success" });
+    console.log("--> URL Upload Requested:", req.body.url || req.query.url);
+    const googleDriveUrl = 'https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5oR4I5hFPSSGc8gx_HHYHY';
+
+    res.json({
+        "code": 0,
+        "msg": "success",
+        "data": {
+            "downloadUrl": googleDriveUrl,
+            "url": googleDriveUrl,
+            "fileSize": 35000000
+        }
+    });
 });
 
 app.all('/api/v2/log-service-upload', (req, res) => {
