@@ -18,7 +18,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// 2. خريطة توجيه المسارات الكاملة
+// 2. خريطة توجيه المسارات المحدثة بالكامل بناءً على طلبك
 const fullRoutingResponse = {
     "code": 0,
     "msg": "success",
@@ -32,20 +32,83 @@ const fullRoutingResponse = {
             { "key": "publicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
             { "key": "publicsoftservice.nt", "value": `${MY_DOMAIN}/api/v2/publicsoftservice-nt` },
             { "key": "x431padpublicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
-            { "key": "x431paddiagsoftservice.*", "value":"https://diagboss.ch/api/v2/diagsoftservice" },
-            { "key": "diagnosticLog.query", "value":"https://diagboss.ch/api/v2/diagnosticLog" },
+            { "key": "x431paddiagsoftservice.*", "value": "https://diagboss.ch/api/v2/diagsoftservice" },
+            { "key": "diagnosticLog.query", "value": "https://diagboss.ch/api/v2/diagnosticLog" },
             { "key": "createDiagSoftOrder", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "checkProductToUpgrade", "value": `${MY_DOMAIN}/api/v2/product-service` },
+            { "key": "user.set_base", "value": "https://diagboss.ch/api/v2/user-set-base" },
+            { "key": "user.get_base_info_car_logo", "value": "https://diagboss.ch/api/v2/user-get-base-info-car-logo" },
+            { "key": "area.get_country_list", "value": "https://diagboss.ch/api/v2/area-get_country_list" },
+            { "key": "userinfo.set_password", "value": "https://diagboss.ch/api/v2/set-password" },
+            { "key": "addRepairShop", "value": "https://diagboss.ch/api/v2/addRepairShop" },
+            { "key": "queryRepairShop", "value": "https://diagboss.ch/api/v2/queryRepairShop" },
             { "key": "publicsoft.download", "value": `${MY_DOMAIN}/api/v2/download` },
             { "key": "downloaddiagsoftws.action", "value": `${MY_DOMAIN}/api/v2/download` },
+            { "key": "publicsoft_breakpoint_action", "value": `${MY_DOMAIN}/api/v2/download` },
+            { "key": "diagsoft_breakpoint_action", "value": `${MY_DOMAIN}/api/v2/download` },
+            { "key": "dlDiagSoftPack.action", "value": `${MY_DOMAIN}/api/v2/download` },
             { "key": "diagsoftservice.*", "value": `${MY_DOMAIN}/api/v2/diagsoftservice` },
             { "key": "activation", "value": "https://diagboss.ch/api/v2/activation" },
-            { "key": "log.upload", "value":"https://diagboss.ch/api/v2/log-service-upload" },
+            { "key": "log.upload", "value": "https://diagboss.ch/api/v2/log-service-upload" },
             { "key": "report_list", "value": `${MY_DOMAIN}/api/v2/httapi-report-list` },
+            { "key": "getAutoCodeByVin", "value": "https://diagboss.ch/api/v2/getAutoCodeByVin" },
+            { "key": "getAutoEntranceIdByVin", "value": "https://diagboss.ch/api/v2/getAutoEntranceIdByVin" },
             { "key": "programfile.download_new", "value": `${MY_DOMAIN}/api/v2/download-programming` },
             { "key": "td.query-state", "value": "https://diagboss.ch/api/v2/td-query-state" },
+            { "key": "td.report-state", "value": "https://diagboss.ch/api/v2/td-report-state" },
+            { "key": "td.upload-cert", "value": "https://diagboss.ch/api/v2/td-upload-cert" },
             { "key": "td.check-locked", "value": "https://diagboss.ch/api/v2/td-check-locked" },
-            { "key": "getVersionDetialIds", "value": "https://my-diag-server.onrender.com/api/v2/getVersionDetialIds" }
+            { "key": "td2.flasher", "value": "https://diagboss.ch/api/v2/td2-flasher" },
+            { "key": "onlinelic", "value": "https://diagboss.ch/api/v2/onlinelic" },
+            { "key": "pubaccount.pid_byt", "value": "https://diagboss.ch/api/v2/pid-byt" },
+            { "key": "friend.list", "value": "https://diagboss.ch/api/v2/friend-list" },
+            { "key": "user.s_search", "value": "https://diagboss.ch/api/v2/friend-search" },
+            { "key": "recover_password", "value": "https://diagboss.ch/api/v2/recover-password" },
+            { "key": "reg_step_1", "value": "https://diagboss.ch/api/v2/reg-step1" },
+            { "key": "reg_step_2", "value": "https://diagboss.ch/api/v2/reg-step2" },
+            { "key": "reg_step_3", "value": "https://diagboss.ch/api/v2/reg-step3" },
+            { "key": "get_tpmsgun_binding_devices", "value": "https://diagboss.ch/api/v2/get-pressure-device-list" },
+            { "key": "unbinding_tpmsgun_device", "value": "https://diagboss.ch/api/v2/delete-pressure-device" },
+            { "key": "binding_tpmsgun_device", "value": "https://diagboss.ch/api/v2/binding-pressure-device" },
+            { "key": "sendDiagnosticLog", "value": "https://diagboss.ch/api/v2/send-diagnostic-log" },
+            { "key": "funch_url1", "value": "https://repairdata.webdiag.name/serve/rest/queryFunchDocBycondition" },
+            { "key": "funch_url2", "value": "https://repairdata.webdiag.name/serve/rest/queryFunchDocBycondition" },
+            { "key": "adas_register_url", "value": "https://diagboss.ch/api/v2/adas-card-reg" },
+            { "key": "adas_get_data_hd_url", "value": "https://diagboss.ch/api/v2/get-hdadas-key-by-sn" },
+            { "key": "burnquery", "value": "https://diagboss.ch/api/v2/burnquery" },
+            { "key": "burn", "value": "https://diagboss.ch/api/v2/burnstatus" },
+            { "key": "diagonline_url", "value": "https://diagboss.ch/api/v2/diagonline" },
+            { "key": "diagreq_uploadzip_method", "value": "-kiswb-ziprequest/" },
+            { "key": "diagresult_queryjson_method", "value": "-kiswb-zipresponse/" },
+            { "key": "diagonline_response_url", "value": "https://diagboss.ch/api/v2/diagonline-kiswb-zipresponse/" },
+            { "key": "uploadECUFile_url", "value": "https://diagboss.ch/api/v2/diagonline-ecurecordfile" },
+            { "key": "onlineArithQuery_new_url", "value": "https://diagboss.ch/api/v2/diagonline-gettransdiagdataex-new" },
+            { "key": "onlineFaultCodeQuery_url", "value": "https://diagboss.ch/api/v2/diagonline-faultcodequery" },
+            { "key": "onlineFaultCodeQueryWithSys_url", "value": "https://diagboss.ch/api/v2/diagonline-getdiagsoftdtc" },
+            { "key": "onlineUploadCarInfo_url", "value": "https://diagboss.ch/api/v2/diagonline-addcardata" },
+            { "key": "get_dtcs_ds_url", "value": "https://diagboss.ch/api/v2/diagonline-getfaultcodeflow" },
+            { "key": "ds_upload_dtcs_ds_url", "value": "https://diagboss.ch/api/v2/diagonline-uploadfaultcodeflow" },
+            { "key": "upload_diag_statistic_url", "value": "https://diagboss.ch/api/v2/diagonline-softuploadrecord" },
+            { "key": "download_multi_files_url", "value": "https://diagboss.ch/api/v2/diagonline-downloadmulti" },
+            { "key": "query_diagcar_data_new", "value": "https://diagboss.ch/api/v2/diagonline-query-diagcar-data-new" },
+            { "key": "haynes", "value": "https://diagboss.ch/api/v2/haynes" },
+            { "key": "europe_web_fca_token_url", "value": "https://diagboss.ch/api/v2/fca-token" },
+            { "key": "europe_web_fca_code_login_url", "value": "https://diagboss.ch/api/v2/fca-login" },
+            { "key": "europe_web_fca_level3auth_url", "value": "https://diagboss.ch/api/v2/fca-level3auth" },
+            { "key": "europe_web_fca_signed_url", "value": "https://diagboss.ch/api/v2/fca-signedchallenge" },
+            { "key": "europe_web_fca_track_url", "value": "https://diagboss.ch/api/v2/fca-trackresponse" },
+            { "key": "getConditionDataOnline", "value": "https://diagboss.ch/api/v2/getConditionDataOnline" },
+            { "key": "file.upload", "value": "https://diagboss.ch/api/v2/file-upload" },
+            { "key": "getExpertDataFlow_new", "value": "https://diagboss.ch/api/v2/getExpertDataFlow-new" },
+            { "key": "downloaddocumentws.action", "value": "https://diagboss.ch/api/v2/download-document" },
+            { "key": "multipagecomp_html_url", "value": "https://diagboss.ch/api/v2/multipagecomp-html-url-new" },
+            { "key": "motorCardReg", "value": "https://diagboss.ch/api/v2/motorCardReg?" },
+            { "key": "getMotorUrlBySn", "value": "https://diagboss.ch/api/v2/getMotorUrlBySn" },
+            { "key": "query_adas_product", "value": "https://diagboss.ch/api/v2/query-adas-product" },
+            { "key": "query_adas_soft_file", "value": "https://diagboss.ch/api/v2/query-adas-soft-file" },
+            { "key": "adas_soft_file_down_loadurl", "value": "https://diagboss.ch/api/v2/adas-soft-file-down-loadurl" },
+            { "key": "get_plate_by_vin", "value": "http://ait.golo365.com/Home/HttApi/getPlateByVin?" },
+            { "key": "getVersionDetialIds", "value": `${MY_DOMAIN}/api/v2/getVersionDetialIds` }
         ]
     }
 };
@@ -84,6 +147,16 @@ app.all('/api/v2/td-check-locked', (req, res) => {
         "message": "OK",
         "data": { "isLocked": false }
     });
+});
+
+// مسار التحقق من الـ Token
+app.all('/api/v2/check-token', (req, res) => {
+    res.json({ "code": 0, "msg": "success", "data": { "isValid": true } });
+});
+
+// مسار جلب تفاصيل النسخ
+app.all('/api/v2/getVersionDetialIds', (req, res) => {
+    res.json({ "code": 0, "msg": "success", "data": [] });
 });
 
 // 6. مسار خدمات المنتجات
@@ -142,7 +215,6 @@ app.all('/api/v2/activation', (req, res) => {
 // 11. مسار التحميل الموجه مباشرة إلى ملف DEMO.zip على GitHub Release
 app.all('/api/v2/download', (req, res) => {
     const githubFileUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
-    console.log(`Redirecting download to GitHub Release: ${githubFileUrl}`);
     res.redirect(302, githubFileUrl);
 });
 
