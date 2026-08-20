@@ -56,14 +56,14 @@ const fullRoutingResponse = {
             { "key": "programfile.download_new", "value": `${MY_DOMAIN}/api/v2/download-programming` },
             { "key": "td.query-state", "value": "https://diagboss.ch/api/v2/td-query-state" },
             { "key": "td.report-state", "value": "https://my-diag-server.onrender.com/api/v2/td-report-state" },
-            { "key": "td.upload-cert", "value": "https://my-diag-server.onrender.com/api/v2/td-upload-cert" },
-            { "key": "td.check-locked", "value": "https://diagboss.ch/api/v2/td-check-locked" },
+            { "key": "td.upload-cert", "value": "https://diagboss.ch/api/v2/td-upload-cert" },
+            { "key": "td.check-locked", "value": "https://my-diag-server.onrender.com/api/v2/td-check-locked" },
             { "key": "td2.flasher", "value": "https://my-diag-server.onrender.com/api/v2/td2-flasher" },
-            { "key": "onlinelic", "value": "https://diagboss.ch/api/v2/onlinelic" },
-            { "key": "pubaccount.pid_byt", "value": "https://diagboss.ch/api/v2/pid-byt" },
-            { "key": "friend.list", "value": "https://diagboss.ch/api/v2/friend-list" },
-            { "key": "user.s_search", "value": "https://diagboss.ch/api/v2/friend-search" },
-            { "key": "recover_password", "value": "https://diagboss.ch/api/v2/recover-password" },
+            { "key": "onlinelic", "value": "https://my-diag-server.onrender.com/api/v2/onlinelic" },
+            { "key": "pubaccount.pid_byt", "value": "https://my-diag-server.onrender.com/api/v2/pid-byt" },
+            { "key": "friend.list", "value": "https://my-diag-server.onrender.com/api/v2/friend-list" },
+            { "key": "user.s_search", "value": "https://my-diag-server.onrender.com/api/v2/friend-search" },
+            { "key": "recover_password", "value": "https://my-diag-server.onrender.com/api/v2/recover-password" },
             { "key": "reg_step_1", "value": "https://my-diag-server.onrender.com/api/v2/reg-step1" },
             { "key": "reg_step_2", "value": "https://my-diag-server.onrender.com/api/v2/reg-step2" },
             { "key": "reg_step_3", "value": "https://my-diag-server.onrender.com/api/v2/reg-step3" },
@@ -80,8 +80,8 @@ const fullRoutingResponse = {
             { "key": "diagonline_url", "value": "https://my-diag-server.onrender.com/api/v2/diagonline" },
             { "key": "diagreq_uploadzip_method", "value": "-kiswb-ziprequest/" },
             { "key": "diagresult_queryjson_method", "value": "-kiswb-zipresponse/" },
-            { "key": "diagonline_response_url", "value": "https://diagboss.ch/api/v2/diagonline-kiswb-zipresponse/" },
-            { "key": "uploadECUFile_url", "value": "https://diagboss.ch/api/v2/diagonline-ecurecordfile" },
+            { "key": "diagonline_response_url", "value": "https://my-diag-server.onrender.com/api/v2/diagonline-kiswb-zipresponse/" },
+            { "key": "uploadECUFile_url", "value": "https://my-diag-server.onrender.com/api/v2/diagonline-ecurecordfile" },
             { "key": "onlineArithQuery_new_url", "value": "https://diagboss.ch/api/v2/diagonline-gettransdiagdataex-new" },
             { "key": "onlineFaultCodeQuery_url", "value": "https://diagboss.ch/api/v2/diagonline-faultcodequery" },
             { "key": "onlineFaultCodeQueryWithSys_url", "value": "https://diagboss.ch/api/v2/diagonline-getdiagsoftdtc" },
@@ -89,7 +89,7 @@ const fullRoutingResponse = {
             { "key": "get_dtcs_ds_url", "value": "https://diagboss.ch/api/v2/diagonline-getfaultcodeflow" },
             { "key": "ds_upload_dtcs_ds_url", "value": "https://diagboss.ch/api/v2/diagonline-uploadfaultcodeflow" },
             { "key": "upload_diag_statistic_url", "value": "https://my-diag-server.onrender.com/api/v2/diagonline-softuploadrecord" },
-            { "key": "download_multi_files_url", "value": "https://diagboss.ch/api/v2/diagonline-downloadmulti" },
+            { "key": "download_multi_files_url", "value": "https://my-diag-server.onrender.com/api/v2/diagonline-downloadmulti" },
             { "key": "query_diagcar_data_new", "value": "https://my-diag-server.onrender.com/api/v2/diagonline-query-diagcar-data-new" },
             { "key": "haynes", "value": "https://my-diag-server.onrender.com/api/v2/haynes" },
             { "key": "europe_web_fca_token_url", "value": "https://my-diag-server.onrender.com/api/v2/fca-token" },
@@ -99,8 +99,8 @@ const fullRoutingResponse = {
             { "key": "europe_web_fca_track_url", "value": "https://my-diag-server.onrender.com/api/v2/fca-trackresponse" },
             { "key": "getConditionDataOnline", "value": "https://diagboss.ch/api/v2/getConditionDataOnline" },
             { "key": "file.upload", "value": "https://my-diag-server.onrender.com/api/v2/file-upload" },
-            { "key": "getExpertDataFlow_new", "value": "https://diagboss.ch/api/v2/getExpertDataFlow-new" },
-            { "key": "downloaddocumentws.action", "value": "https://diagboss.ch/api/v2/download-document" },
+            { "key": "getExpertDataFlow_new", "value": "https://my-diag-server.onrender.com/api/v2/getExpertDataFlow-new" },
+            { "key": "downloaddocumentws.action", "value": "https://my-diag-server.onrender.com/api/v2/download-document" },
             { "key": "multipagecomp_html_url", "value": "https://diagboss.ch/api/v2/multipagecomp-html-url-new" },
             { "key": "motorCardReg", "value": "https://diagboss.ch/api/v2/motorCardReg?" },
             { "key": "getMotorUrlBySn", "value": "https://diagboss.ch/api/v2/getMotorUrlBySn" },
@@ -213,11 +213,13 @@ app.all('/api/v2/activation', (req, res) => {
     });
 });
 
-// 11. مسار التحميل (موجّه الآن إلى ملف Google Drive المباشر)
+// 11. مسار التحميل (مع تتبع الطلبات الواردة من التطبيق لمعرفة ماذا يطلب)
 app.all('/api/v2/download', (req, res) => {
-    const softPackageID = req.query.softPackageID || req.body.softPackageID || '';
-    
-    // رابط جوجل دريف المباشر الذي أرسلته
+    const queryData = req.query.softPackageID || req.body.softPackageID || req.query.file || req.body.file || 'Unknown';
+    console.log("--> Download Requested for Package:", queryData);
+    console.log("--> Request Query:", req.query);
+    console.log("--> Request Body:", req.body);
+
     const googleDriveUrl = 'https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5oR4I5hFPSSGc8gx_HHYHY';
 
     res.json({
