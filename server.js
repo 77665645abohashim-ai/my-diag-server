@@ -56,14 +56,14 @@ const fullRoutingResponse = {
             { "key": "programfile.download_new", "value": `${MY_DOMAIN}/api/v2/download-programming` },
             { "key": "td.query-state", "value": "https://diagboss.ch/api/v2/td-query-state" },
             { "key": "td.report-state", "value": "https://my-diag-server.onrender.com/api/v2/td-report-state" },
-            { "key": "td.upload-cert", "value": "https://diagboss.ch/api/v2/td-upload-cert" },
+            { "key": "td.upload-cert", "value": "https://my-diag-server.onrender.com/api/v2/td-upload-cert" },
             { "key": "td.check-locked", "value": "https://diagboss.ch/api/v2/td-check-locked" },
             { "key": "td2.flasher", "value": "https://my-diag-server.onrender.com/api/v2/td2-flasher" },
-            { "key": "onlinelic", "value": "https://my-diag-server.onrender.com/api/v2/onlinelic" },
-            { "key": "pubaccount.pid_byt", "value": "https://my-diag-server.onrender.com/api/v2/pid-byt" },
-            { "key": "friend.list", "value": "https://my-diag-server.onrender.com/api/v2/friend-list" },
-            { "key": "user.s_search", "value": "https://my-diag-server.onrender.com/api/v2/friend-search" },
-            { "key": "recover_password", "value": "https://my-diag-server.onrender.com/api/v2/recover-password" },
+            { "key": "onlinelic", "value": "https://diagboss.ch/api/v2/onlinelic" },
+            { "key": "pubaccount.pid_byt", "value": "https://diagboss.ch/api/v2/pid-byt" },
+            { "key": "friend.list", "value": "https://diagboss.ch/api/v2/friend-list" },
+            { "key": "user.s_search", "value": "https://diagboss.ch/api/v2/friend-search" },
+            { "key": "recover_password", "value": "https://diagboss.ch/api/v2/recover-password" },
             { "key": "reg_step_1", "value": "https://my-diag-server.onrender.com/api/v2/reg-step1" },
             { "key": "reg_step_2", "value": "https://my-diag-server.onrender.com/api/v2/reg-step2" },
             { "key": "reg_step_3", "value": "https://my-diag-server.onrender.com/api/v2/reg-step3" },
@@ -80,8 +80,8 @@ const fullRoutingResponse = {
             { "key": "diagonline_url", "value": "https://my-diag-server.onrender.com/api/v2/diagonline" },
             { "key": "diagreq_uploadzip_method", "value": "-kiswb-ziprequest/" },
             { "key": "diagresult_queryjson_method", "value": "-kiswb-zipresponse/" },
-            { "key": "diagonline_response_url", "value": "https://my-diag-server.onrender.com/api/v2/diagonline-kiswb-zipresponse/" },
-            { "key": "uploadECUFile_url", "value": "https://my-diag-server.onrender.com/api/v2/diagonline-ecurecordfile" },
+            { "key": "diagonline_response_url", "value": "https://diagboss.ch/api/v2/diagonline-kiswb-zipresponse/" },
+            { "key": "uploadECUFile_url", "value": "https://diagboss.ch/api/v2/diagonline-ecurecordfile" },
             { "key": "onlineArithQuery_new_url", "value": "https://diagboss.ch/api/v2/diagonline-gettransdiagdataex-new" },
             { "key": "onlineFaultCodeQuery_url", "value": "https://diagboss.ch/api/v2/diagonline-faultcodequery" },
             { "key": "onlineFaultCodeQueryWithSys_url", "value": "https://diagboss.ch/api/v2/diagonline-getdiagsoftdtc" },
@@ -89,18 +89,18 @@ const fullRoutingResponse = {
             { "key": "get_dtcs_ds_url", "value": "https://diagboss.ch/api/v2/diagonline-getfaultcodeflow" },
             { "key": "ds_upload_dtcs_ds_url", "value": "https://diagboss.ch/api/v2/diagonline-uploadfaultcodeflow" },
             { "key": "upload_diag_statistic_url", "value": "https://my-diag-server.onrender.com/api/v2/diagonline-softuploadrecord" },
-            { "key": "download_multi_files_url", "value": "https://my-diag-server.onrender.com/api/v2/diagonline-downloadmulti" },
+            { "key": "download_multi_files_url", "value": "https://diagboss.ch/api/v2/diagonline-downloadmulti" },
             { "key": "query_diagcar_data_new", "value": "https://my-diag-server.onrender.com/api/v2/diagonline-query-diagcar-data-new" },
             { "key": "haynes", "value": "https://my-diag-server.onrender.com/api/v2/haynes" },
             { "key": "europe_web_fca_token_url", "value": "https://my-diag-server.onrender.com/api/v2/fca-token" },
             { "key": "europe_web_fca_code_login_url", "value": "https://diagboss.ch/api/v2/fca-login" },
             { "key": "europe_web_fca_level3auth_url", "value": "https://diagboss.ch/api/v2/fca-level3auth" },
             { "key": "europe_web_fca_signed_url", "value": "https://my-diag-server.onrender.com/api/v2/fca-signedchallenge" },
-            { "key": "europe_web_fca_track_url", "value": "https://diagboss.ch/api/v2/fca-trackresponse" },
+            { "key": "europe_web_fca_track_url", "value": "https://my-diag-server.onrender.com/api/v2/fca-trackresponse" },
             { "key": "getConditionDataOnline", "value": "https://diagboss.ch/api/v2/getConditionDataOnline" },
             { "key": "file.upload", "value": "https://my-diag-server.onrender.com/api/v2/file-upload" },
-            { "key": "getExpertDataFlow_new", "value": "https://my-diag-server.onrender.com/api/v2/getExpertDataFlow-new" },
-            { "key": "downloaddocumentws.action", "value": "https://my-diag-server.onrender.com/api/v2/download-document" },
+            { "key": "getExpertDataFlow_new", "value": "https://diagboss.ch/api/v2/getExpertDataFlow-new" },
+            { "key": "downloaddocumentws.action", "value": "https://diagboss.ch/api/v2/download-document" },
             { "key": "multipagecomp_html_url", "value": "https://diagboss.ch/api/v2/multipagecomp-html-url-new" },
             { "key": "motorCardReg", "value": "https://diagboss.ch/api/v2/motorCardReg?" },
             { "key": "getMotorUrlBySn", "value": "https://diagboss.ch/api/v2/getMotorUrlBySn" },
@@ -108,7 +108,8 @@ const fullRoutingResponse = {
             { "key": "query_adas_soft_file", "value": "https://my-diag-server.onrender.com/api/v2/query-adas-soft-file" },
             { "key": "adas_soft_file_down_loadurl", "value": "https://my-diag-server.onrender.com/api/v2/adas-soft-file-down-loadurl" },
             { "key": "get_plate_by_vin", "value": "http://ait.golo365.com/Home/HttApi/getPlateByVin?" },
-            { "key": "getVersionDetialIds", "value": `${MY_DOMAIN}/api/v2/getVersionDetialIds` }
+            { "key": "getVersionDetialIds", "value": `${MY_DOMAIN}/api/v2/getVersionDetialIds` },
+            { "key": "url-upload", "value": `${MY_DOMAIN}/api/v2/url-upload` }
         ]
     }
 };
@@ -212,29 +213,28 @@ app.all('/api/v2/activation', (req, res) => {
     });
 });
 
-// 11. مسار التحميل بصيغة JSON ليتوافق مع مدير التنزيل في التطبيق
+// 11. مسار التحميل (موجّه الآن إلى ملف Google Drive المباشر)
 app.all('/api/v2/download', (req, res) => {
     const softPackageID = req.query.softPackageID || req.body.softPackageID || '';
     
-    let targetUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
-
-    if (softPackageID.includes('DOWNLOAD') || softPackageID.includes('Firmware')) {
-        targetUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/Firmware.zip';
-    } else if (softPackageID.includes('ECUAID')) {
-        targetUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/ECUAID.zip';
-    }
+    // رابط جوجل دريف المباشر الذي أرسلته
+    const googleDriveUrl = 'https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5oR4I5hFPSSGc8gx_HHYHY';
 
     res.json({
         "code": 0,
         "msg": "success",
         "data": {
-            "downloadUrl": targetUrl,
-            "fileSize": 55740637
+            "downloadUrl": googleDriveUrl,
+            "fileSize": 35000000 
         }
     });
 });
 
 // 12. المسارات الإضافية لمنع أخطاء 404
+app.all('/api/v2/url-upload', (req, res) => {
+    res.json({ "code": 0, "msg": "success" });
+});
+
 app.all('/api/v2/log-service-upload', (req, res) => {
     res.json({ "code": 0, "msg": "success" });
 });
@@ -244,13 +244,13 @@ app.all('/api/v2/httapi-report-list', (req, res) => {
 });
 
 app.all('/api/v2/download-programming', (req, res) => {
-    const githubProgUrl = 'https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1.0/DEMO.zip';
+    const googleDriveUrl = 'https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5oR4I5hFPSSGc8gx_HHYHY';
     res.json({
         "code": 0,
         "msg": "success",
         "data": {
-            "downloadUrl": githubProgUrl,
-            "fileSize": 55740637
+            "downloadUrl": googleDriveUrl,
+            "fileSize": 35000000
         }
     });
 });
