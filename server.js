@@ -161,11 +161,6 @@ app.all('/api/v2/download', (req, res) => {
     // إرسال تحويل مباشر للسيرفر ليقوم التطبيق بتحميل الملف من حسابك على غيت هب
     res.redirect(302, githubFileUrl);
 });
-const express = require('express');
-const app = express();
-
-const PORT = process.env.PORT || 10000;
-const MY_DOMAIN = 'https://my-diag-server.onrender.com';
 
 // إعدادات قراءة البيانات
 app.use(express.json());
