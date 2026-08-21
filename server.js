@@ -1,11 +1,18 @@
-// 4. معالجة طلبات الاستعلام والتحديثات (SOAP) في نفس المسار
+const express = require('express');
+const app = express();
+
+// استخدام وسيط لقراءة النصوص أو البيانات القادمة من التطبيق
+app.use(express.text({ type: '*/*' }));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// مسار خدمة التشخيص والعلامات
 app.post('/api/v2/diagsoftservice', (req, res) => {
     res.setHeader('Content-Type', 'text/xml; charset=UTF-8');
     
-    // تحويل الطلب الوارد إلى نص للتحقق من نوع الدالة المطلوبة
     const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '');
 
-    // 1. إذا كان الطلب يخص حزم التحديثات والـ Cdn
+    // 1. معالجة طلب جلب التحديثات والحزم (queryLatestDiagSoftsIncrCdn)
     if (requestBody.includes('queryLatestDiagSoftsIncrCdn')) {
         return res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
@@ -136,7 +143,7 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
 </SOAP-ENV:Envelope>`);
     }
 
-    // 2. إذا كان الطلب يخص حزم الفحص الموجه (Guided Functions)
+    // 2. معالجة طلب الفحص الموجه أو الحزم الفرعية (إن وجد)
     if (requestBody.includes('queryPDTDiagSoftSubPack')) {
         return res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
@@ -146,7 +153,7 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
                 <code>0</code>
                 <message>success</message>
                 <diagSoftSubPackList>
-                    <!-- ضع هنا حزم Audi, Skoda, VW, Seat التي أرسلتها مسبقاً -->
+                    <!-- بيانات الحزم الفرعية الخاصة بك هنا -->
                 </diagSoftSubPackList>
             </return>
         </ns1:queryPDTDiagSoftSubPackResponse>
@@ -154,8 +161,8 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
 </SOAP-ENV:Envelope>`);
     }
 
-    // 3. رد افتراضي لأي طلب آخر غير متوقع على نفس المسار
-    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+    // الرد الافتراضي في حال لم يتطابق أي طلب
+    return res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
   <SOAP-ENV:Body>
     <ns1:response>
@@ -166,4 +173,10 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
     </ns1:response>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`);
+});
+
+// تشغيل السيرفر على المنفذ المحلي أو المنفذ المحدد من قبل المنصة (مثل Render)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
