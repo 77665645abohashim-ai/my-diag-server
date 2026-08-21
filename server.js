@@ -56,7 +56,7 @@ const fullRoutingResponse = {
             { "key": "getAutoEntranceIdByVin", "value": `${MY_DOMAIN}/api/v2/getAutoEntranceIdByVin` },
             { "key": "programfile.download_new", "value": `${MY_DOMAIN}/api/v2/download-programming` },
             { "key": "td.query-state", "value": "https://diagboss.ch/api/v2/td-query-state" },
-            { "key": "td.report-state", "value": `${MY_DOMAIN}/api/v2/td-report-state` },
+            { "key": "td.report-state", "value":"https://diagboss.ch/api/v2/td-report-state" },
             { "key": "td.upload-cert", "value": `${MY_DOMAIN}/api/v2/td-upload-cert` },
             { "key": "td.check-locked", "value": "https://diagboss.ch/api/v2/td-check-locked" },
             { "key": "td2.flasher", "value": `${MY_DOMAIN}/api/v2/td2-flasher` },
