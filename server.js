@@ -28,11 +28,11 @@ const fullRoutingResponse = {
         "urls": [
             { "key": "login", "value": "https://diagboss.ch/api/v2/login" },
             { "key": "check-token", "value": `${MY_DOMAIN}/api/v2/check-token` },
-            { "key": "productservice.*", "value": `${MY_DOMAIN}/api/v2/product-service2` },
-            { "key": "publicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice4` },
-            { "key": "publicsoftservice.nt", "value": `${MY_DOMAIN}/api/v2/publicsoftservice-nt6` },
-            { "key": "x431padpublicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice7` },
-            { "key": "x431paddiagsoftservice.*", "value": `${MY_DOMAIN}/api/v2/diagsoftservice8` },
+            { "key": "productservice.*", "value": `${MY_DOMAIN}/api/v2/product-service` },
+            { "key": "publicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
+            { "key": "publicsoftservice.nt", "value": `${MY_DOMAIN}/api/v2/publicsoftservice-nt` },
+            { "key": "x431padpublicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
+            { "key": "x431paddiagsoftservice.*", "value": `${MY_DOMAIN}/api/v2/diagsoftservice` },
             { "key": "diagnosticLog.query", "value": `${MY_DOMAIN}/api/v2/diagnosticLog` },
             { "key": "createDiagSoftOrder", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "checkProductToUpgrade", "value": `${MY_DOMAIN}/api/v2/product-service` },
@@ -65,9 +65,9 @@ const fullRoutingResponse = {
             { "key": "friend.list", "value": `${MY_DOMAIN}/api/v2/friend-list` },
             { "key": "user.s_search", "value": `${MY_DOMAIN}/api/v2/friend-search` },
             { "key": "recover_password", "value": `${MY_DOMAIN}/api/v2/recover-password` },
-            { "key": "reg_step_1", "value": `${MY_DOMAIN}/api/v2/reg-step1` },
-            { "key": "reg_step_2", "value": `${MY_DOMAIN}/api/v2/reg-step2` },
-            { "key": "reg_step_3", "value": `${MY_DOMAIN}/api/v2/reg-step3` },
+            { "key": "reg_step_", "value": `${MY_DOMAIN}/api/v2/reg-step` },
+            { "key": "reg_step_", "value": `${MY_DOMAIN}/api/v2/reg-step2` },
+            { "key": "reg_step_", "value": `${MY_DOMAIN}/api/v2/reg-step` },
             { "key": "get_tpmsgun_bingding_devices", "value": `${MY_DOMAIN}/api/v2/get-pressure-device-list` },
             { "key": "unbinding_tpmsgun_device", "value": `${MY_DOMAIN}/api/v2/delete-pressure-device` },
             { "key": "binding_tpmsgun_device", "value": `${MY_DOMAIN}/api/v2/binding-pressure-device` },
@@ -125,7 +125,7 @@ const fullRoutingResponse = {
     }
 };
 // 7. مسار خدمات البرامج والماركات (محدث برد getMaxVersionForMobileAppCDN الدقيق)
-app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt6'], (req, res) => {
+app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
     res.status(200).send(soapResponse);
