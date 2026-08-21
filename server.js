@@ -129,8 +129,8 @@ app.all('/api/v2/activation', (req, res) => {
     res.json({ "code": 0, "msg": "OK", "data": { "activationCode": "cW9VVEdobWZwdjQxNkZTeG51emRuZz09" } });
 });
 
-// 2. معالجة طلبات الرفع التي تظهر في الصورة لتجنب خطأ 404
-app.all(['/api/v2/url-upload', '/api/v2/log-service-upload', '/api/v2/file-upload'], (req, res) => {
+// 2. معالجة طلبات الخدمات والرفع لتجنب أخطاء 404
+app.all(['/api/v2/url-upload', '/api/v2/log-service-upload', '/api/v2/file-upload', '/api/v2/product-service', '/api/v2/publicsoftservice-nt', '/api/v2/publicsoftservice'], (req, res) => {
     res.json({ "code": 0, "msg": "success", "data": {} });
 });
 
