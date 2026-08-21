@@ -145,24 +145,39 @@ app.all('/api/v2/diagnosticLog', (req, res) => {
     res.json({ "code": 0, "msg": "success" });
 });
 
-// 7. مسار خدمات البرامج والماركات (ديناميكي للتعامل مع الطلبات المختلفة على نفس الرابط)
+// 7. مسار خدمات البرامج والماركات العام
 app.all('/api/v2/publicsoftservice', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>68365802</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softId>1015</softId><softName>Diagzone PRO V2</softName><softPackageID>Diagzone_PRO_V2</softPackageID><softUpdateTime>2025-03-08 00:00:00</softUpdateTime><versionDetailId>359645</versionDetailId><versionNo>V2.00.033</versionNo></x431PadSoft><x431PadSoft><fileSize>393300</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2023-03-27 00:00:00</softUpdateTime><versionDetailId>343730</versionDetailId><versionNo>V11.91</versionNo></x431PadSoft></x431PadSoftList></return></ns1:queryLatestPublicSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+    res.status(200).send(soapResponse);
+});
+
+// 8. مسار خدمات البرامج (NT)
+app.all('/api/v2/publicsoftservice-nt', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+    res.status(200).send(soapResponse);
+});
+
+// 9. مسار البرمجيات والماركات التشخيصية (يتعامل بديناميكية مع كلا الطلبين)
+app.all('/api/v2/diagsoftservice', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     
     const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
-    console.log("Publicsoftservice Request Received:", requestBody);
+    console.log("Diagsoftservice Request Received:", requestBody);
 
-    let soapMethodName = "queryLatestPublicSofts";
+    let soapMethodName = "queryPDTDiagSoftSubPack";
     let innerResponseContent = "";
 
-    // يمكنك تخصيص الاستجابة هنا بناءً على ما يظهر لك في سجلات الـ Logs للطلبين المختلفين
-    if (requestBody.includes("queryLatestPublicSofts") || requestBody.includes("Soft")) {
-        soapMethodName = "queryLatestPublicSofts";
-        innerResponseContent = `<code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>68365802</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softId>1015</softId><softName>Diagzone PRO V2</softName><softPackageID>Diagzone_PRO_V2</softPackageID><softUpdateTime>2025-03-08 00:00:00</softUpdateTime><versionDetailId>359645</versionDetailId><versionNo>V2.00.033</versionNo></x431PadSoft><x431PadSoft><fileSize>393300</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2023-03-27 00:00:00</softUpdateTime><versionDetailId>343730</versionDetailId><versionNo>V11.91</versionNo></x431PadSoft></x431PadSoftList>`;
-    } else {
-        // استجابة الطلب الثاني المختلف على نفس الرابط
-        soapMethodName = "queryLatestPublicSofts"; 
-        innerResponseContent = `<code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>6166636</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softId>880</softId><softName>VIN Recognition App</softName><softPackageID>VIN_RECOGNITION_APP</softPackageID><softUpdateTime>2024-05-02 00:00:00</softUpdateTime><versionDetailId>354418</versionDetailId><versionNo>V1.01.006</versionNo></x431PadSoft></x431PadSoftList>`;
+    // الرد على الطلب الأول الخاص بالتحديثات الإضافية
+    if (requestBody.includes("queryLatestDiagSoftsIncrCdn")) {
+        soapMethodName = "queryLatestDiagSoftsIncrCdn";
+        innerResponseContent = `<code>0</code><message>success</message><diagSoftList><diagSoft><fileSize>123456</fileSize><lanId>AR</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softId>100</softId><softName>Demo Brand</softName><softPackageID>DEMO</softPackageID><softUpdateTime>2026-01-01 00:00:00</softUpdateTime><versionDetailId>9999</versionDetailId><versionNo>V16.00</versionNo></diagSoft></diagSoftList>`;
+    } 
+    // الرد على الطلب الثاني الخاص بالحزم الفرعية والوظائف
+    else {
+        soapMethodName = "queryPDTDiagSoftSubPack";
+        innerResponseContent = `<code>0</code><message>success</message><diagSoftSubPackList><diagSoftSubPack><spfId>21</spfId><softSubPackKey>AUDI_DIV01</softSubPackKey><softPackageId>AUDI</softPackageId><softDesc>Audi</softDesc><spfDesc>This package contains the guided functions</spfDesc><softId>6</softId><spfNameDesc>Audi Guided function</spfNameDesc><vNum>29.16</vNum><fileSize>0</fileSize></diagSoftSubPack></diagSoftSubPackList>`;
     }
 
     const soapResponse = `<?xml version="1.0" encoding="UTF-8"?>
@@ -174,20 +189,6 @@ app.all('/api/v2/publicsoftservice', (req, res) => {
         </SOAP-ENV:Body>
     </SOAP-ENV:Envelope>`;
 
-    res.status(200).send(soapResponse);
-});
-
-// 8. مسار خدمات البرامج (NT)
-app.all('/api/v2/publicsoftservice-nt', (req, res) => {
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
-    res.status(200).send(soapResponse);
-});
-
-// 9. مسار البرمجيات والماركات التشخيصية
-app.all('/api/v2/diagsoftservice', (req, res) => {
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryPDTDiagSoftSubPack><return><code>0</code><message>success</message><diagSoftSubPackList><diagSoftSubPack><spfId>21</spfId><softSubPackKey>AUDI_DIV01</softSubPackKey><softPackageId>AUDI</softPackageId><softDesc>Audi</softDesc><spfDesc>This package contains the guided functions of the Audi A1,A2</spfDesc><softId>6</softId><spfNameDesc>Audi Guided function package 1(AUDI A1,A2)</spfNameDesc><vNum>29.16</vNum><fileSize>0</fileSize></diagSoftSubPack></diagSoftSubPackList></return></ns1:queryPDTDiagSoftSubPack></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
     res.status(200).send(soapResponse);
 });
 
