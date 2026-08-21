@@ -125,7 +125,10 @@ const fullRoutingResponse = {
     }
 };
 
-
+// معالجة مسار رفع الروابط أو أي مسار غير معرف لتجنب 404
+app.all('/api/v2/url-upload', (req, res) => {
+    res.json({ "code": 0, "msg": "success" });
+});
 // تشغيل السيرفر
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
