@@ -43,7 +43,7 @@ app.post('/api/v2/publicsoftservice', (req, res) => {
 </SOAP-ENV:Envelope>`);
     }
 
-    // رد افتراضي إذا كان الطلب مختلفاً
+    // رد افتراضي لـ publicsoftservice
     return res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
   <SOAP-ENV:Body>
@@ -57,12 +57,13 @@ app.post('/api/v2/publicsoftservice', (req, res) => {
 </SOAP-ENV:Envelope>`);
 });
 
-// 2. مسار خدمة التشخيص والعلامات (Diag Soft Service) الذي تم العمل عليه مسبقاً
+// 2. مسار خدمة التشخيص والعلامات (Diag Soft Service)
 app.post('/api/v2/diagsoftservice', (req, res) => {
     res.setHeader('Content-Type', 'text/xml; charset=UTF-8');
     
     const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '');
 
+    // معالجة طلب الفحوصات والتحديثات الإضافية (IncrCdn)
     if (requestBody.includes('queryLatestDiagSoftsIncrCdn')) {
         return res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
@@ -93,6 +94,25 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
 </SOAP-ENV:Envelope>`);
     }
 
+    // معالجة طلب الحزم الفرعية الموجهة (Guided Functions)
+    if (requestBody.includes('queryPDTDiagSoftSubPack')) {
+        return res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+<SOAP-ENV:Body>
+<ns1:queryPDTDiagSoftSubPackResponse>
+<return>
+<code>0</code>
+<message>success</message>
+<diagSoftSubPackList>
+<!-- أضف بيانات الحزم هنا إذا احتجتها مستقبلاً -->
+</diagSoftSubPackList>
+</return>
+</ns1:queryPDTDiagSoftSubPackResponse>
+</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`);
+    }
+
+    // رد افتراضي لـ diagsoftservice
     return res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
   <SOAP-ENV:Body>
