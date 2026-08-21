@@ -164,6 +164,17 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
     const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryPDTDiagSoftSubPack><return><code>0</code><message>success</message><diagSoftSubPackList><diagSoftSubPack><spfId>21</spfId><softSubPackKey>AUDI_DIV01</softSubPackKey><softPackageId>AUDI</softPackageId><softDesc>Audi</softDesc><spfDesc>This package contains the guided functions of the Audi A1,A2</spfDesc><softId>6</softId><spfNameDesc>Audi Guided function package 1(AUDI A1,A2)</spfNameDesc><vNum>29.16</vNum><fileSize>0</fileSize></diagSoftSubPack><diagSoftSubPack><spfId>22</spfId><softSubPackKey>AUDI_DIV02</softSubPackKey><softPackageId>AUDI</softPackageId><softDesc>Audi</softDesc><spfDesc>This package contains the guided functions of the Audi A3</spfDesc><softId>6</softId><spfNameDesc>Audi Guided function package 2(AUDI A3)</spfNameDesc><vNum>29.16</vNum><fileSize>0</fileSize></diagSoftSubPack></diagSoftSubPackList></return></ns1:queryPDTDiagSoftSubPack></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
     res.status(200).send(soapResponse);
 });
+// مسار خدمات البرمجيات والماركات التشخيصية (متعدد الطلبات)
+app.all('/api/v2/diagsoftservice', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    
+    // يمكنك فحص محتوى الطلب (req.body أو نص الطلب) إذا كنت تريد توجيه الاستجابة بناءً على طلب معين
+    // حالياً، سنعيد استجابة SOAP الشاملة التي تقبلها الحزم التشخيصية بشكل افتراضي:
+    
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryPDTDiagSoftSubPack><return><code>0</code><message>success</message><diagSoftSubPackList><diagSoftSubPack><spfId>21</spfId><softSubPackKey>AUDI_DIV01</softSubPackKey><softPackageId>AUDI</softPackageId><softDesc>Audi</softDesc><spfDesc>This package contains the guided functions of the Audi A1,A2</spfDesc><softId>6</softId><spfNameDesc>Audi Guided function package 1(AUDI A1,A2)</spfNameDesc><vNum>29.16</vNum><fileSize>0</fileSize></diagSoftSubPack><diagSoftSubPack><spfId>22</spfId><softSubPackKey>AUDI_DIV02</softSubPackKey><softPackageId>AUDI</softPackageId><softDesc>Audi</softDesc><spfDesc>This package contains the guided functions of the Audi A3</spfDesc><softId>6</softId><spfNameDesc>Audi Guided function package 2(AUDI A3)</spfNameDesc><vNum>29.16</vNum><fileSize>0</fileSize></diagSoftSubPack></diagSoftSubPackList></return></ns1:queryPDTDiagSoftSubPack></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+    
+    res.status(200).send(soapResponse);
+});
 
 // تشغيل السيرفر
 app.listen(PORT, () => {
