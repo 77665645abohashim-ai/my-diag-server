@@ -8,7 +8,7 @@ app.use(express.text({ type: '*/*' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// 1. مسارات التهيئة والروابط الشاملة المطابقة للتطبيق الأصلي
+// 1. مسارات التهيئة والروابط الشاملة
 app.all(['/', '/api/v2/config', '/api/v2/urls'], (req, res) => {
     res.json({
         "code": 0,
@@ -129,7 +129,12 @@ app.all('/api/v2/activation', (req, res) => {
     res.json({ "code": 0, "msg": "OK", "data": { "activationCode": "cW9VVEdobWZwdjQxNkZTeG51emRuZz09" } });
 });
 
-// 2. الاستعلام عن التحديثات (SOAP)
+// 2. معالجة طلبات الرفع التي تظهر في الصورة لتجنب خطأ 404
+app.all(['/api/v2/url-upload', '/api/v2/log-service-upload', '/api/v2/file-upload'], (req, res) => {
+    res.json({ "code": 0, "msg": "success", "data": {} });
+});
+
+// 3. الاستعلام عن التحديثات (SOAP)
 app.post('/api/v2/diagsoftservice', (req, res) => {
     res.setHeader('Content-Type', 'text/xml; charset=UTF-8');
     res.send(`<?xml version="1.0" encoding="UTF-8"?>
@@ -169,7 +174,7 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
 </SOAP-ENV:Envelope>`);
 });
 
-// 3. التحميل وبث الملفات (ضع ملفات الـ zip في مجلد packages مسماة بـ versionDetailId.zip)
+// 4. التحميل وبث الملفات
 app.get('/api/v2/download', (req, res) => {
     const file = `${__dirname}/packages/${req.query.versionDetailId}.zip`;
     if (fs.existsSync(file)) {
