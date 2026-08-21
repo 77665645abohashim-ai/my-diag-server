@@ -26,7 +26,7 @@ const fullRoutingResponse = {
     "area": "2",
     "data": {
         "urls": [
-            { "key": "login", "value": "https://diagboss.ch//api/v2/login" },
+            { "key": "login", "value": "https://diagboss.ch/api/v2/login" },
             { "key": "check-token", "value": `${MY_DOMAIN}/api/v2/check-token` },
             { "key": "productservice.*", "value": `${MY_DOMAIN}/api/v2/product-service` },
             { "key": "publicsoftservice.*", "value": `${MY_DOMAIN}/api/v2/publicsoftservice` },
@@ -96,7 +96,7 @@ const fullRoutingResponse = {
             { "key": "onlineUploadCarInfo_url", "value": `${MY_DOMAIN}/api/v2/diagonline-addcardata` },
             { "key": "get_dtcs_ds_url", "value": `${MY_DOMAIN}/api/v2/diagonline-getfaultcodeflow` },
             { "key": "ds_upload_dtcs_ds_url", "value": `${MY_DOMAIN}/api/v2/diagonline-uploadfaultcodeflow` },
-            { "key": "upload_diag_statistic_url", "value": `${MY_DOMAIN}/api/v2/diagonline-softuploadrecord` },
+            { "key": "upload_diag_statistic_url", "value": `${MY_DOMAIN}/api/v2/diagonline-softuploadrecord`},
             { "key": "download_multi_files_url", "value": `${MY_DOMAIN}/api/v2/diagonline-multi-files` },
             { "key": "query_diagcar_data", "value": `${MY_DOMAIN}/api/v2/diagonline-query-diagcar-data-new` },
             { "key": "query_diagcar_data_new", "value": `${MY_DOMAIN}/api/v2/diagonline-query-diagcar-data-new` },
@@ -125,10 +125,21 @@ const fullRoutingResponse = {
     }
 };
 
-// معالجة مسار رفع الروابط أو أي مسار غير معرف لتجنب 404
+// 3. مسار الجذر و مسار الروابط الأساسي لتجنب خطأ 404
+app.all(['/', '/api/v2/urls'], (req, res) => {
+    res.json(fullRoutingResponse);
+});
+
+// 4. معالجة مسار رفع الروابط
 app.all('/api/v2/url-upload', (req, res) => {
     res.json({ "code": 0, "msg": "success" });
 });
+
+// 5. مسار عام لتغطية أي طلب آخر يأتي من التطبيق ويرجع نجاح تلقائي
+app.all('/api/v2/*', (req, res) => {
+    res.json({ "code": 0, "msg": "success" });
+});
+
 // تشغيل السيرفر
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
