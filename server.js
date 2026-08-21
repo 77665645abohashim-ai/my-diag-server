@@ -125,7 +125,7 @@ const fullRoutingResponse = {
     }
 };
 // 7. مسار خدمات البرامج والماركات (محدث برد getMaxVersionForMobileAppCDN الدقيق)
-app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt'], (req, res) => {
+app.all(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt6'], (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
     res.status(200).send(soapResponse);
