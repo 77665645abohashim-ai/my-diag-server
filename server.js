@@ -140,43 +140,963 @@ app.all('/api/v2/product-service', (req, res) => {
     res.send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getRegisteredProductsForPad46><return><code>0</code><productDTOs><carLicenseTag></carLicenseTag><serialNo>979862374489</serialNo><dzKey>WpFNRUnQThVAz/lNTGrq3nhN5bmcNSo7Ntdj4fv5pfWUEWWWi2V+xYALPP7K4obNxNLJhoRbCHaObSQJV2s86E+yE6xsvZJL5Z6fYPjbfb6bWI1hL3FkA3qhH50vBAMo7BAslnf7aT1hcVbJRIqWbnIhhLILmZ+h5naRReqc3ZyXP/T0Mx3TJTksXkIE2P9x</dzKey><pdtCategory>2</pdtCategory></productDTOs><productDTOs><carLicenseTag></carLicenseTag><serialNo>989140722496</serialNo><dzKey>NgfpI+Mvntqj2KiEZmVEIH7XofYtj7mqUm7QIcum+iRS7DGNlIfioKgGo5KaPjQipeMoccwg/n6orcrV0Bd+GaKbjfi/m7x3yKniRVhtl3iVmxUmbKpl9J/3K3pDRvNy4M0rlPu/O1too9z+NRqXy2TwBTlXIVgvzRxiNnGChzqEtWnbpG/JDB2S8vkW4d10</dzKey><pdtCategory>2</pdtCategory></productDTOs></return></ns1:getRegisteredProductsForPad46></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
 });
 
-// 4. الاستعلام عن التحديثات (SOAP)
+// 4. الاستعلام عن حزم الفحص الموجه والفرعية (SOAP)
 app.post('/api/v2/diagsoftservice', (req, res) => {
     res.setHeader('Content-Type', 'text/xml; charset=UTF-8');
     res.send(`<?xml version="1.0" encoding="UTF-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com">
-  <SOAP-ENV:Body>
-    <ns1:queryLatestDiagSoftsIncrCdn>
-      <return>
-        <code>0</code>
-        <message>success</message>
-        <x431PadSoftIncrList>
-          <x431PadSoftIncr>
-            <fileSize>55740637</fileSize>
-            <freeUseEndTime>2099-01-01</freeUseEndTime>
-            <lanId>AR</lanId>
-            <serverCurrentTime>2026-08-21</serverCurrentTime>
-            <softId>69</softId>
-            <softName>Demo</softName>
-            <softPackageID>DEMO</softPackageID>
-            <versionDetailId>380901</versionDetailId>
-            <versionNo>V15.68</versionNo>
-          </x431PadSoftIncr>
-          <x431PadSoftIncr>
-            <fileSize>18979371</fileSize>
-            <freeUseEndTime>2099-01-01</freeUseEndTime>
-            <lanId>EN</lanId>
-            <serverCurrentTime>2026-08-21</serverCurrentTime>
-            <softId>92</softId>
-            <softName>ECUAID</softName>
-            <softPackageID>ECUAID</softPackageID>
-            <versionDetailId>366146</versionDetailId>
-            <versionNo>V12.11</versionNo>
-          </x431PadSoftIncr>
-        </x431PadSoftIncrList>
-      </return>
-    </ns1:queryLatestDiagSoftsIncrCdn>
-  </SOAP-ENV:Body>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Body>
+        <ns1:queryPDTDiagSoftSubPackResponse>
+            <return>
+                <code>0</code>
+                <message>success</message>
+                <diagSoftSubPackList>
+                    <diagSoftSubPack>
+                        <spfId>21</spfId>
+                        <softSubPackKey>AUDI_DIV01</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi A1,A2</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 1(AUDI A1,A2)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>22</spfId>
+                        <softSubPackKey>AUDI_DIV02</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId><softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi A3</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 2(AUDI A3)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>23</spfId>
+                        <softSubPackKey>AUDI_DIV03</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi A3(USA/CAN)</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 3(AUDI A3 USA/CAN)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>24</spfId>
+                        <softSubPackKey>AUDI_DIV04</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi A4</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 4(AUDI A4)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>25</spfId>
+                        <softSubPackKey>AUDI_DIV05</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi A4(USA/CAN)</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 5(AUDI A4 USA/CAN)</spfNameDesc>
+                        <vNum>29.16</vNum><fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>26</spfId>
+                        <softSubPackKey>AUDI_DIV06</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi A5,A7,Cabriolet</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 6(AUDI A5,A7,Cabriolet)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>27</spfId>
+                        <softSubPackKey>AUDI_DIV07</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi A5(USA/CAN),A7(USA/CAN),Cabriolet(USA/CAN)</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 7((AUDI A5,A7,Cabriolet)USA/CAN)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>28</spfId>
+                        <softSubPackKey>AUDI_DIV08</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi A6</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 8(AUDI A6)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>29</spfId>
+                        <softSubPackKey>AUDI_DIV09</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi A6(USA/CAN)</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 9(AUDI A6 USA/CAN)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>30</spfId>
+                        <softSubPackKey>AUDI_DIV10</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi A8</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 10(AUDI A8)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>31</spfId>
+                        <softSubPackKey>AUDI_DIV11</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi A8(USA/CAN)</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 11(AUDI A8 USA/CAN)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>32</spfId>
+                        <softSubPackKey>AUDI_DIV12</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi Q3,Q5</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 12(AUDI Q3,Q5)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>33</spfId>
+                        <softSubPackKey>AUDI_DIV13</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi Q3(USA/CAN),Q5(USA/CAN)</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 13((AUDI Q3,Q5)USA/CAN)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>34</spfId>
+                        <softSubPackKey>AUDI_DIV14</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi Q7</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 14(AUDI Q7)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>35</spfId>
+                        <softSubPackKey>AUDI_DIV15</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi Q7(USA/CAN)</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 15(AUDI Q7 USA/CAN)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>36</spfId>
+                        <softSubPackKey>AUDI_DIV16</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi TT</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 16(AUDI TT)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>37</spfId>
+                        <softSubPackKey>AUDI_DIV17</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi TT(USA/CAN)</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 17(AUDI TT USA/CAN)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>38</spfId>
+                        <softSubPackKey>AUDI_DIV18</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi R8</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 18(AUDI R8)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>39</spfId>
+                        <softSubPackKey>AUDI_DIV19</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guided functions of the Audi R8(USA/CAN)</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 19(AUDI R8 USA/CAN)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>59</spfId>
+                        <softSubPackKey>AUDI_DIV20</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guide functions of the Audi Q2 and e-tron</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 20(AUDI Q2, e-tron)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>60</spfId>
+                        <softSubPackKey>AUDI_DIV21</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guide functions of the Audi Q8</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 21(AUDI Q8)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>61</spfId>
+                        <softSubPackKey>AUDI_DIV22</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the online function of AUDI</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>AUDI online function package</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>223</spfId>
+                        <softSubPackKey>AUDI_DIV23</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains the guide functions of the Audi Q4</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>Audi Guided function package 23(AUDI Q4)</spfNameDesc>
+                        <vNum>29.16</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>82</spfId>
+                        <softSubPackKey>AUDI_DIV30</softSubPackKey>
+                        <softPackageId>AUDI</softPackageId>
+                        <softDesc>Audi</softDesc>
+                        <spfDesc>This package contains ADAS functions of AUDI</spfDesc>
+                        <softId>6</softId>
+                        <spfNameDesc>AUDI ADAS function package</spfNameDesc>
+                        <vNum>29.16</vNum><fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>62</spfId>
+                        <softSubPackKey>SEAT_DIV30</softSubPackKey>
+                        <softPackageId>SEAT</softPackageId>
+                        <softDesc>Seat</softDesc>
+                        <spfDesc>This package contains ADAS functions of SEAT</spfDesc>
+                        <softId>339</softId>
+                        <spfNameDesc>SEAT ADAS function package</spfNameDesc>
+                        <vNum>28.53</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>49</spfId>
+                        <softSubPackKey>SKODA_DIV01</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Octavia</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 1(SKODA Octavia)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>50</spfId>
+                        <softSubPackKey>SKODA_DIV02</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Fabia</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 2(SKODA Fabia)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>51</spfId>
+                        <softSubPackKey>SKODA_DIV03</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Superb</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 3(SKODA Superb)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>63</spfId>
+                        <softSubPackKey>SKODA_DIV04</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Roomster</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 4(SKODA Roomster)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>52</spfId>
+                        <softSubPackKey>SKODA_DIV05</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Kodiaq</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 5(SKODA Kodiaq)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>64</spfId>
+                        <softSubPackKey>SKODA_DIV06</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Yeti</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 6(SKODA Yeti)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>53</spfId>
+                        <softSubPackKey>SKODA_DIV07</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId><softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Rapid</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 7(SKODA Rapid)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>65</spfId>
+                        <softSubPackKey>SKODA_DIV08</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Citigo</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 8(SKODA Citigo)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>66</spfId>
+                        <softSubPackKey>SKODA_DIV09</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Karoq</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 9(Karoq)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>67</spfId>
+                        <softSubPackKey>SKODA_DIV10</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Kamiq and Scala</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 10(Kamiq/Scala)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>225</spfId>
+                        <softSubPackKey>SKODA_DIV12</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Enyaq</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 12(Enyaq)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>232</spfId>
+                        <softSubPackKey>SKODA_DIV13</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains the guided functions of the SKODA Kushaq and Slavia</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA Guided function package 13(Kushaq, Slavia)</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>68</spfId>
+                        <softSubPackKey>SKODA_DIV30</softSubPackKey>
+                        <softPackageId>SKODA</softPackageId>
+                        <softDesc>Skoda</softDesc>
+                        <spfDesc>This package contains ADAS functions of SKODA</spfDesc>
+                        <softId>354</softId>
+                        <spfNameDesc>SKODA ADAS function package</spfNameDesc>
+                        <vNum>28.56</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>40</spfId>
+                        <softSubPackKey>YQVW_DIV01</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>YQVW_DIV01</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW_DIV01</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>41</spfId>
+                        <softSubPackKey>YQVW_DIV02</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>YQVW_DIV02</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW_DIV02</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>42</spfId>
+                        <softSubPackKey>YQVW_DIV03</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>YQVW_DIV03</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW_DIV03</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>43</spfId>
+                        <softSubPackKey>YQVW_DIV04</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>YQVW_DIV04</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW_DIV04</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>44</spfId>
+                        <softSubPackKey>YQVW_DIV05</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>YQVW_DIV05</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW_DIV05</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>88</spfId>
+                        <softSubPackKey>YQVW_DIV06</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>This package contains the guide functions of the YQVW Sportsvan and T-Roc</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW Guided function package 06(Sportvan, T-Roc)</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>89</spfId>
+                        <softSubPackKey>YQVW_DIV07</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>This package contains the guide functions of the YQVW Tayron and CC Fastback</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW Guided function package 07(Tayron, CC Fastback)</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>90</spfId>
+                        <softSubPackKey>YQVW_DIV08</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>This package contains the online function of YQVW</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW online function package</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>91</spfId>
+                        <softSubPackKey>YQVW_DIV09</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>YQVW_DIV09</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW_DIV09</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>228</spfId>
+                        <softSubPackKey>YQVW_DIV10</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>YQVW_DIV10</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW_DIV10</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>229</spfId>
+                        <softSubPackKey>YQVW_DIV11</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>YQVW_DIV11</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW_DIV11</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>92</spfId>
+                        <softSubPackKey>YQVW_DIV30</softSubPackKey>
+                        <softPackageId>YQVW</softPackageId>
+                        <softDesc>VW (FAW)</softDesc>
+                        <spfDesc>YQVW_DIV30</spfDesc>
+                        <softId>402</softId>
+                        <spfNameDesc>YQVW_DIV30</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>1</spfId>
+                        <softSubPackKey>SHVW_DIV01</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>SHVW_DIV01</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW_DIV01</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>2</spfId>
+                        <softSubPackKey>SHVW_DIV02</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>SHVW_DIV02</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW_DIV02</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>3</spfId>
+                        <softSubPackKey>SHVW_DIV03</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>SHVW_DIV03</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW_DIV03</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>4</spfId>
+                        <softSubPackKey>SHVW_DIV04</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>SHVW_DIV04</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW_DIV04</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>5</spfId>
+                        <softSubPackKey>SHVW_DIV05</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>SHVW_DIV05</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW_DIV05</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>6</spfId>
+                        <softSubPackKey>SHVW_DIV06</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>SHVW_DIV06</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW_DIV06</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>83</spfId>
+                        <softSubPackKey>SHVW_DIV07</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>This package contains the guide functions of the SHVW Teramont and Phideon</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW Guided function package 07(Teramont Phideon)</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>84</spfId>
+                        <softSubPackKey>SHVW_DIV08</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>This package contains the guide functions of the SHVW Tharu and T-Cross</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW Guided function package 08(Tharu, T-Cross)</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>85</spfId>
+                        <softSubPackKey>SHVW_DIV09</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>This package contains the online function of SHVW</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW online function package</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>86</spfId>
+                        <softSubPackKey>SHVW_DIV10</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>SHVW_DIV10</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW_DIV10</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>222</spfId>
+                        <softSubPackKey>SHVW_DIV11</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>SHVW_DIV11</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW_DIV11</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>224</spfId>
+                        <softSubPackKey>SHVW_DIV12</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>SHVW_DIV12</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW_DIV12</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>87</spfId>
+                        <softSubPackKey>SHVW_DIV30</softSubPackKey>
+                        <softPackageId>SHVW</softPackageId>
+                        <softDesc>VW (SAIC)</softDesc>
+                        <spfDesc>SHVW_DIV30</spfDesc>
+                        <softId>350</softId>
+                        <spfNameDesc>SHVW_DIV30</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>7</spfId>
+                        <softSubPackKey>VW_DIV01</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include up, Tiguan, Touareg Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 1</spfNameDesc>
+                        <vNum>29.06</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>8</spfId>
+                        <softSubPackKey>VW_DIV02</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Eos Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 2</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>9</spfId>
+                        <softSubPackKey>VW_DIV03</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Golf Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 3</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>10</spfId>
+                        <softSubPackKey>VW_DIV04</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Touran Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 4</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>11</spfId>
+                        <softSubPackKey>VW_DIV05</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Passat Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 5</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>12</spfId>
+                        <softSubPackKey>VW_DIV06</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Polo Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 6</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>13</spfId>
+                        <softSubPackKey>VW_DIV07</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Sharan Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 7</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>14</spfId>
+                        <softSubPackKey>VW_DIV08</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Beetle Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 8</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>15</spfId>
+                        <softSubPackKey>VW_DIV09</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Jetta Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 9</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>16</spfId>
+                        <softSubPackKey>VW_DIV10</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Gol Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 10</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>17</spfId>
+                        <softSubPackKey>VW_DIV11</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Fox, Lupo, Suran, Sportvan, Space Cross Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 11</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>18</spfId>
+                        <softSubPackKey>VW_DIV12</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Santana, Rabbit, Scirocco, XL1, Kombi, Lupo Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 12</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>19</spfId>
+                        <softSubPackKey>VW_DIV13</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Phaeton Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 13</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>20</spfId>
+                        <softSubPackKey>VW_DIV14</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Bora Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided Functions 14</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>69</spfId>
+                        <softSubPackKey>VW_DIV15</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>This package contains the guided functions of the VW T-Roc,T-Cross and Atlas</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided function package 15(T-Roc,T-Cross,Atlas)</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>70</spfId>
+                        <softSubPackKey>VW_DIV16</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>This package contains the guide functions of the VW Arteon</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided function package 16(Arteon)</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>230</spfId>
+                        <softSubPackKey>VW_DIV17</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>This package contains the guide functions of the VW Caddy and Amarok</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided function package 17(Caddy,Amarok)</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>231</spfId>
+                        <softSubPackKey>VW_DIV18</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>This package contains the guide functions of the VW Transporter and Crafter</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided function package 18(Transporter,Crafter)</spfNameDesc>
+                        <vNum>29.06</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>71</spfId>
+                        <softSubPackKey>VW_DIV19</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>This package contains the online function of VW</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Online function package</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>72</spfId>
+                        <softSubPackKey>VW_DIV20</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>This package contains the guide functions of the VW Nivus and ID.3</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided function package 20(Nivus,ID.3)</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>226</spfId>
+                        <softSubPackKey>VW_DIV21</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>This package contains the guide functions of the VW Taos and ID.4</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided function package 21(Taos,ID.4)</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>227</spfId>
+                        <softSubPackKey>VW_DIV24</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>VW Guided Functions: Include Tarek,Taigo,ID.5 Guided Functions</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW Guided function package 24(Tarek,Taigo,ID.5)</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                    <diagSoftSubPack>
+                        <spfId>221</spfId>
+                        <softSubPackKey>VW_DIV30</softSubPackKey>
+                        <softPackageId>VW</softPackageId>
+                        <softDesc>VW/Bentley/Bugatti/Lamborghini</softDesc>
+                        <spfDesc>This package contains ADAS functions of VW.</spfDesc>
+                        <softId>379</softId>
+                        <spfNameDesc>VW ADAS function package</spfNameDesc>
+                        <vNum>29.05</vNum>
+                        <fileSize>0</fileSize>
+                    </diagSoftSubPack>
+                </diagSoftSubPackList>
+            </return>
+        </ns1:queryPDTDiagSoftSubPackResponse>
+    </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`);
 });
 
