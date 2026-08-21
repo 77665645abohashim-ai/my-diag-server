@@ -129,12 +129,18 @@ app.all('/api/v2/activation', (req, res) => {
     res.json({ "code": 0, "msg": "OK", "data": { "activationCode": "cW9VVEdobWZwdjQxNkZTeG51emRuZz09" } });
 });
 
-// 2. معالجة طلبات الخدمات والرفع لتجنب أخطاء 404
-app.all(['/api/v2/url-upload', '/api/v2/log-service-upload', '/api/v2/file-upload', '/api/v2/product-service', '/api/v2/publicsoftservice-nt', '/api/v2/publicsoftservice'], (req, res) => {
+// 2. معالجة طلبات الخدمات والرفع
+app.all(['/api/v2/url-upload', '/api/v2/log-service-upload', '/api/v2/file-upload', '/api/v2/publicsoftservice-nt', '/api/v2/publicsoftservice'], (req, res) => {
     res.json({ "code": 0, "msg": "success", "data": {} });
 });
 
-// 3. الاستعلام عن التحديثات (SOAP)
+// 3. مسار product-service ليرد بصيغة SOAP XML للمنتجات المسجلة
+app.all('/api/v2/product-service', (req, res) => {
+    res.setHeader('Content-Type', 'text/xml; charset=UTF-8');
+    res.send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getRegisteredProductsForPad46><return><code>0</code><productDTOs><carLicenseTag></carLicenseTag><serialNo>979862374489</serialNo><dzKey>WpFNRUnQThVAz/lNTGrq3nhN5bmcNSo7Ntdj4fv5pfWUEWWWi2V+xYALPP7K4obNxNLJhoRbCHaObSQJV2s86E+yE6xsvZJL5Z6fYPjbfb6bWI1hL3FkA3qhH50vBAMo7BAslnf7aT1hcVbJRIqWbnIhhLILmZ+h5naRReqc3ZyXP/T0Mx3TJTksXkIE2P9x</dzKey><pdtCategory>2</pdtCategory></productDTOs><productDTOs><carLicenseTag></carLicenseTag><serialNo>989140722496</serialNo><dzKey>NgfpI+Mvntqj2KiEZmVEIH7XofYtj7mqUm7QIcum+iRS7DGNlIfioKgGo5KaPjQipeMoccwg/n6orcrV0Bd+GaKbjfi/m7x3yKniRVhtl3iVmxUmbKpl9J/3K3pDRvNy4M0rlPu/O1too9z+NRqXy2TwBTlXIVgvzRxiNnGChzqEtWnbpG/JDB2S8vkW4d10</dzKey><pdtCategory>2</pdtCategory></productDTOs></return></ns1:getRegisteredProductsForPad46></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
+});
+
+// 4. الاستعلام عن التحديثات (SOAP)
 app.post('/api/v2/diagsoftservice', (req, res) => {
     res.setHeader('Content-Type', 'text/xml; charset=UTF-8');
     res.send(`<?xml version="1.0" encoding="UTF-8"?>
@@ -174,7 +180,7 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
 </SOAP-ENV:Envelope>`);
 });
 
-// 4. التحميل وبث الملفات
+// 5. التحميل وبث الملفات
 app.get('/api/v2/download', (req, res) => {
     const file = `${__dirname}/packages/${req.query.versionDetailId}.zip`;
     if (fs.existsSync(file)) {
