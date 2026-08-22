@@ -128,7 +128,7 @@ app.all(['/', '/api/v2/urls'], (req, res) => {
     res.json(fullRoutingResponse);
 });
 
-// 4. معالجة مسار رفع الروابط والرد بالرابط المطلوبة
+// 4. معالجة مسار رفع الروابط
 app.all('/api/v2/url-upload', (req, res) => {
     console.log("URL Upload Request Body:", req.body);
     console.log("URL Upload Request Query:", req.query);
@@ -138,7 +138,12 @@ app.all('/api/v2/url-upload', (req, res) => {
         "msg": "success",
         "data": {
             "url": `${MY_DOMAIN}/api/v2/download`,
-            "downloadUrl": `${MY_DOMAIN}/api/v2/download`
+            "downloadUrl": `${MY_DOMAIN}/api/v2/download`,
+            "fileUrl": `${MY_DOMAIN}/api/v2/download`,
+            "size": 102400,
+            "md5": "d41d8cd98f00b204e9800998ecf8427e",
+            "version": "1.0.0",
+            "status": 1
         }
     });
 });
