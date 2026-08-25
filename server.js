@@ -207,64 +207,38 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
 const fs = require('fs');
 const path = require('path');
 
-// مسار تخزين الملفات الوهمية أو الحقيقية على السيرفر (تأكد من وجود المجلد أو سيتم إنشاؤه تلقائياً)
-const DOWNLOAD_DIR = path.join(__dirname, 'downloads');
-if (!fs.existsSync(DOWNLOAD_DIR)) {
-    fs.mkdirSync(DOWNLOAD_DIR, { recursive: true });
-}
+// خريطة لربط كل versionDetailId برابط التحميل المباشر الخاص به على جوجل درايف
+const fileMap = {
+  // ملف EOBD / OBDII (الإصدار V23.12)
+  "362272": "https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5oR4I5hFPSSGc8gx_HHYHY",
+  
+  // يمكنك إضافة بقية المعرفات والروابط هنا بنفس الطريقة لاحقاً
+  // مثال:
+  // "380901": "رابط_ملف_Demo_المباشر_على_درايف",
+  // "363814": "رابط_ملف_DEMO_Motor_المباشر_على_درايف"
+};
 
-// 10. مسار التحميل الشامل ودعم استكمال التحميل (Breakpoint Download)
-app.all('/api/v2/download', (req, res) => {
-    console.log("Download Request Headers:", req.headers);
-    console.log("Download Request Query/Body:", req.query, req.body);
+// مسار التحميل (Download Endpoint)
+app.get('/api/v2/download', (req, res) => {
+  const { versionDetailId, dzCode, serialNo, token } = req.query;
 
-    // استخراج اسم الملف أو معرف الإصدار من الطلب (افتراضي للتجربة)
-    // يمكنك تعديل هذه المنطقية لاستخراج اسم الملف بناءً على الرابط أو البارامترات المرسلة
-    const fileName = req.query.fileName || req.body?.fileName || 'default_soft.zip';
-    const filePath = path.join(DOWNLOAD_DIR, fileName);
+  // طباعة بيانات الطلب في السجل للتتبع والتأكد
+  console.log(`Download request received for versionDetailId: ${versionDetailId}, Serial: ${serialNo}`);
 
-    // لو الملف غير موجود، نقوم بتوليد ملف وهمي صغير (أو ملف نصي/ضغط) لغرض التجربة والاختبار
-    if (!fs.existsSync(filePath)) {
-        // إنشاء ملف وهمي حجمه 1 ميجابايت مثلاً لكي ينجح التحميل
-        const buffer = Buffer.alloc(1024 * 1024, 'X'); 
-        fs.writeFileSync(filePath, buffer);
-    }
-
-    const stat = fs.statSync(filePath);
-    const fileSize = stat.size;
-
-    // دعم خاصية الاستكمال (Range Header) التي يرسلها التطبيق عند انقطاع الاتصال
-    const range = req.headers.range;
-    
-    if (range) {
-        const parts = range.replace(/bytes=/, "").split("-");
-        const start = parseInt(parts[0], 10);
-        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-        const chunksize = (end - start) + 1;
-        
-        const file = fs.createReadStream(filePath, { start, end });
-        
-        res.writeHead(206, {
-            'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-            'Accept-Ranges': 'bytes',
-            'Content-Length': chunksize,
-            'Content-Type': 'application/octet-stream',
-        });
-        
-        file.pipe(res);
-        console.log(`Resuming download from byte ${start} to ${end}`);
-    } else {
-        // إرسال الملف كاملاً من البداية
-        res.writeHead(200, {
-            'Content-Length': fileSize,
-            'Content-Type': 'application/octet-stream',
-            'Accept-Ranges': 'bytes'
-        });
-        
-        fs.createReadStream(filePath).pipe(res);
-        console.log(`Starting full download for: ${fileName}`);
-    }
+  // التحقق مما إذا كان المعرف موجوداً في القائمة
+  if (fileMap[versionDetailId]) {
+    // توجيه طلب التطبيق مباشرة لرابط التحميل المباشر على جوجل درايف
+    return res.redirect(fileMap[versionDetailId]);
+  } else {
+    // في حال لم يتم العثور على الملف
+    console.log(`File not found for versionDetailId: ${versionDetailId}`);
+    return.status(404).json({
+      code: 404,
+      message: "File not found for this versionDetailId"
+    });
+  }
 });
+
 
 // تشغيل السيرفر
 app.listen(PORT, () => {
