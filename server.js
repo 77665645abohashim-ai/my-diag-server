@@ -207,11 +207,48 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
 const fs = require('fs');
 const path = require('path');
 
-// خريطة لربط كل versionDetailId برابط التحميل المباشر الخاص به على جوجل درايف
+const axios = require('axios');
+
+// خريطة لربط كل versionDetailId برابط التحميل المباشر على جوجل درايف
 const fileMap = {
-  // ملف EOBD / OBDII (الإصدار V23.12)
-  "362272": "https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5oR4I5hFPSSGc8gx_HHYHY",
-  
+  "362272": "https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5oR4I5hFPSSGc8gx_HHYHY"
+};
+
+// مسار التحميل (Download Endpoint)
+app.get('/api/v2/download', async (req, res) => {
+  const { versionDetailId, dzCode, serialNo, token } = req.query;
+
+  console.log(`Download request received for versionDetailId: ${versionDetailId}, Serial: ${serialNo}`);
+
+  const fileUrl = fileMap[versionDetailId];
+
+  if (!fileUrl) {
+    console.log(`File not found for versionDetailId: ${versionDetailId}`);
+    return res.status(404).json({
+      code: 404,
+      message: "File not found for this versionDetailId"
+    });
+  }
+
+  try {
+    // جلب الملف من درايف وبثه كبيانات ثنائية مطابقة للسيرفر الأصلي
+    const response = await axios({
+      method: 'GET',
+      url: fileUrl,
+      responseType: 'stream'
+    });
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename="EOBD2_2312_AR.ZIP"');
+
+    response.data.pipe(res);
+
+  } catch (error) {
+    console.error("Error streaming file:", error.message);
+    res.status(500).json({ code: 500, message: "Server error downloading file" });
+  }
+});
+
   // يمكنك إضافة بقية المعرفات والروابط هنا بنفس الطريقة لاحقاً
   // مثال:
   // "380901": "رابط_ملف_Demo_المباشر_على_درايف",
