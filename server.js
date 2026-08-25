@@ -27,8 +27,8 @@ const fullRoutingResponse = {
     "data": {
         "urls": [
             { "key": "login", "value": "https://diagboss.ch/api/v2/login" },
-            { "key": "check-token", "value": `${MY_DOMAIN}/api/v2/check-token` },
-            { "key": "productservice.*", "value":"https://my-diag-server.onrender.com/api/v2/product-service" },
+            { "key": "check-token", "value":"https://diagboss.ch/api/v2/check-token" },
+            { "key": "productservice.*", "value":"https://diagboss.ch/api/v2/product-service" },
             { "key": "publicsoftservice.*", "value":"https://my-diag-server.onrender.com/api/v2/publicsoftservice" },
             { "key": "publicsoftservice.nt", "value":"https://my-diag-server.onrender.com/api/v2/publicsoftservice-nt" },
             { "key": "x431padpublicsoftservice.*", "value":"https://my-diag-server.onrender.com/api/v2/publicsoftservice" },
