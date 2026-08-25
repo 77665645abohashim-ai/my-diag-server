@@ -212,7 +212,7 @@ const fileMap = {
 };
 
 // 11. مسار التحميل الموحد (Download Endpoint)
-app.get('/api/v2/download', async (req, res) => {
+app.get('/api/v2/download', (req, res) => {
   const { versionDetailId, dzCode, serialNo, token } = req.query;
 
   console.log(`Download request received for versionDetailId: ${versionDetailId}, Serial: ${serialNo}`);
@@ -227,23 +227,8 @@ app.get('/api/v2/download', async (req, res) => {
     });
   }
 
-  try {
-    // سحب الملف وبثه مباشرة إلى التطبيق لضمان نجاح التنزيل
-    const response = await axios({
-      method: 'GET',
-      url: fileUrl,
-      responseType: 'stream'
-    });
-
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', `attachment; filename="package_${versionDetailId}.zip"`);
-
-    response.data.pipe(res);
-
-  } catch (error) {
-    console.error("Error streaming file:", error.message);
-    res.status(500).json({ code: 500, message: "Server error downloading file" });
-  }
+  // إعادة توجيه التطبيق مباشرة إلى رابط الملف الخارجي (مثل السيرفر الأصلي)
+  return res.redirect(302, fileUrl);
 });
 
 // تشغيل السيرفر
