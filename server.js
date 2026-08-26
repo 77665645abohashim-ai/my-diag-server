@@ -205,21 +205,32 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
 });
 
 // 10. خريطة الروابط للتحميل المباشر من Google Drive
-
 const fileMap = {
     "362272": "https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5OR4I5HPSSGc8gx_HHYHY",
     "380901": "https://drive.google.com/uc?export=download&id=1120X0yc3b4YxC22DcfDtLz7gwazUMTxs"
 };
 
-  const fileUrl = fileMap[versionDetailId];
+// 11. مسار التحميل الموحّد (Download Endpoint)
+app.get('/api/v2/download', (req, res) => {
+    const { versionDetailId, dzCode, serialNo, token } = req.query;
 
-  if (!fileUrl) {
-    console.log(`File not found for versionDetailId: ${versionDetailId}`);
-    return res.status(404).json({
-      code: 404,
-      message: "File not found for this versionDetailId"
-    });
-  }
+    console.log(`Download request received for versionDetailId: ${versionDetailId}, Serial: ${serialNo}`);
+
+    // البحث عن الرابط أو التحويل التلقائي لرابط الديمو إذا لم يتم العثور عليه
+    const fileUrl = fileMap[versionDetailId] || fileMap["380901"];
+
+    if (!fileUrl) {
+        console.log(`File not found for versionDetailId: ${versionDetailId}`);
+        return res.status(404).json({
+            code: 404,
+            message: "File not found for this versionDetailId"
+        });
+    }
+
+    // إعادة توجيه التطبيق مباشرة إلى رابط التحميل الخارجي
+    return res.redirect(302, fileUrl);
+});
+
 
   // إعادة توجيه التطبيق مباشرة إلى رابط الملف الخارجي (مثل السيرفر الأصلي)
   return res.redirect(302, fileUrl);
