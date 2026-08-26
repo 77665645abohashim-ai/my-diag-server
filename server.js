@@ -175,7 +175,7 @@ app.all('/api/v2/publicsoftservice-nt', (req, res) => {
 });
 
 // 9. مسار البرمجيات والماركات التشخيصية
- app.all('/api/v2/diagsoftservice', (req, res) => {
+app.all('/api/v2/diagsoftservice', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     
     const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
@@ -301,11 +301,7 @@ app.all('/api/v2/publicsoftservice-nt', (req, res) => {
         </x431PadSoftIncr>
 
         </x431PadSoftIncrList>`;
-    }
-    
-    res.send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><${soapMethodName}Response>${innerResponseContent}</${soapMethodName}Response></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
-});
-{
+    } else {
         soapMethodName = "queryPDTDiagSoftSubPack";
         innerResponseContent = `<code>0</code><message>success</message><diagSoftSubPackList><diagSoftSubPack><spfId><softSubPackKey>AUDI_DIV01</softSubPackKey><softPackageId>AUDI</softPackageId><softDesc>Audi</softDesc><spfDesc>This package contains the guided functions of the Audi A1,A2</spfDesc><softId>6</softId><spfNameDesc>Audi Guided function package 1(AUDI A1,A2)</spfNameDesc><vNum>29.16</vNum><fileSize>0</fileSize></diagSoftSubPack></diagSoftSubPackList>`;
     }
