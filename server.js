@@ -206,10 +206,12 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
 
 // 10. خريطة الروابط للتحميل المباشر من Google Drive
 const fileMap = {
-  "362272": "https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5oR4I5hFPSSGc8gx_HHYHY"
-  // يمكنك إضافة روابط أخرى هنا لاحقاً بنفس الشكل:
-  // "380901": "https://drive.google.com/file/d/1120X0yc3b4YxC22DcfDtLz7gwazUMTxs/view?usp=drivesdk"
-};
+    "362272": "https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5OR4I5HPSSGc8gx_HHYHY",
+    
+    // أضف رابـط ماركة الديمو هنا بنفس الشكل (مع ملاحظة الفاصلة في السطر السابق):
+    "380901": "https://drive.google.com/file/d/1120X0yc3b4YxC22DcfDtLz7gwazUMTxs/view?usp=drivesdk"
+}; 
+
 
 // 11. مسار التحميل الموحد (Download Endpoint)
 app.get('/api/v2/download', (req, res) => {
