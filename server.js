@@ -209,8 +209,8 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
 const fileMap = {
     "362272": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/EOBD2_2312_AR.ZIP",
     "5565": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/EOBD2_2312_AR.ZIP",
-    "1115": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/AUTOSEARCH_1115_AR.ZIP",
-    "1555": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/BMS_DEMO_1555_AR.ZIP",
+    "365206": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/AUTOSEARCH_1115_AR.ZIP",
+    "367837": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/BMS_DEMO_1555_AR.ZIP",
     "380901": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/DEMO_1568_AR.ZIP",
     "1211": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/ECUAID_1211_EN.ZIP",
     "4001": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP",
@@ -293,7 +293,7 @@ app.get('/api/v2/download', (req, res) => {
     console.log(`Download request received for versionDetailId: ${versionDetailId}, Serial: ${serialNo}`);
 
     // البحث عن الرابط أو التحويل التلقائي لرابط الديمو إذا لم يتم العثور عليه
-    const fileUrl = fileMap[versionDetailId] || fileMap["380901"];
+    const fileUrl = fileMap[versionDetailId] || fileMap["580565"];
 
     if (!fileUrl) {
         console.log(`File not found for versionDetailId: ${versionDetailId}`);
