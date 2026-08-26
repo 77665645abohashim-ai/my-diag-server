@@ -173,8 +173,7 @@ app.all('/api/v2/publicsoftservice-nt', (req, res) => {
     const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
     res.status(200).send(soapResponse);
 });
-
-// 9. مسار البرمجيات والماركات التشخيصية
+// 9. مسار البرمجيات والماركات التشخيصية (شامل الماركات المشهورة والأصلية)
 app.all('/api/v2/diagsoftservice', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     
@@ -203,7 +202,32 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
             <versionNo>V10.66</versionNo>
         </x431PadSoftIncr>
 
-        <!-- مهارات الماركات المستخرجة من الصور -->
+        <!-- الماركات الكبرى والمشهورة (تويوتا، هوندا، فورد، وغيرها) -->
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>150000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1001</softId><softName>Toyota</softName><softPackageID>TOYOTA</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4001</versionDetailId><versionNo>V15.50</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>95000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1002</softId><softName>Honda</softName><softPackageID>HONDA</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4002</versionDetailId><versionNo>V14.20</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>180000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1003</softId><softName>Ford</softName><softPackageID>FORD</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4003</versionDetailId><versionNo>V18.10</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>110000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1004</softId><softName>Audi</softName><softPackageID>AUDI</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4004</versionDetailId><versionNo>V29.16</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>210000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1005</softId><softName>Volkswagen</softName><softPackageID>VW</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4005</versionDetailId><versionNo>V29.30</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>130000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1006</softId><softName>Lexus</softName><softPackageID>LEXUS</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4006</versionDetailId><versionNo>V13.10</versionNo>
+        </x431PadSoftIncr>
+
+        <!-- باقي الماركات التي طلبتها مسبقاً -->
         <x431PadSoftIncr>
             <diagVehicleType>1</diagVehicleType><fileSize>9380000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1101</softId><softName>Isuzu</softName><softPackageID>ISUZU</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4010</versionDetailId><versionNo>V10.46</versionNo>
         </x431PadSoftIncr>
