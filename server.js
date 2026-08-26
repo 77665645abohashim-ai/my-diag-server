@@ -173,7 +173,7 @@ app.all('/api/v2/publicsoftservice-nt', (req, res) => {
     const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
     res.status(200).send(soapResponse);
 });
-// 9. مسار البرمجيات والماركات التشخيصية (شامل الماركات المشهورة والأصلية)
+// 9. مسار البرمجيات والماركات التشخيصية (شامل الأساسيات والماركات كاملة)
 app.all('/api/v2/diagsoftservice', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     
@@ -187,6 +187,7 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
         soapMethodName = "queryLatestDiagSoftsIncrCdn";
         innerResponseContent = `<code>0</code><message>success</message><x431PadSoftIncrList>
         
+        <!-- الحزم الأساسية ونظام الفحص والـ Demo -->
         <x431PadSoftIncr>
             <diagVehicleType>1</diagVehicleType>
             <fileSize>55740637</fileSize>
@@ -202,7 +203,47 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
             <versionNo>V10.66</versionNo>
         </x431PadSoftIncr>
 
-        <!-- الماركات الكبرى والمشهورة (تويوتا، هوندا، فورد، وغيرها) -->
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType>
+            <fileSize>2305655</fileSize>
+            <freeUseEndTime>2099-01-01</freeUseEndTime>
+            <lanId>AR</lanId>
+            <serverCurrentTime>2026-08-21</serverCurrentTime>
+            <softApplicableArea>5</softApplicableArea>
+            <softId>1452</softId>
+            <softName>Demo (BMS)</softName>
+            <softPackageID>BMS_DEMO</softPackageID>
+            <softUpdateTime>2024-05-30 09:48:23</softUpdateTime>
+            <versionDetailId>367837</versionDetailId>
+            <versionNo>V15.55</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType>
+            <fileSize>6656601</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>AR</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1366</softId><softName>Demo (EV)</softName><softPackageID>EV_DEMO</softPackageID><softUpdateTime>2026-03-04 11:01:01</softUpdateTime><versionDetailId>381744</versionDetailId><versionNo>V15.68</versionNo><tab>EV</tab>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>2241856</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1150</softId><softName>DEMO Motor</softName><softPackageID>MT_DEMO</softPackageID><softUpdateTime>2024-11-21 15:26:22</softUpdateTime><versionDetailId>363814</versionDetailId><versionNo>V10.11</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>18979371</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>92</softId><softName>ECUAID</softName><softPackageID>ECUAID</softPackageID><softUpdateTime>2025-12-08 16:02:02</softUpdateTime><versionDetailId>366146</versionDetailId><versionNo>V12.11</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>2590675</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>AR</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>93</softId><softName>EOBD/OBDII</softName><softPackageID>EOBD2</softPackageID><softUpdateTime>2025-08-14 09:43:52</softUpdateTime><versionDetailId>362272</versionDetailId><versionNo>V23.12</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>89446936</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>AR</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>9</softId><softName>VINSCAN Service</softName><softPackageID>AUTOSEARCH</softPackageID><softUpdateTime>2025-10-24 10:05:07</softUpdateTime><versionDetailId>365206</versionDetailId><versionNo>V11.15</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>1991767</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1145</softId><softName>VINSCAN Service (HD)</softName><softPackageID>HD_AUTOSEARCH</softPackageID><softUpdateTime>2025-08-06 09:32:58</softUpdateTime><versionDetailId>362469</versionDetailId><versionNo>V10.85</versionNo><tab>HD</tab>
+        </x431PadSoftIncr>
+
+        <!-- الماركات الكبرى والمشهورة (تويوتا، هوندا، فورد، أودي، فولكس فاجن، لكزس) -->
         <x431PadSoftIncr>
             <diagVehicleType>1</diagVehicleType><fileSize>150000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1001</softId><softName>Toyota</softName><softPackageID>TOYOTA</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4001</versionDetailId><versionNo>V15.50</versionNo>
         </x431PadSoftIncr>
@@ -227,7 +268,7 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
             <diagVehicleType>1</diagVehicleType><fileSize>130000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1006</softId><softName>Lexus</softName><softPackageID>LEXUS</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4006</versionDetailId><versionNo>V13.10</versionNo>
         </x431PadSoftIncr>
 
-        <!-- باقي الماركات التي طلبتها مسبقاً -->
+        <!-- باقي ماركات السيارات -->
         <x431PadSoftIncr>
             <diagVehicleType>1</diagVehicleType><fileSize>9380000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1101</softId><softName>Isuzu</softName><softPackageID>ISUZU</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4010</versionDetailId><versionNo>V10.46</versionNo>
         </x431PadSoftIncr>
