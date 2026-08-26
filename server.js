@@ -245,7 +245,7 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
 
         <!-- الماركات الكبرى والمشهورة (تويوتا، هوندا، فورد، أودي، فولكس فاجن، لكزس) -->
         <x431PadSoftIncr>
-            <diagVehicleType>1</diagVehicleType><fileSize>150000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1001</softId><softName>Toyota</softName><softPackageID>TOYOTA</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4001</versionDetailId><versionNo>V15.50</versionNo>
+            <diagVehicleType>1</diagVehicleType><fileSize>150000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1001</softId><softName>Toyota</softName><softPackageID>TOYOTA</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4001</versionDetailId><versionNo>V10.62</versionNo>
         </x431PadSoftIncr>
 
         <x431PadSoftIncr>
