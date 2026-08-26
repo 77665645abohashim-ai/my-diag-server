@@ -206,7 +206,7 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
 
 // 10. خريطة الروابط للتحميل المباشر من Google Drive
 const fileMap = {
-    "362272": "https://drive.google.com/uc?export=download&id=1-WxtYve6Ja5OR4I5HPSSGc8gx_HHYHY",
+    "362272": "https://drive.google.com/file/d/1-WxtYve6Ja5oR4I5hFPSSGc8gx_HHYHY/view?usp=drivesdk",
     "380901": "https://drive.google.com/uc?export=download&id=1120X0yc3b4YxC22DcfDtLz7gwazUMTxs"
 };
 
