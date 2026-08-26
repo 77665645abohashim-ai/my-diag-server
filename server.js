@@ -175,7 +175,7 @@ app.all('/api/v2/publicsoftservice-nt', (req, res) => {
 });
 
 // 9. مسار البرمجيات والماركات التشخيصية
-app.all('/api/v2/diagsoftservice', (req, res) => {
+ app.all('/api/v2/diagsoftservice', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     
     const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
@@ -186,8 +186,126 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
 
     if (requestBody.includes("queryLatestDiagSoftsIncrCdn")) {
         soapMethodName = "queryLatestDiagSoftsIncrCdn";
-        innerResponseContent = `<code>0</code><message>success</message><x431PadSoftIncrList><x431PadSoftIncr><diagVehicleType>1</diagVehicleType><fileSize>55740637</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>AR</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>69</softId><softName>Demo</softName><softPackageID>DEMO</softPackageID><softUpdateTime>2026-03-04 10:32:08</softUpdateTime><versionDetailId>380901</versionDetailId><versionNo>V10.66</versionNo></x431PadSoftIncr><x431PadSoftIncr><diagVehicleType>1</diagVehicleType><fileSize>2305655</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>AR</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1452</softId><softName>Demo (BMS)</softName><softPackageID>BMS_DEMO</softPackageID><softUpdateTime>2024-05-30 09:48:23</softUpdateTime><versionDetailId>367837</versionDetailId><versionNo>V15.55</versionNo></x431PadSoftIncr><x431PadSoftIncr><diagVehicleType>1</diagVehicleType><fileSize>6656601</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>AR</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1366</softId><softName>Demo (EV)</softName><softPackageID>EV_DEMO</softPackageID><softUpdateTime>2026-03-04 11:01:01</softUpdateTime><versionDetailId>381744</versionDetailId><versionNo>V15.68</versionNo><tab>EV</tab></x431PadSoftIncr><x431PadSoftIncr><diagVehicleType>1</diagVehicleType><fileSize>2241856</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1150</softId><softName>DEMO Motor</softName><softPackageID>MT_DEMO</softPackageID><softUpdateTime>2024-11-21 15:26:22</softUpdateTime><versionDetailId>363814</versionDetailId><versionNo>V10.11</versionNo></x431PadSoftIncr><x431PadSoftIncr><diagVehicleType>1</diagVehicleType><fileSize>18979371</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>92</softId><softName>ECUAID</softName><softPackageID>ECUAID</softPackageID><softUpdateTime>2025-12-08 16:02:02</softUpdateTime><versionDetailId>366146</versionDetailId><versionNo>V12.11</versionNo></x431PadSoftIncr><x431PadSoftIncr><diagVehicleType>1</diagVehicleType><fileSize>2590675</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>AR</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>93</softId><softName>EOBD/OBDII</softName><softPackageID>EOBD2</softPackageID><softUpdateTime>2025-08-14 09:43:52</softUpdateTime><versionDetailId>362272</versionDetailId><versionNo>V23.12</versionNo></x431PadSoftIncr><x431PadSoftIncr><diagVehicleType>1</diagVehicleType><fileSize>89446936</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>AR</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>9</softId><softName>VINSCAN Service</softName><softPackageID>AUTOSEARCH</softPackageID><softUpdateTime>2025-10-24 10:05:07</softUpdateTime><versionDetailId>365206</versionDetailId><versionNo>V11.15</versionNo></x431PadSoftIncr><x431PadSoftIncr><diagVehicleType>1</diagVehicleType><fileSize>1991767</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1145</softId><softName>VINSCAN Service (HD)</softName><softPackageID>HD_AUTOSEARCH</softPackageID><softUpdateTime>2025-08-06 09:32:58</softUpdateTime><versionDetailId>362469</versionDetailId><versionNo>V10.85</versionNo><tab>HD</tab></x431PadSoftIncr></x431PadSoftIncrList>`;
-    } else {
+        innerResponseContent = `<code>0</code><message>success</message><x431PadSoftIncrList>
+        
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType>
+            <fileSize>55740637</fileSize>
+            <freeUseEndTime>2099-01-01</freeUseEndTime>
+            <lanId>AR</lanId>
+            <serverCurrentTime>2026-08-21</serverCurrentTime>
+            <softApplicableArea>5</softApplicableArea>
+            <softId>69</softId>
+            <softName>Demo</softName>
+            <softPackageID>DEMO</softPackageID>
+            <softUpdateTime>2026-03-04 10:32:08</softUpdateTime>
+            <versionDetailId>380901</versionDetailId>
+            <versionNo>V10.66</versionNo>
+        </x431PadSoftIncr>
+
+        <!-- مهارات الماركات المستخرجة من الصور -->
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>9380000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1101</softId><softName>Isuzu</softName><softPackageID>ISUZU</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4010</versionDetailId><versionNo>V10.46</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>116500000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1102</softId><softName>LandRover</softName><softPackageID>LANDROVER</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4011</versionDetailId><versionNo>V10.74</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>26660000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1103</softId><softName>Suzuki</softName><softPackageID>SUZUKI</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4012</versionDetailId><versionNo>V10.50</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>12000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1104</softId><softName>Mazda</softName><softPackageID>HMAZDA</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4013</versionDetailId><versionNo>V10.12</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>24300000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1105</softId><softName>Fiat</softName><softPackageID>BXFIAT</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4014</versionDetailId><versionNo>V10.02</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>8000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1106</softId><softName>Ferrari</softName><softPackageID>FERRARI</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4015</versionDetailId><versionNo>V10.20</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>12000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1107</softId><softName>Daihatsu</softName><softPackageID>DAIHATSU</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4016</versionDetailId><versionNo>V10.24</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>2700000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1108</softId><softName>Daewoo</softName><softPackageID>DAEWOO</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4017</versionDetailId><versionNo>V10.02</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>73000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1109</softId><softName>Renault</softName><softPackageID>RENAULT</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4018</versionDetailId><versionNo>V10.66</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>68000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1110</softId><softName>Seat</softName><softPackageID>SEAT</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4019</versionDetailId><versionNo>V10.20</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>74000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1111</softId><softName>Citroen</softName><softPackageID>CITROEN</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4020</versionDetailId><versionNo>V10.30</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>1030000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1112</softId><softName>Benz</softName><softPackageID>BENZ</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4021</versionDetailId><versionNo>V11.28</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>89000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1113</softId><softName>Kia</softName><softPackageID>KIA</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4022</versionDetailId><versionNo>V10.80</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>98000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1114</softId><softName>Hyundai</softName><softPackageID>HYUNDAI</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4023</versionDetailId><versionNo>V10.70</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>92000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1115</softId><softName>Peugeot</softName><softPackageID>PEUGEOT</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4024</versionDetailId><versionNo>V10.60</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>92000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1116</softId><softName>Nissan</softName><softPackageID>NISSAN</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4025</versionDetailId><versionNo>V10.56</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>81000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1117</softId><softName>GM</softName><softPackageID>GM</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4026</versionDetailId><versionNo>V11.22</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>230000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1118</softId><softName>BMW</softName><softPackageID>BMW</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4027</versionDetailId><versionNo>V10.72</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>80000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1119</softId><softName>Mitsubishi</softName><softPackageID>MITSUBISHI</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4028</versionDetailId><versionNo>V10.48</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>15000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1120</softId><softName>Volvo</softName><softPackageID>VOLVO</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4029</versionDetailId><versionNo>V10.54</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>32000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1121</softId><softName>Subaru</softName><softPackageID>SUBARU</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4030</versionDetailId><versionNo>V10.68</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>40000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1122</softId><softName>Skoda</softName><softPackageID>SKODA</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4031</versionDetailId><versionNo>V10.18</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>138000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1123</softId><softName>Porsche</softName><softPackageID>PORSCHE</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4032</versionDetailId><versionNo>V10.46</versionNo>
+        </x431PadSoftIncr>
+
+        <x431PadSoftIncr>
+            <diagVehicleType>1</diagVehicleType><fileSize>20000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1124</softId><softName>Opel</softName><softPackageID>OPEL</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4033</versionDetailId><versionNo>V10.84</versionNo>
+        </x431PadSoftIncr>
+
+        </x431PadSoftIncrList>`;
+    }
+    
+    res.send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><${soapMethodName}Response>${innerResponseContent}</${soapMethodName}Response></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
+});
+{
         soapMethodName = "queryPDTDiagSoftSubPack";
         innerResponseContent = `<code>0</code><message>success</message><diagSoftSubPackList><diagSoftSubPack><spfId><softSubPackKey>AUDI_DIV01</softSubPackKey><softPackageId>AUDI</softPackageId><softDesc>Audi</softDesc><spfDesc>This package contains the guided functions of the Audi A1,A2</spfDesc><softId>6</softId><spfNameDesc>Audi Guided function package 1(AUDI A1,A2)</spfNameDesc><vNum>29.16</vNum><fileSize>0</fileSize></diagSoftSubPack></diagSoftSubPackList>`;
     }
