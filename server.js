@@ -390,7 +390,7 @@ const fileMap = {
     "2855": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/EOBD2_2312_AR.ZIP",
     "365206": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/AUTOSEARCH_1115_AR.ZIP",
     "367837": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/BMS_DEMO_1555_AR.ZIP",
-    "380901": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/DEMO_1568_AR.ZIP",
+    "380901": "https://downloadapp.mythinkcar.com/app_soft/DEMO/2/V10.66/Arabic/DEMO_THINKDIAG1_V10.66_AR.zip",
     "366146": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/ECUAID_1211_EN.ZIP",
     "4001": "https://downloadapp.mythinkcar.com/app_soft/TOYOTA/2/V10.62/English/TOYOTA_THINKDIAG_V10.62_EN.zip",
     "4002": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP",
