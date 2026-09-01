@@ -392,7 +392,7 @@ const fileMap = {
     "367837": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/BMS_DEMO_1555_AR.ZIP",
     "380901": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/DEMO_7766_AR.ZIP",
     "366146": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/ECUAID_1576511_V10.55_EN.ZIP",
-    "4001": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/TOYOTA_THINKDIAG_V10.62_EN.zip",
+    "4001": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/TOYOTA/LEXUS_V10.62_EN.ZIP",
     "4002": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP",
     "4003": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP",
     "4004": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP",
