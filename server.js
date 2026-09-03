@@ -408,7 +408,7 @@ const fileMap = {
     "4014": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP",
     "4015": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP",
     "4016": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP",
-    "4017": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/DAEWOO_THINKDIAG_V10.02_EN.zip",
+    "4017": "https://downloadapp.mythinkcar.com/app_soft/DAEWOO/2/V10.02/English/DAEWOO_THINKDIAG_V10.02_EN.zip",
     "4018": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP",
     "4019": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP",
     "4020": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP",
