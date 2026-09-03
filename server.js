@@ -232,7 +232,7 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
         </x431PadSoftIncr>
 
         <x431PadSoftIncr>
-            <diagVehicleType>1</diagVehicleType><fileSize>2590675</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>AR</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>93</softId><softName>EOBD/OBDII</softName><softPackageID>EOBD2</softPackageID><softUpdateTime>2025-08-14 09:43:52</softUpdateTime><versionDetailId>362272</versionDetailId><versionNo>V10.28</versionNo>
+            <diagVehicleType>1</diagVehicleType><fileSize>2590675</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>93</softId><softName>EOBD/OBDII</softName><softPackageID>EOBD2</softPackageID><softUpdateTime>2025-08-14 09:43:52</softUpdateTime><versionDetailId>362272</versionDetailId><versionNo>V10.28</versionNo>
         </x431PadSoftIncr>
 
         <x431PadSoftIncr>
