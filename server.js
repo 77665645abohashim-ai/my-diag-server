@@ -386,7 +386,7 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
 
 // 10. خريطة الروابط للتحميل المباشر من GitHub Releases (مكتملة بـ 70 نسخة وهمية)
 const fileMap = {
-    "362272": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/EOBD2_THINKDIAG_V10.28_EN.zip",
+    "362272": "https://downloadapp.mythinkcar.com/app_soft/EOBD2/2/V10.28/English/EOBD2_THINKDIAG_V10.28_EN.zip",
     "2855": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/EOBD2_THINKDIAG_V10.28_EN.zip",
     "365206": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/AUTOSEARCH_1115_AR.ZIP",
     "367837": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/BMS_DEMO_1555_AR.ZIP",
