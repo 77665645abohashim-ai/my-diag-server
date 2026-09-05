@@ -1,4 +1,4 @@
-const express = require('express');
+Const express = require('express');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
@@ -173,6 +173,7 @@ app.all('/api/v2/publicsoftservice-nt', (req, res) => {
     const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
     res.status(200).send(soapResponse);
 });
+
 // 9. مسار البرمجيات والماركات التشخيصية (شامل الأساسيات والماركات كاملة)
 app.all('/api/v2/diagsoftservice', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
@@ -180,12 +181,7 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
     const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
     console.log("Diagsoftservice Request Received:", requestBody);
 
-    let soapMethodName = "queryPDTDiagSoftSubPack";
-    let innerResponseContent = "";
-
-    if (requestBody.includes("queryLatestDiagSoftsIncrCdn")) {
-        soapMethodName = "queryLatestDiagSoftsIncrCdn";
-        innerResponseContent = `<code>0</code><message>success</message><x431PadSoftIncrList>
+    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestDiagSoftsIncrCdn><return><code>0</code><message>success</message><x431PadSoftIncrList>
         
         <!-- الحزم الأساسية ونظام الفحص والـ Demo -->
         <x431PadSoftIncr>
@@ -364,10 +360,13 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
         <x431PadSoftIncr>
             <diagVehicleType>1</diagVehicleType><fileSize>20000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1124</softId><softName>Opel</softName><softPackageID>OPEL</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4033</versionDetailId><versionNo>V10.84</versionNo>
         </x431PadSoftIncr>
+
+    </x431PadSoftIncrList></return></ns1:queryLatestDiagSoftsIncrCdn></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+    
+    res.status(200).send(soapResponse);
 });
 
-
-// 10. خريطة الروابط للتحميل المباشر من GitHub Releases (مكتملة بـ 70 نسخة وهمية)
+// 10. خريطة الروابط للتحميل المباشر من GitHub Releases
 const fileMap = {
     "362272": "https://downloadapp.mythinkcar.com/app_soft/EOBD2/2/V10.28/English/EOBD2_THINKDIAG_V10.28_EN.zip",
     "2855": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/EOBD2_THINKDIAG_V10.28_EN.zip",
@@ -447,15 +446,13 @@ const fileMap = {
     "4070": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP"
 };
 
-
 // 11. مسار التحميل الموحّد (Download Endpoint)
 app.get('/api/v2/download', (req, res) => {
     const { versionDetailId, dzCode, serialNo, token } = req.query;
 
     console.log(`Download request received for versionDetailId: ${versionDetailId}, Serial: ${serialNo}`);
 
-    // البحث عن الرابط أو التحويل التلقائي لرابط الديمو إذا لم يتم العثور عليه
-    const fileUrl = fileMap[versionDetailId] || fileMap["580565"];
+    const fileUrl = fileMap[versionDetailId] || fileMap["4001"];
 
     if (!fileUrl) {
         console.log(`File not found for versionDetailId: ${versionDetailId}`);
@@ -465,7 +462,6 @@ app.get('/api/v2/download', (req, res) => {
         });
     }
 
-    // إعادة توجيه التطبيق مباشرة إلى رابط الملف الخارجي
     return res.redirect(302, fileUrl);
 });
 
