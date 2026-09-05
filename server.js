@@ -365,10 +365,7 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
             <diagVehicleType>1</diagVehicleType><fileSize>20000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1124</softId><softName>Opel</softName><softPackageID>OPEL</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4033</versionDetailId><versionNo>V10.84</versionNo>
         </x431PadSoftIncr>
 
-        </x431PadSoftIncrList>`;
-    } else {
-        soapMethodName = "queryPDTDiagSoftSubPack";
-        innerResponseContent = `<code>0</code><message>success</message><diagSoftSubPackList><diagSoftSubPack><spfId><softSubPackKey>AUDI_DIV01</softSubPackKey><softPackageId>AUDI</softPackageId><softDesc>Audi</softDesc><spfDesc>This package contains the guided functions of the Audi A1,A2</spfDesc><softId>6</softId><spfNameDesc>Audi Guided function package 1(AUDI A1,A2)</spfNameDesc><vNum>29.16</vNum><fileSize>0</fileSize></diagSoftSubPack></diagSoftSubPackList>`;
+    
     }
 
     const finalSoapResponse = `<?xml version="1.0" encoding="UTF-8"?>
