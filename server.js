@@ -364,20 +364,6 @@ app.all('/api/v2/diagsoftservice', (req, res) => {
         <x431PadSoftIncr>
             <diagVehicleType>1</diagVehicleType><fileSize>20000000</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>1124</softId><softName>Opel</softName><softPackageID>OPEL</softPackageID><softUpdateTime>2026-01-15 12:00:00</softUpdateTime><versionDetailId>4033</versionDetailId><versionNo>V10.84</versionNo>
         </x431PadSoftIncr>
-
-    
-    }
-
-    const finalSoapResponse = `<?xml version="1.0" encoding="UTF-8"?>
-    <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-        <SOAP-ENV:Body>
-            <ns1:${soapMethodName}>
-                <return>${innerResponseContent}</return>
-            </ns1:${soapMethodName}>
-        </SOAP-ENV:Body>
-    </SOAP-ENV:Envelope>`;
-
-    res.status(200).send(finalSoapResponse);
 });
 
 
