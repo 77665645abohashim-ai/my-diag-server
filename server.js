@@ -148,11 +148,28 @@ app.all('/api/v2/url-upload', (req, res) => {
     });
 });
 
-// 7.مسار خدمات البرامج والماركات الاساسية 
+
 app.all('/api/v2/publicsoftservice', (req, res) => {
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    const soapResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>68365802</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softId>1015</softId><softName>Diagzone PRO V2</softName><softPackageID>Diagzone_PRO_V2</softPackageID><softUpdateTime>2025-03-08 00:00:00</softUpdateTime><versionDetailId>359645</versionDetailId><versionNo>V2.00.033</versionNo></x431PadSoft><x431PadSoft><fileSize>393300</fileSize><lanId>EN</lanId><serverCurrentTime>2026-08-21</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2023-03-27 00:00:00</softUpdateTime><versionDetailId>343730</versionDetailId><versionNo>V11.91</versionNo></x431PadSoft><x431PadSoft><diagVehicleType>1</diagVehicleType><fileSize>2590675</fileSize><freeUseEndTime>2099-01-01</freeUseEndTime><lanId>AR</lanId><serverCurrentTime>2026-09-05</serverCurrentTime><softApplicableArea>5</softApplicableArea><softId>93</softId><softName>VIN Recognition App</softName><softPackageID>VIN_RECOGNITION_APP</softPackageID><softUpdateTime>2025-08-14 09:43:52</softUpdateTime><versionDetailId>354418</versionDetailId><versionNo>V1.01.006</versionNo></x431PadSoft></x431PadSoftList></return></ns1:queryLatestPublicSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
-    res.status(200).send(soapResponse);
+    res.setHeader('Content-Type', 'text/html;charset=UTF-8');
+
+    const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
+    
+    if (
+        requestBody.includes('queryLatestPublicSofts') ||
+        (req.headers['soapaction'] && req.headers['soapaction'].includes('queryLatestPublicSofts'))
+    ) {
+        // استخراج المتغيرات ديناميكياً من طلب التطبيق
+        const lanMatch = requestBody.match(/<lanId[^>]*>(.*?)<\/lanId>/);
+        const serialMatch = requestBody.match(/<serialNo[^>]*>(.*?)<\/serialNo>/);
+        
+        const lanId = lanMatch ? lanMatch[1] : 'AR';
+        const serialNo = serialMatch ? serialMatch[1] : '979862374489';
+        const currentTime = new Date().toISOString().split('T')[0];
+
+        const dynamicResponse = `<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>68365802</fileSize><lanId>${lanId}</lanId><serverCurrentTime>${currentTime}</serverCurrentTime><softId>1015</softId><softName>Diagzone PRO V2</softName><softPackageID>Diagzone_PRO_V2</softPackageID><softUpdateTime>2025-03-08 00:00:00</softUpdateTime><versionDetailId>359645</versionDetailId><versionNo>V2.00.033</versionNo></x431PadSoft><x431PadSoft><fileSize>393300</fileSize><lanId>${lanId}</lanId><serverCurrentTime>${currentTime}</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2023-03-27 00:00:00</softUpdateTime><versionDetailId>343730</versionDetailId><versionNo>V11.91</versionNo></x431PadSoft><x431PadSoft><fileSize>6166636</fileSize><lanId>${lanId}</lanId><serverCurrentTime>${currentTime}</serverCurrentTime><softId>880</softId><softName>VIN Recognition App</softName><softPackageID>VIN_RECOGNITION_APP</softPackageID><softUpdateTime>2024-05-02 00:00:00</softUpdateTime><versionDetailId>354418</versionDetailId><versionNo>V1.01.006</versionNo></x431PadSoft></x431PadSoftList></return></ns1:queryLatestPublicSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`;
+
+        return res.send(dynamicResponse);
+    }
 });
 
 
