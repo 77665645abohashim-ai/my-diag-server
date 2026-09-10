@@ -46,6 +46,13 @@ app.get('/api/v2/diagsoftservice', (req, res) => {
         res.status(500).json({ error: "Failed to read or parse softwares.json file" });
     }
 });
+app.post('/api/v2/url-upload', (req, res) => {
+    console.log("URL Upload request received:", req.body);
+    return res.status(200).json({
+        code: 0,
+        message: "OK"
+    });
+});
 
 // تشغيل السيرفر
 app.listen(PORT, () => {
