@@ -30,22 +30,40 @@ app.get('/api/v2/download', (req, res) => {
     return res.redirect(302, fileUrl);
 });
 
-// مسار جلب قائمة الماركات والبرمجيات بقراءة ملف softwares.json محلياً
+// مسار جلب قائمة الماركات والبرمجيات بقراءة ملف softwares.json محلياً مع معالجة آمنة للأخطاء
 app.post('/api/v2/diagsoftservice', (req, res) => {
     try {
         const filePath = path.join(__dirname, 'softwares.json');
         
         if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ error: "softwares.json file not found on server" });
+            console.log("softwares.json file missing, returning empty list.");
+            return res.status(200).json({
+                "code": 0,
+                "msg": "success",
+                "data": {
+                    "list": []
+                }
+            });
         }
 
         const rawData = fs.readFileSync(filePath, 'utf8');
         const jsonData = JSON.parse(rawData);
-        res.json(jsonData);
+        
+        // إرسال البيانات بشكل مباشر وصحيح لتجنب أي انهيار
+        return res.json(jsonData);
     } catch (error) {
-        res.status(500).json({ error: "Failed to read or parse softwares.json file" });
+        console.error("Error parsing softwares.json:", error.message);
+        // في حال وجود خطأ في تنسيق الـ JSON داخل الملف، نرسل هيكلاً فارغاً ناجحاً لضمان عدم توقف التطبيق
+        return res.status(200).json({
+            "code": 0,
+            "msg": "success",
+            "data": {
+                "list": []
+            }
+        });
     }
 });
+
 app.post('/api/v2/url-upload', (req, res) => {
     console.log("URL Upload request received:", req.body);
     return res.status(200).json({
