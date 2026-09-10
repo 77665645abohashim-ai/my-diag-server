@@ -31,7 +31,7 @@ app.get('/api/v2/download', (req, res) => {
 });
 
 // مسار جلب قائمة الماركات والبرمجيات بقراءة ملف softwares.json محلياً
-app.get('/api/v2/diagsoftservice', (req, res) => {
+app.post('/api/v2/diagsoftservice', (req, res) => {
     try {
         const filePath = path.join(__dirname, 'softwares.json');
         
