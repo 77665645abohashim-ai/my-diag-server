@@ -329,6 +329,7 @@ app.get('/api/v2/download', (req, res) => {
 
     return res.redirect(302, fileUrl);
 });
+
 // مسار جلب قائمة الماركات بقراءة ملف softwares.json
 app.get('/api/v2/diagsoftservice', (req, res) => {
     try {
