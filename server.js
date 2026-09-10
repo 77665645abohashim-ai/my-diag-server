@@ -174,6 +174,57 @@ app.post('/api/v2/publicsoftservice-nt', express.text({ type: '*/*' }), (req, re
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
 });
+app.post('/api/v2/login', express.urlencoded({ extended: true }), (req, res) => {
+    const { app_id, ver, login_key, password, time, type, device_token } = req.body;
+    
+    // يمكنك طباعة بيانات تسجيل الدخول الواردة من التطبيق للمتابعة
+    console.log("Login Request Received:", { login_key, app_id, ver });
+
+    return res.status(200).json({
+        "code": 0,
+        "msg": "success",
+        "data": {
+            "token": "mock-token-diagzone-123456",
+            "user_id": "1",
+            "login_key": login_key || "user",
+            "nickname": "Diagnostic User"
+        }
+    });
+});
+app.post('/api/v2/product-service', express.text({ type: '*/*' }), (req, res) => {
+    const requestBody = req.body || "";
+    console.log("Received Product Service Request:", requestBody);
+
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getRegisteredProductsForPad46><return><code>0</code><productDTOs><carLicenseTag></carLicenseTag><serialNo>979862374489</serialNo><dzKey>WpFNRUnQThVAz/lNTGrq3nhN5bmcNSo7Ntdj4fv5pfWUEWWWi2V+xYALPP7K4obNxNLJhoRbCHaObSQJV2s86E+yE6xsvZJL5Z6fYPjbfb6bWI1hL3FkA3qhH50vBAMo7BAslnf7aT1hcVbJRIqWbnIhhLILmZ+h5naRReqc3ZyXP/T0Mx3TJTksXkIE2P9x</dzKey><pdtCategory>2</pdtCategory></productDTOs><productDTOs><carLicenseTag></carLicenseTag><serialNo>989140722496</serialNo><dzKey>NgfpI+Mvntqj2KiEZmVEIH7XofYtj7mqUm7QIcum+iRS7DGNlIfioKgGo5KaPjQipeMoccwg/n6orcrV0Bd+GaKbjfi/m7x3yKniRVhtl3iVmxUmbKpl9J/3K3pDRvNy4M0rlPu/O1too9z+NRqXy2TwBTlXIVgvzRxiNnGChzqEtWnbpG/JDB2S8vkW4d10</dzKey><pdtCategory>2</pdtCategory></productDTOs></return></ns1:getRegisteredProductsForPad46></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
+});
+app.post('/api/v2/diagnosticLog', express.text({ type: '*/*' }), (req, res) => {
+    const requestBody = req.body || "";
+    console.log("Received Diagnostic Log Request:", requestBody);
+
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryDiagnosticLogBasic><return><code>0</code><message>success</message><diagLogBasicDTOList></diagLogBasicDTOList></return></ns1:queryDiagnosticLogBasic></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
+});
+app.post('/api/v2/statistics', express.urlencoded({ extended: true }), (req, res) => {
+    const { d_model, imei, mac, version, sid, lat, lon, app_id, token } = req.body;
+    console.log("Received Statistics Request:", { d_model, imei, app_id });
+
+    return res.status(200).json({
+        "code": 0,
+        "msg": null,
+        "data": {
+            "user_id": 0,
+            "bool": "0"
+        }
+    });
+});
+app.post('/api/v2/publicsoftservice', express.text({ type: '*/*' }), (req, res) => {
+    const requestBody = req.body || "";
+    console.log("Received Public Soft Service Request:", requestBody);
+
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>68365802</fileSize><lanId>EN</lanId><serverCurrentTime>2026-09-10</serverCurrentTime><softId>1015</softId><softName>Diagzone PRO V2</softName><softPackageID>Diagzone_PRO_V2</softPackageID><softUpdateTime>2025-03-08 00:00:00</softUpdateTime><versionDetailId>359638</versionDetailId><versionNo>V2.00.033</versionNo></x431PadSoft><x431PadSoft><fileSize>327680</fileSize><lanId>EN</lanId><serverCurrentTime>2026-09-10</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2022-11-15 00:00:00</softUpdateTime><versionDetailId>341054</versionDetailId><versionNo>V12.00</versionNo></x431PadSoft><x431PadSoft><fileSize>6166636</fileSize><lanId>EN</lanId><serverCurrentTime>2026-09-10</serverCurrentTime><softId>880</softId><softName>VIN Recognition App</softName><softPackageID>VIN_RECOGNITION_APP</softPackageID><softUpdateTime>2024-05-02 00:00:00</softUpdateTime><versionDetailId>354411</versionDetailId><versionNo>V1.01.006</versionNo></x431PadSoft></x431PadSoftList></return></ns1:queryLatestPublicSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
+});
 
 // تشغيل السيرفر
 app.listen(PORT, () => {
