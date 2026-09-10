@@ -182,7 +182,7 @@ app.all('/api/v2/publicsoftservice-nt', (req, res) => {
 });
 
 // 9. مسار البرمجيات والماركات التشخيصية (مع التوجيه الديناميكي للطلبات المختلفة)
-app.all('/api/v2/diagsoftservice', (req, res) => {
+app.all('/api/v2/dioftservgice', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     
     const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
@@ -328,6 +328,17 @@ app.get('/api/v2/download', (req, res) => {
     }
 
     return res.redirect(302, fileUrl);
+});
+// مسار جلب قائمة الماركات بقراءة ملف softwares.json
+app.get('/api/v2/diagsoftservice', (req, res) => {
+    try {
+        const filePath = path.join(__dirname, 'softwares.json');
+        const rawData = fs.readFileSync(filePath, 'utf8');
+        const jsonData = JSON.parse(rawData);
+        res.json(jsonData);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to read softwares.json file" });
+    }
 });
 
 // تشغيل السيرفر
