@@ -177,20 +177,47 @@ app.post('/api/v2/publicsoftservice-nt', express.text({ type: '*/*' }), (req, re
 app.post('/api/v2/login', express.urlencoded({ extended: true }), (req, res) => {
     const { app_id, ver, login_key, password, time, type, device_token } = req.body;
     
-    // يمكنك طباعة بيانات تسجيل الدخول الواردة من التطبيق للمتابعة
     console.log("Login Request Received:", { login_key, app_id, ver });
 
     return res.status(200).json({
         "code": 0,
-        "msg": "success",
+        "msg": null,
         "data": {
-            "token": "mock-token-diagzone-123456",
-            "user_id": "1",
-            "login_key": login_key || "user",
-            "nickname": "Diagnostic User"
+            "xmpp": {
+                "ip": "jabber.diagzone.com",
+                "port": 5222,
+                "domain": "diagzone.com"
+            },
+            "token": "N0VwSEZML2NIdnRSajRvNXdKai90QT09",
+            "user": {
+                "user_id": "GBV4NMU5",
+                "sex": "1",
+                "user_name": login_key || "Udhdozjdidj",
+                "nick_name": "Hassan",
+                "mobile": "",
+                "is_bind_mobile": "0",
+                "email": "7766565abohashim@gmail.com",
+                "is_bind_email": "0",
+                "signature": "",
+                "set_face_time": "0",
+                "roles": "1",
+                "reg_zone": "1",
+                "reg_source": "0",
+                "is_agree_clause": "0",
+                "pub_id": "",
+                "face_url": null,
+                "is_365": false,
+                "tech_status": "-1",
+                "country": "MA",
+                "province": null,
+                "city": null,
+                "nation_id": "237"
+            },
+            "config": null
         }
     });
 });
+
 app.post('/api/v2/product-service', express.text({ type: '*/*' }), (req, res) => {
     const requestBody = req.body || "";
     console.log("Received Product Service Request:", requestBody);
