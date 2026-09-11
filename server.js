@@ -16,12 +16,18 @@ app.get('/api/v2/download', (req, res) => {
     try {
         const rawData = fs.readFileSync(path.join(__dirname, 'softwares.json'), 'utf8');
         const jsonData = JSON.parse(rawData);
-        const list = jsonData.data.list;
+        
+        // استخراج القائمة سواء كانت في data.list أو مباشرة كمتغير
+        const list = jsonData.data?.list || jsonData.list || jsonData.data || [];
 
-        const targetItem = list.find(item => String(item.versionDetailId) === String(versionDetailId));
+        // بحث مرن يطابق versionDetailId أو id بأي صيغة (نص أو رقم)
+        const targetItem = list.find(item => 
+            String(item.versionDetailId) === String(versionDetailId) || 
+            String(item.id) === String(versionDetailId)
+        );
 
-        if (targetItem && targetItem.downloadLink) {
-            let cleanUrl = targetItem.downloadLink.replace(/\\/g, '');
+        if (targetItem && (targetItem.downloadLink || targetItem.url)) {
+            let cleanUrl = (targetItem.downloadLink || targetItem.url).replace(/\\/g, '');
             console.log(`Streaming file from: ${cleanUrl}`);
 
             https.get(cleanUrl, (externalRes) => {
@@ -31,7 +37,7 @@ app.get('/api/v2/download', (req, res) => {
                 }
 
                 res.setHeader('Content-Type', 'application/zip');
-                res.setHeader('Content-Disposition', `attachment; filename="${targetItem.softName || 'software'}.zip"`);
+                res.setHeader('Content-Disposition', `attachment; filename="${targetItem.softName || targetItem.name || 'software'}.zip"`);
                 
                 externalRes.pipe(res);
             }).on('error', (err) => {
@@ -40,14 +46,15 @@ app.get('/api/v2/download', (req, res) => {
             });
 
         } else {
-            console.log(`VersionDetailId ${versionDetailId} not found in softwares.json`);
-            return res.status(404).send('Download link not found');
+            console.log(`VersionDetailId ${versionDetailId} not found in softwares.json keys`);
+            return res.status(404).send('Download link not found in JSON');
         }
     } catch (error) {
         console.error('Error reading softwares.json for proxy download:', error);
         return res.status(500).send('Internal Server Error');
     }
 });
+
 
 
 
