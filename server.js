@@ -123,6 +123,13 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
     }
 });
 
+app.post('/api/v2/url-upload', (req, res) => {
+    res.json({
+        code: 0,
+        msg: "success",
+        data: {}
+    });
+});
 
 app.get('/api/v2/urls', (req, res) => {
     const { config_no, app_id } = req.query;
