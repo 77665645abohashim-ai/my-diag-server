@@ -10,21 +10,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/api/v2/download', (req, res) => {
-    // يمكن أن يأتي الطلب باسم أو رقم (سواء كان اسمه versionDetailId, id, softName, أو softPackageID)
     const queryParam = req.query.versionDetailId || req.query.id || req.query.name || req.query.softPackageID;
-    console.log(`Proxy download request received for query: ${queryParam}`);
 
     try {
         const rawData = fs.readFileSync(path.join(__dirname, 'softwares.json'), 'utf8');
         const jsonData = JSON.parse(rawData);
-        
         const list = jsonData.data?.list || jsonData.list || jsonData.data || [];
 
-        // بحث مرن يشمل الأرقام والأسماء والرموز (يقارن بغض النظر عن حالة الأحرف Upper/Lower case)
         const targetItem = list.find(item => {
             if (!queryParam) return false;
             const q = String(queryParam).trim().toLowerCase();
-
             return (
                 String(item.versionDetailId).toLowerCase() === q ||
                 String(item.id).toLowerCase() === q ||
@@ -36,30 +31,26 @@ app.get('/api/v2/download', (req, res) => {
 
         if (targetItem && (targetItem.downloadLink || targetItem.url)) {
             let cleanUrl = (targetItem.downloadLink || targetItem.url).replace(/\\/g, '');
-            console.log(`Streaming file from: ${cleanUrl}`);
 
             https.get(cleanUrl, (externalRes) => {
                 if (externalRes.statusCode !== 200) {
-                    console.error(`Failed to fetch file, status code: ${externalRes.statusCode}`);
-                    return res.status(502).send('Failed to fetch file from source');
+                    return res.status(502).send('Error');
                 }
 
                 res.setHeader('Content-Type', 'application/zip');
-                res.setHeader('Content-Disposition', `attachment; filename="${targetItem.softName || targetItem.name || 'software'}.zip"`);
+                res.setHeader('Content-Disposition', `attachment; filename="${targetItem.softName || 'software'}.zip"`);
                 
+                // ضخ الملف مباشرة بدون طباعة أي نصوص تعيق التحميل
                 externalRes.pipe(res);
-            }).on('error', (err) => {
-                console.error('Error during file streaming:', err);
-                return res.status(500).send('Internal Server Error during download');
+            }).on('error', () => {
+                return res.status(500).send('Error');
             });
 
         } else {
-            console.log(`Item matching "${queryParam}" not found in softwares.json`);
-            return res.status(404).send('Download link not found in JSON');
+            return res.status(404).send('Not found');
         }
     } catch (error) {
-        console.error('Error reading softwares.json for proxy download:', error);
-        return res.status(500).send('Internal Server Error');
+        return res.status(500).send('Server error');
     }
 });
 
