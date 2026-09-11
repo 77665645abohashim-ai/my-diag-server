@@ -30,11 +30,10 @@ app.get('/api/v2/download', (req, res) => {
     return res.redirect(302, fileUrl);
 });
 
-// مسار جلب الماركات لتوافق Diagzone مع بيانات ThinkDiag من ملف softwares.json
 app.post('/api/v2/diagsoftservice', (req, res) => {
     try {
-        const filePath = path.join(__dirname, 'softwares.json');
-        const rawData = fs.readFileSync(filePath, 'utf8');
+        // قراءة الملف من المجلد الحالي مباشرة
+        const rawData = fs.readFileSync('./softwares.json', 'utf8');
         const jsonData = JSON.parse(rawData);
 
         // ضمان تحويل downloadLink إلى url ليتوافق مع كلاس z0 في Diagzone
@@ -53,6 +52,7 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
         res.status(500).json({ code: -1, msg: "Server Error reading softwares file", data: { list: [] } });
     }
 });
+
 
 
 app.post('/api/v2/url-upload', (req, res) => {
