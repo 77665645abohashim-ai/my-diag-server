@@ -34,23 +34,22 @@ app.get('/api/v2/download', (req, res) => {
 
             https.get(cleanUrl, (externalRes) => {
                 if (externalRes.statusCode !== 200) {
-                    return res.status(502).send('Error');
+                    return res.status(502).end();
                 }
 
                 res.setHeader('Content-Type', 'application/zip');
                 res.setHeader('Content-Disposition', `attachment; filename="${targetItem.softName || 'software'}.zip"`);
                 
-                // ضخ الملف مباشرة بدون طباعة أي نصوص تعيق التحميل
                 externalRes.pipe(res);
             }).on('error', () => {
-                return res.status(500).send('Error');
+                return res.status(500).end();
             });
 
         } else {
-            return res.status(404).send('Not found');
+            return res.status(404).end();
         }
     } catch (error) {
-        return res.status(500).send('Server error');
+        return res.status(500).end();
     }
 });
 
