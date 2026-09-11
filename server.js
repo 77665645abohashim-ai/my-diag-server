@@ -29,97 +29,58 @@ app.get('/api/v2/download', (req, res) => {
 
     return res.redirect(302, fileUrl);
 });
+
 app.post('/api/v2/diagsoftservice', (req, res) => {
     try {
-        const jsonData = {
-            "code": 0,
-            "msg": "success",
-            "data": {
-                "list": [
-                    {
-                        "isHotModel": 0,
-                        "purchased": 1,
-                        "is_free": 1,
-                        "softName": "Demo",
-                        "cloudSoftName": "Demo",
-                        "softPackageID": "DEMO_SF",
-                        "price": "38.91",
-                        "sonSoftPackageID": "",
-                        "freeUseEndTime": 2104578373,
-                        "isSelect": 0,
-                        "curId": 11,
-                        "renew_diagnosis_sign": 0,
-                        "serverCurrentTime": 1788959173,
-                        "type": 1,
-                        "is_son": 0,
-                        "fileSize": 63283837,
-                        "versionNo": "V10.66",
-                        "platType": 2,
-                        "softId": 72792,
-                        "sku": "20230228000002",
-                        "good_id": 93,
-                        "good_name": "diag model soft one year",
-                        "is_renew": null,
-                        "is_send": 0,
-                        "url": "https://downloadapp.mythinkcar.com/app_soft/DEMO/2/V10.66/Arabic/DEMO_THINKDIAG1_V10.66_AR.zip",
-                        "zyVersion": "V15.56",
-                        "isNewPath": 0,
-                        "lanId": "12",
-                        "softApplicableAreaId": 10,
-                        "softUpdateTime": 1722304322667,
-                        "versionDetailId": 2654,
-                        "plus_end_time": 0,
-                        "plus_price": 39.95,
-                        "plus_sku": "",
-                        "plus_good_id": 0,
-                        "plus_good_name": ""
-                    },
-                    {
-                        "isHotModel": 0,
-                        "purchased": 1,
-                        "is_free": 1,
-                        "softName": "TPMS",
-                        "cloudSoftName": "TPMS",
-                        "softPackageID": "TPMS_SF",
-                        "price": "38.91",
-                        "sonSoftPackageID": "",
-                        "freeUseEndTime": 2104578373,
-                        "isSelect": 0,
-                        "curId": 11,
-                        "renew_diagnosis_sign": 0,
-                        "serverCurrentTime": 1788959173,
-                        "type": 1,
-                        "is_son": 0,
-                        "fileSize": 21316809,
-                        "versionNo": "V10.42",
-                        "platType": 2,
-                        "softId": 97189,
-                        "sku": "20230228000002",
-                        "good_id": 93,
-                        "good_name": "diag model soft one year",
-                        "is_renew": null,
-                        "is_send": 0,
-                        "url": "https://downloadapp.mythinkcar.com/app_soft/TPMS/2/V10.42/Arabic/TPMS_THINKDIAG_V10.42_AR.zip",
-                        "zyVersion": "V10.37",
-                        "isNewPath": 0,
-                        "lanId": "12",
-                        "softApplicableAreaId": 0,
-                        "softUpdateTime": 1645587570977,
-                        "versionDetailId": 1216,
-                        "plus_end_time": 0,
-                        "plus_price": 39.95,
-                        "plus_sku": "",
-                        "plus_good_id": 0,
-                        "plus_good_name": ""
-                    }
-                ]
-            }
-        };
+        const filePath = path.join(__dirname, 'softwares.json');
+        let softwares = [];
 
-        res.json(jsonData);
+        if (fs.existsSync(filePath)) {
+            const rawData = fs.readFileSync(filePath, 'utf8');
+            const jsonData = JSON.parse(rawData);
+            softwares = jsonData.data && jsonData.data.list ? jsonData.data.list : [];
+        }
+
+        let itemsXml = '';
+        softwares.forEach(item => {
+            itemsXml += `
+                <x431PadSoftIncr>
+                    <diagVehicleType>${item.type || 1}</diagVehicleType>
+                    <fileSize>${item.fileSize || 0}</fileSize>
+                    <freeUseEndTime>${item.freeUseEndTime || 2104578373}</freeUseEndTime>
+                    <lanId>AR</lanId>
+                    <serverCurrentTime>${item.serverCurrentTime || 1788959173}</serverCurrentTime>
+                    <softApplicableArea>${item.softApplicableAreaId || 5}</softApplicableArea>
+                    <softId>${item.softId || 0}</softId>
+                    <softName>${item.softName || ''}</softName>
+                    <softPackageID>${item.softPackageID || ''}</softPackageID>
+                    <softUpdateTime>2026-03-04 10:32:08</softUpdateTime>
+                    <versionDetailId>${item.versionDetailId || 0}</versionDetailId>
+                    <versionNo>${item.versionNo || 'V1.0'}</versionNo>
+                    <url>${item.downloadLink || item.url || ''}</url>
+                </x431PadSoftIncr>`;
+        });
+
+        const soapResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Body>
+        <ns1:queryLatestDiagSoftsIncrCdnResponse xmlns:ns1="https://diagzone.com">
+            <return>
+                <code>0</code>
+                <message>success</message>
+                <x431PadSoftIncrList>
+                    ${itemsXml}
+                </x431PadSoftIncrList>
+            </return>
+        </ns1:queryLatestDiagSoftsIncrCdnResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`;
+
+        res.setHeader('Content-Type', 'text/xml; charset=utf-8');
+        res.send(soapResponse);
     } catch (error) {
-        console.error("Error:", error);
-        res.status(500).json({ code: -1, msg: "Error", data: { list: [] } });
+        console.error("Error reading softwares.json:", error);
+        res.status(500).send("Server Error reading softwares file");
     }
 });
 
