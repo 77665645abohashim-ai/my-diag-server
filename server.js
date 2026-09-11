@@ -13,22 +13,34 @@ const fileMap = {
     "4001": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP"
 };
 
-// مسار التحميل الأساسي
+// مسار التحميل الديناميكي الذي يقرأ من softwares.json مباشرة
 app.get('/api/v2/download', (req, res) => {
-    const { versionDetailId, serialNo } = req.query;
-    console.log(`Download request received for versionDetailId: ${versionDetailId}, Serial: ${serialNo}`);
+    const { versionDetailId } = req.query;
+    console.log(`Download request received for versionDetailId: ${versionDetailId}`);
 
-    const fileUrl = fileMap[versionDetailId] || fileMap["4001"];
+    try {
+        const rawData = fs.readFileSync(path.join(__dirname, 'softwares.json'), 'utf8');
+        const jsonData = JSON.parse(rawData);
+        const list = jsonData.data.list;
 
-    if (!fileUrl) {
-        return res.status(404).json({
-            code: 404,
-            message: "File not found for this versionDetailId"
-        });
+        // البحث عن السيارة باستخدام versionDetailId
+        const targetItem = list.find(item => String(item.versionDetailId) === String(versionDetailId));
+
+        if (targetItem && targetItem.downloadLink) {
+            console.log(`Redirecting to original link: ${targetItem.downloadLink}`);
+            // إصلاح الرموز المهربة في الرابط إذا وجدت
+            let cleanUrl = targetItem.downloadLink.replace(/\\/g, '');
+            return res.redirect(cleanUrl);
+        } else {
+            console.log(`VersionDetailId ${versionDetailId} not found in softwares.json`);
+            return res.status(404).send('Download link not found');
+        }
+    } catch (error) {
+        console.error('Error reading softwares.json for download:', error);
+        return res.status(500).send('Internal Server Error');
     }
-
-    return res.redirect(302, fileUrl);
 });
+
 
 app.post('/api/v2/diagsoftservice', (req, res) => {
     try {
