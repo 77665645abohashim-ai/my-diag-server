@@ -1,13 +1,7 @@
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
 const https = require('https');
-
-const app = express();
-const PORT = process.env.PORT || 10000;
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
 app.get('/api/v2/download', (req, res) => {
     const queryParam = req.query.versionDetailId || req.query.id || req.query.name || req.query.softPackageID;
@@ -32,16 +26,31 @@ app.get('/api/v2/download', (req, res) => {
         if (targetItem && (targetItem.downloadLink || targetItem.url)) {
             let cleanUrl = (targetItem.downloadLink || targetItem.url).replace(/\\/g, '');
 
-            https.get(cleanUrl, (externalRes) => {
+            // إعداد ترويسات تخدع سيرفر ثينك كار وتجعله يعامل الطلب معاملة المتصفح
+            const options = {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                    'Accept-Language': 'en-US,en;q=0.5',
+                    'Connection': 'keep-alive'
+                }
+            };
+
+            https.get(cleanUrl, options, (externalRes) => {
                 if (externalRes.statusCode !== 200) {
-                    return res.status(502).end();
+                    return res.status(502).send(`External Server Error: ${externalRes.statusCode}`);
                 }
 
                 res.setHeader('Content-Type', 'application/zip');
                 res.setHeader('Content-Disposition', `attachment; filename="${targetItem.softName || 'software'}.zip"`);
                 
+                if (externalRes.headers['content-length']) {
+                    res.setHeader('Content-Length', externalRes.headers['content-length']);
+                }
+
+                // تمرير تدفق الملف المضغوط للتطبيق مباشرة
                 externalRes.pipe(res);
-            }).on('error', () => {
+            }).on('error', (err) => {
                 return res.status(500).end();
             });
 
