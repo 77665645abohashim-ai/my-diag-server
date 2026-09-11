@@ -29,39 +29,101 @@ app.get('/api/v2/download', (req, res) => {
 
     return res.redirect(302, fileUrl);
 });
-
 app.post('/api/v2/diagsoftservice', (req, res) => {
     try {
-        // قراءة الملف من المجلد الحالي مباشرة
-        const rawData = fs.readFileSync('./softwares.json', 'utf8');
-        const jsonData = JSON.parse(rawData);
-
-        // ضمان تحويل downloadLink إلى url ليتوافق مع كلاس z0 في Diagzone
-        if (jsonData.data && jsonData.data.list) {
-            jsonData.data.list = jsonData.data.list.map(item => {
-                return {
-                    ...item,
-                    url: item.url || item.downloadLink
-                };
-            });
-        }
+        const jsonData = {
+            "code": 0,
+            "msg": "success",
+            "data": {
+                "list": [
+                    {
+                        "isHotModel": 0,
+                        "purchased": 1,
+                        "is_free": 1,
+                        "softName": "Demo",
+                        "cloudSoftName": "Demo",
+                        "softPackageID": "DEMO_SF",
+                        "price": "38.91",
+                        "sonSoftPackageID": "",
+                        "freeUseEndTime": 2104578373,
+                        "isSelect": 0,
+                        "curId": 11,
+                        "renew_diagnosis_sign": 0,
+                        "serverCurrentTime": 1788959173,
+                        "type": 1,
+                        "is_son": 0,
+                        "fileSize": 63283837,
+                        "versionNo": "V10.66",
+                        "platType": 2,
+                        "softId": 72792,
+                        "sku": "20230228000002",
+                        "good_id": 93,
+                        "good_name": "diag model soft one year",
+                        "is_renew": null,
+                        "is_send": 0,
+                        "url": "https://downloadapp.mythinkcar.com/app_soft/DEMO/2/V10.66/Arabic/DEMO_THINKDIAG1_V10.66_AR.zip",
+                        "zyVersion": "V15.56",
+                        "isNewPath": 0,
+                        "lanId": "12",
+                        "softApplicableAreaId": 10,
+                        "softUpdateTime": 1722304322667,
+                        "versionDetailId": 2654,
+                        "plus_end_time": 0,
+                        "plus_price": 39.95,
+                        "plus_sku": "",
+                        "plus_good_id": 0,
+                        "plus_good_name": ""
+                    },
+                    {
+                        "isHotModel": 0,
+                        "purchased": 1,
+                        "is_free": 1,
+                        "softName": "TPMS",
+                        "cloudSoftName": "TPMS",
+                        "softPackageID": "TPMS_SF",
+                        "price": "38.91",
+                        "sonSoftPackageID": "",
+                        "freeUseEndTime": 2104578373,
+                        "isSelect": 0,
+                        "curId": 11,
+                        "renew_diagnosis_sign": 0,
+                        "serverCurrentTime": 1788959173,
+                        "type": 1,
+                        "is_son": 0,
+                        "fileSize": 21316809,
+                        "versionNo": "V10.42",
+                        "platType": 2,
+                        "softId": 97189,
+                        "sku": "20230228000002",
+                        "good_id": 93,
+                        "good_name": "diag model soft one year",
+                        "is_renew": null,
+                        "is_send": 0,
+                        "url": "https://downloadapp.mythinkcar.com/app_soft/TPMS/2/V10.42/Arabic/TPMS_THINKDIAG_V10.42_AR.zip",
+                        "zyVersion": "V10.37",
+                        "isNewPath": 0,
+                        "lanId": "12",
+                        "softApplicableAreaId": 0,
+                        "softUpdateTime": 1645587570977,
+                        "versionDetailId": 1216,
+                        "plus_end_time": 0,
+                        "plus_price": 39.95,
+                        "plus_sku": "",
+                        "plus_good_id": 0,
+                        "plus_good_name": ""
+                    }
+                ]
+            }
+        };
 
         res.json(jsonData);
     } catch (error) {
-        console.error("Error reading softwares.json:", error);
-        res.status(500).json({ code: -1, msg: "Server Error reading softwares file", data: { list: [] } });
+        console.error("Error:", error);
+        res.status(500).json({ code: -1, msg: "Error", data: { list: [] } });
     }
 });
 
 
-
-app.post('/api/v2/url-upload', (req, res) => {
-    console.log("URL Upload request received:", req.body);
-    return res.status(200).json({
-        code: 0,
-        message: "OK"
-    });
-});
 app.get('/api/v2/urls', (req, res) => {
     const { config_no, app_id } = req.query;
     const serverUrl = "https://my-diag-server.onrender.com";
