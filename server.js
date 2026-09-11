@@ -130,16 +130,18 @@ app.post('/api/v2/url-upload', (req, res) => {
     });
 });
 
-app.get('/api/v2/urls', (req, res) => {
-    const { config_no, app_id } = req.query;
-    const serverUrl = "https://my-diag-server.onrender.com";
-
-    // يمكنك استخدام config_no أو app_id إذا كنت تريد تغيير الردود بناءً عليها مستقبلاً
-
+app.post('/api/v2/url-upload', (req, res) => {
+    console.log("Upload status report received:", req.body);
     return res.status(200).json({
-        "code": 0,
-        "msg": "success",
-        "data": {
+        code: 0,
+        msg: "success",
+        data: {
+            success: true,
+            status: 1
+        }
+    });
+});
+
             "urls": [
                 {"key": "login", "value": `${serverUrl}/api/v2/login`},
                 {"key": "check-token", "value": `${serverUrl}/api/v2/check-token`},
