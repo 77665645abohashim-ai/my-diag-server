@@ -9,7 +9,6 @@ const PORT = process.env.PORT || 10000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// مسار التحميل عبر الـ Proxy لجلب الملف وتمريره للتطبيق حتى يتم تسجيله في "تم التنزيل"
 app.get('/api/v2/download', (req, res) => {
     const { versionDetailId } = req.query;
     console.log(`Proxy download request received for versionDetailId: ${versionDetailId}`);
@@ -48,10 +47,6 @@ app.get('/api/v2/download', (req, res) => {
         console.error('Error reading softwares.json for proxy download:', error);
         return res.status(500).send('Internal Server Error');
     }
-});
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
 });
 
 
