@@ -30,39 +30,30 @@ app.get('/api/v2/download', (req, res) => {
     return res.redirect(302, fileUrl);
 });
 
-// مسار جلب قائمة الماركات والبرمجيات بقراءة ملف softwares.json محلياً مع معالجة آمنة للأخطاء
+// مسار جلب الماركات لتوافق Diagzone مع بيانات ThinkDiag من ملف softwares.json
 app.post('/api/v2/diagsoftservice', (req, res) => {
     try {
         const filePath = path.join(__dirname, 'softwares.json');
-        
-        if (!fs.existsSync(filePath)) {
-            console.log("softwares.json file missing, returning empty list.");
-            return res.status(200).json({
-                "code": 0,
-                "msg": "success",
-                "data": {
-                    "list": []
-                }
+        const rawData = fs.readFileSync(filePath, 'utf8');
+        const jsonData = JSON.parse(rawData);
+
+        // ضمان تحويل downloadLink إلى url ليتوافق مع كلاس z0 في Diagzone
+        if (jsonData.data && jsonData.data.list) {
+            jsonData.data.list = jsonData.data.list.map(item => {
+                return {
+                    ...item,
+                    url: item.url || item.downloadLink
+                };
             });
         }
 
-        const rawData = fs.readFileSync(filePath, 'utf8');
-        const jsonData = JSON.parse(rawData);
-        
-        // إرسال البيانات بشكل مباشر وصحيح لتجنب أي انهيار
-        return res.json(jsonData);
+        res.json(jsonData);
     } catch (error) {
-        console.error("Error parsing softwares.json:", error.message);
-        // في حال وجود خطأ في تنسيق الـ JSON داخل الملف، نرسل هيكلاً فارغاً ناجحاً لضمان عدم توقف التطبيق
-        return res.status(200).json({
-            "code": 0,
-            "msg": "success",
-            "data": {
-                "list": []
-            }
-        });
+        console.error("Error reading softwares.json:", error);
+        res.status(500).json({ code: -1, msg: "Server Error reading softwares file", data: { list: [] } });
     }
 });
+
 
 app.post('/api/v2/url-upload', (req, res) => {
     console.log("URL Upload request received:", req.body);
