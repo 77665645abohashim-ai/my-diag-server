@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -8,38 +9,51 @@ const PORT = process.env.PORT || 10000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// خريطة الروابط للتحميل (قم بتعديل أو إضافة الروابط هنا عند الحاجة)
-const fileMap = {
-    "4001": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/FILE_DEMO_AR.ZIP"
-};
-
-// مسار التحميل الديناميكي الذي يقرأ من softwares.json مباشرة
+// مسار التحميل عبر الـ Proxy لجلب الملف وتمريره للتطبيق حتى يتم تسجيله في "تم التنزيل"
 app.get('/api/v2/download', (req, res) => {
     const { versionDetailId } = req.query;
-    console.log(`Download request received for versionDetailId: ${versionDetailId}`);
+    console.log(`Proxy download request received for versionDetailId: ${versionDetailId}`);
 
     try {
         const rawData = fs.readFileSync(path.join(__dirname, 'softwares.json'), 'utf8');
         const jsonData = JSON.parse(rawData);
         const list = jsonData.data.list;
 
-        // البحث عن السيارة باستخدام versionDetailId
         const targetItem = list.find(item => String(item.versionDetailId) === String(versionDetailId));
 
         if (targetItem && targetItem.downloadLink) {
-            console.log(`Redirecting to original link: ${targetItem.downloadLink}`);
-            // إصلاح الرموز المهربة في الرابط إذا وجدت
             let cleanUrl = targetItem.downloadLink.replace(/\\/g, '');
-            return res.redirect(cleanUrl);
+            console.log(`Streaming file from: ${cleanUrl}`);
+
+            https.get(cleanUrl, (externalRes) => {
+                if (externalRes.statusCode !== 200) {
+                    console.error(`Failed to fetch file, status code: ${externalRes.statusCode}`);
+                    return res.status(502).send('Failed to fetch file from source');
+                }
+
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${targetItem.softName || 'software'}.zip"`);
+                
+                externalRes.pipe(res);
+            }).on('error', (err) => {
+                console.error('Error during file streaming:', err);
+                return res.status(500).send('Internal Server Error during download');
+            });
+
         } else {
             console.log(`VersionDetailId ${versionDetailId} not found in softwares.json`);
             return res.status(404).send('Download link not found');
         }
     } catch (error) {
-        console.error('Error reading softwares.json for download:', error);
+        console.error('Error reading softwares.json for proxy download:', error);
         return res.status(500).send('Internal Server Error');
     }
 });
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
 
 
 app.post('/api/v2/diagsoftservice', (req, res) => {
