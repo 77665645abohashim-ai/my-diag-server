@@ -10,21 +10,29 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/api/v2/download', (req, res) => {
-    const { versionDetailId } = req.query;
-    console.log(`Proxy download request received for versionDetailId: ${versionDetailId}`);
+    // يمكن أن يأتي الطلب باسم أو رقم (سواء كان اسمه versionDetailId, id, softName, أو softPackageID)
+    const queryParam = req.query.versionDetailId || req.query.id || req.query.name || req.query.softPackageID;
+    console.log(`Proxy download request received for query: ${queryParam}`);
 
     try {
         const rawData = fs.readFileSync(path.join(__dirname, 'softwares.json'), 'utf8');
         const jsonData = JSON.parse(rawData);
         
-        // استخراج القائمة سواء كانت في data.list أو مباشرة كمتغير
         const list = jsonData.data?.list || jsonData.list || jsonData.data || [];
 
-        // بحث مرن يطابق versionDetailId أو id بأي صيغة (نص أو رقم)
-        const targetItem = list.find(item => 
-            String(item.versionDetailId) === String(versionDetailId) || 
-            String(item.id) === String(versionDetailId)
-        );
+        // بحث مرن يشمل الأرقام والأسماء والرموز (يقارن بغض النظر عن حالة الأحرف Upper/Lower case)
+        const targetItem = list.find(item => {
+            if (!queryParam) return false;
+            const q = String(queryParam).trim().toLowerCase();
+
+            return (
+                String(item.versionDetailId).toLowerCase() === q ||
+                String(item.id).toLowerCase() === q ||
+                String(item.softName).toLowerCase() === q ||
+                String(item.softPackageID).toLowerCase() === q ||
+                String(item.cloudSoftName).toLowerCase() === q
+            );
+        });
 
         if (targetItem && (targetItem.downloadLink || targetItem.url)) {
             let cleanUrl = (targetItem.downloadLink || targetItem.url).replace(/\\/g, '');
@@ -46,7 +54,7 @@ app.get('/api/v2/download', (req, res) => {
             });
 
         } else {
-            console.log(`VersionDetailId ${versionDetailId} not found in softwares.json keys`);
+            console.log(`Item matching "${queryParam}" not found in softwares.json`);
             return res.status(404).send('Download link not found in JSON');
         }
     } catch (error) {
