@@ -131,7 +131,7 @@ app.get('/api/v2/urls', (req, res) => {
                 {"key": "report_list", "value":"https://diagboss.ch/api/v2/httapi-report-list"},
                 {"key": "getAutoCodeByVin", "value": `${serverUrl}/api/v2/getAutoCodeByVin`},
                 {"key": "getAutoEntranceIdByVin", "value": `${serverUrl}/api/v2/getAutoEntranceIdByVin`},
-                {"key": "programfile.download_new", "value": `${serverUrl}/api/v2/download-programming`},
+                {"key": "programfile.download_new", "value":"https://diagboss.ch/api/v2/download-programming"},
                 {"key": "td.query-state", "value":"https://diagboss.ch/api/v2/td-query-state"},
                 {"key": "td.report-state", "value":"https://diagboss.ch/api/v2/td-report-state"},
                 {"key": "td.upload-cert", "value":"https://diagboss.ch/api/v2/td-upload-cert"},
