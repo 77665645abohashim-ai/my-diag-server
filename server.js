@@ -191,7 +191,7 @@ app.post('/api/v2/url-upload', (req, res) => {
     });
 });
 
-            "urls": [
+            
                 {"key": "login", "value": `${serverUrl}/api/v2/login`},
                 {"key": "check-token", "value": `${serverUrl}/api/v2/check-token`},
                 {"key": "productservice.*", "value": `${serverUrl}/api/v2/product-service`},
