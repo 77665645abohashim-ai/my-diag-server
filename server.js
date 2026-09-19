@@ -8,7 +8,8 @@ const PORT = process.env.PORT || 10000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.get('/api/v2/download', (req, res) => {
+
+app.get('/api/v2/download', async (req, res) => {
     const queryParam = req.query.versionDetailId || req.query.id || req.query.name || req.query.softPackageID;
 
     try {
@@ -45,14 +46,62 @@ app.get('/api/v2/download', (req, res) => {
                     return res.status(502).end();
                 }
 
-                res.setHeader('Content-Type', 'application/zip');
-                res.setHeader('Content-Disposition', `attachment; filename="${targetItem.softName || 'software'}.zip"`);
-                
-                if (externalRes.headers['content-length']) {
-                    res.setHeader('Content-Length', externalRes.headers['content-length']);
-                }
+                const chunks = [];
+                externalRes.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
 
-                externalRes.pipe(res);
+                externalRes.on('end', async () => {
+                    try {
+                        const buffer = Buffer.concat(chunks);
+                        const zip = new JSZip();
+                        const loadedZip = await zip.loadAsync(buffer);
+
+                        // البحث عن مسار مجلد الإصدار (مثل V15.68) بداخل ملف الـ ZIP
+                        let targetFolderPath = "";
+                        loadedZip.forEach((relativePath, file) => {
+                            const match = relativePath.match(/^(.*\/V\d{2}\.\d{2})\//i);
+                            if (match && match[1] && !targetFolderPath) {
+                                targetFolderPath = match[1] + "/";
+                            }
+                        });
+
+                        // احتياطياً: في حال اختلاف صيغة المجلد، البحث عن أي مجلد يبدأ بحرف V
+                        if (!targetFolderPath) {
+                            loadedZip.forEach((relativePath, file) => {
+                                const parts = relativePath.split('/');
+                                for (let i = 0; i < parts.length; i++) {
+                                    if (/^V\d{2}\.\d{2}$/i.test(parts[i]) || /^V\d+/i.test(parts[i])) {
+                                        targetFolderPath = parts.slice(0, i + 1).join('/') + '/';
+                                        break;
+                                    }
+                                }
+                            });
+                        }
+
+                        // تحديد مسار حفظ ملف الترخيص بجانب مكتبات `.so` داخل مجلد الإصدار
+                        const licensePath = targetFolderPath ? targetFolderPath + "LICENSE.DAT" : "LICENSE.DAT";
+                        
+                        // حقن ملف الترخيص
+                        loadedZip.file(licensePath, "");
+
+                        const content = await loadedZip.generateAsync({ 
+                            type: 'nodebuffer',
+                            compression: "DEFLATE"
+                        });
+
+                        res.setHeader('Content-Type', 'application/zip');
+                        res.setHeader('Content-Disposition', `attachment; filename="${targetItem.softName || 'software'}.zip"`);
+                        res.setHeader('Content-Length', content.length);
+                        
+                        return res.send(content);
+
+                    } catch (zipError) {
+                        console.error("Error processing zip injection:", zipError);
+                        return res.status(500).end();
+                    }
+                });
+
             }).on('error', () => {
                 return res.status(500).end();
             });
@@ -61,10 +110,10 @@ app.get('/api/v2/download', (req, res) => {
             return res.status(404).end();
         }
     } catch (error) {
+        console.error("Download route error:", error);
         return res.status(500).end();
     }
 });
-
 
 
 
