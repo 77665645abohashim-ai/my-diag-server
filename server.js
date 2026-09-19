@@ -178,20 +178,13 @@ app.post('/api/v2/url-upload', (req, res) => {
         data: {}
     });
 });
-
-app.post('/api/v2/url-upload', (req, res) => {
-    console.log("Upload status report received:", req.body);
+app.get('/api/v2/config-urls', (req, res) => {
+    const serverUrl = `${req.protocol}://${req.get('host')}`;
     return res.status(200).json({
         code: 0,
         msg: "success",
         data: {
-            success: true,
-            status: 1
-        }
-    });
-});
-
-            
+            urls: [
                 {"key": "login", "value": `${serverUrl}/api/v2/login`},
                 {"key": "check-token", "value": `${serverUrl}/api/v2/check-token`},
                 {"key": "productservice.*", "value": `${serverUrl}/api/v2/product-service`},
@@ -215,16 +208,16 @@ app.post('/api/v2/url-upload', (req, res) => {
                 {"key": "diagsoft_breakpoint_action", "value": `${serverUrl}/api/v2/download`},
                 {"key": "dlDiagSoftPack.action", "value": `${serverUrl}/api/v2/download`},
                 {"key": "diagsoftservice.*", "value": `${serverUrl}/api/v2/diagsoftservice`},
-                {"key": "activation", "value":" https://diagboss.ch/api/v2/activation"},
+                {"key": "activation", "value": "https://diagboss.ch/api/v2/activation"},
                 {"key": "log.upload", "value": `${serverUrl}/api/v2/log-service-upload`},
-                {"key": "report_list", "value":"https://diagboss.ch/api/v2/httapi-report-list"},
+                {"key": "report_list", "value": "https://diagboss.ch/api/v2/httapi-report-list"},
                 {"key": "getAutoCodeByVin", "value": `${serverUrl}/api/v2/getAutoCodeByVin`},
                 {"key": "getAutoEntranceIdByVin", "value": `${serverUrl}/api/v2/getAutoEntranceIdByVin`},
-                {"key": "programfile.download_new", "value":"https://diagboss.ch/api/v2/download-programming"},
-                {"key": "td.query-state", "value":"https://diagboss.ch/api/v2/td-query-state"},
-                {"key": "td.report-state", "value":"https://diagboss.ch/api/v2/td-report-state"},
-                {"key": "td.upload-cert", "value":"https://diagboss.ch/api/v2/td-upload-cert"},
-                {"key": "td.check-locked", "value":"https://diagboss.ch/api/v2/td-check-locked"},
+                {"key": "programfile.download_new", "value": "https://diagboss.ch/api/v2/download-programming"},
+                {"key": "td.query-state", "value": "https://diagboss.ch/api/v2/td-query-state"},
+                {"key": "td.report-state", "value": "https://diagboss.ch/api/v2/td-report-state"},
+                {"key": "td.upload-cert", "value": "https://diagboss.ch/api/v2/td-upload-cert"},
+                {"key": "td.check-locked", "value": "https://diagboss.ch/api/v2/td-check-locked"},
                 {"key": "td2.flasher", "value": `${serverUrl}/api/v2/td2-flasher`},
                 {"key": "onlinelic", "value": `${serverUrl}/api/v2/onlinelic`},
                 {"key": "pubaccount.pid_byt", "value": `${serverUrl}/api/v2/pid-byt`},
@@ -293,6 +286,8 @@ app.post('/api/v2/url-upload', (req, res) => {
         }
     });
 });
+
+
 app.post('/api/v2/publicsoftservice-nt', express.text({ type: '*/*' }), (req, res) => {
     const requestBody = req.body || "";
     
