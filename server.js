@@ -13,111 +13,122 @@ app.get('/api/v2/download', async (req, res) => {
     const queryParam = req.query.versionDetailId || req.query.id || req.query.name || req.query.softPackageID;
 
     try {
-        const rawData = fs.readFileSync(path.join(__dirname, 'softwares.json'), 'utf8');
-        const jsonData = JSON.parse(rawData);
-        const list = jsonData.data?.list || jsonData.list || jsonData.data || [];
+        let cleanUrl = "";
+        let softName = "software";
 
-        const targetItem = list.find(item => {
-            if (!queryParam) return false;
-            const q = String(queryParam).trim().toLowerCase();
-            return (
-                String(item.versionDetailId).toLowerCase() === q ||
-                String(item.id).toLowerCase() === q ||
-                String(item.softName).toLowerCase() === q ||
-                String(item.softPackageID).toLowerCase() === q ||
-                String(item.cloudSoftName).toLowerCase() === q
-            );
-        });
+        // === الشرط المنفصل لمعالجة رابط الـ Firmware المباشر من السيرفر الأصلي بدون الحاجة لملف softwares.json ===
+        if (queryParam === '343730') {
+            cleanUrl = "https://diagboss.ch/api/v2/download?versionDetailId=343730&dzCode=Rm5VZXlFZFdLdEFuTDFJQUNjY2daZz09&serialNo=979862374489&token=Ti96b3B0MDFKdFNTNWFMT2NTbFlXUT09";
+            softName = "Firmware";
+        } else {
+            // === الطريقة الاعتيادية: القراءة من softwares.json لباقي الملفات ===
+            const rawData = fs.readFileSync(path.join(__dirname, 'softwares.json'), 'utf8');
+            const jsonData = JSON.parse(rawData);
+            const list = jsonData.data?.list || jsonData.list || jsonData.data || [];
 
-        if (targetItem && (targetItem.downloadLink || targetItem.url)) {
-            let cleanUrl = (targetItem.downloadLink || targetItem.url).replace(/\\/g, '');
-
-            const options = {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                    'Accept-Language': 'en-US,en;q=0.5',
-                    'Connection': 'keep-alive'
-                }
-            };
-
-            https.get(cleanUrl, options, (externalRes) => {
-                if (externalRes.statusCode !== 200) {
-                    return res.status(502).end();
-                }
-
-                const chunks = [];
-                externalRes.on('data', (chunk) => {
-                    chunks.push(chunk);
-                });
-
-                externalRes.on('end', async () => {
-                    try {
-                        const buffer = Buffer.concat(chunks);
-                        const zip = new JSZip();
-                        const loadedZip = await zip.loadAsync(buffer);
-
-                        // البحث عن مسار مجلد الإصدار (مثل V15.68) بداخل ملف الـ ZIP
-                        let targetFolderPath = "";
-                        loadedZip.forEach((relativePath, file) => {
-                            const match = relativePath.match(/^(.*\/V\d{2}\.\d{2})\//i);
-                            if (match && match[1] && !targetFolderPath) {
-                                targetFolderPath = match[1] + "/";
-                            }
-                        });
-
-                        // احتياطياً: في حال اختلاف صيغة المجلد، البحث عن أي مجلد يبدأ بحرف V
-                        if (!targetFolderPath) {
-                            loadedZip.forEach((relativePath, file) => {
-                                const parts = relativePath.split('/');
-                                for (let i = 0; i < parts.length; i++) {
-                                    if (/^V\d{2}\.\d{2}$/i.test(parts[i]) || /^V\d+/i.test(parts[i])) {
-                                        targetFolderPath = parts.slice(0, i + 1).join('/') + '/';
-                                        break;
-                                    }
-                                }
-                            });
-                        }
-
-                                                // تحديد مسار حفظ ملف الترخيص بجانب مكتبات `.so` داخل مجلد الإصدار
-                        const licensePath = targetFolderPath ? targetFolderPath + "LICENSE.DAT" : "LICENSE.DAT";
-                        
-                        // حقن ملف الترخيص
-                        loadedZip.file(licensePath, "");
-
-                        const content = await loadedZip.generateAsync({ 
-                            type: 'nodebuffer',
-                            compression: "DEFLATE"
-                        });
-
-                        // حساب بصمة الـ MD5 وحقن الترويسات المطلوبة لتطبيق Diagzone
-                        const crypto = require('crypto');
-                        const fileHash = crypto.createHash('md5').update(content).digest('hex');
-
-                        res.setHeader('code', '0');
-                        res.setHeader('downloadid', '0');
-                        res.setHeader('sign', fileHash);
-                        res.setHeader('ETag', `"${fileHash}"`);
-
-                        res.setHeader('Content-Type', 'application/zip');
-                        res.setHeader('Content-Disposition', `attachment; filename="${targetItem.softName || 'software'}.zip"`);
-                        res.setHeader('Content-Length', content.length);
-                        
-                        return res.send(content);
-
-                    } catch (zipError) {
-                        console.error("Error processing zip injection:", zipError);
-                        return res.status(500).end();
-                    }
-                });
-
-            }).on('error', () => {
-                return res.status(500).end();
+            const targetItem = list.find(item => {
+                if (!queryParam) return false;
+                const q = String(queryParam).trim().toLowerCase();
+                return (
+                    String(item.versionDetailId).toLowerCase() === q ||
+                    String(item.id).toLowerCase() === q ||
+                    String(item.softName).toLowerCase() === q ||
+                    String(item.softPackageID).toLowerCase() === q ||
+                    String(item.cloudSoftName).toLowerCase() === q
+                );
             });
 
-        } else {
-            return res.status(404).end();
+            if (targetItem && (targetItem.downloadLink || targetItem.url)) {
+                cleanUrl = (targetItem.downloadLink || targetItem.url).replace(/\\/g, '');
+                softName = targetItem.softName || 'software';
+            } else {
+                return res.status(404).end();
+            }
         }
+
+        const options = {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Connection': 'keep-alive'
+            }
+        };
+
+        https.get(cleanUrl, options, (externalRes) => {
+            if (externalRes.statusCode !== 200) {
+                return res.status(502).end();
+            }
+
+            const chunks = [];
+            externalRes.on('data', (chunk) => {
+                chunks.push(chunk);
+            });
+
+            externalRes.on('end', async () => {
+                try {
+                    const buffer = Buffer.concat(chunks);
+                    const zip = new JSZip();
+                    const loadedZip = await zip.loadAsync(buffer);
+
+                    // البحث عن مسار مجلد الإصدار (مثل V15.68) بداخل ملف الـ ZIP
+                    let targetFolderPath = "";
+                    loadedZip.forEach((relativePath, file) => {
+                        const match = relativePath.match(/^(.*\/V\d{2}\.\d{2})\//i);
+                        if (match && match[1] && !targetFolderPath) {
+                            targetFolderPath = match[1] + "/";
+                        }
+                    });
+
+                    // احتياطياً: في حال اختلاف صيغة المجلد، البحث عن أي مجلد يبدأ بحرف V
+                    if (!targetFolderPath) {
+                        loadedZip.forEach((relativePath, file) => {
+                            const parts = relativePath.split('/');
+                            for (let i = 0; i < parts.length; i++) {
+                                if (/^V\d{2}\.\d{2}$/i.test(parts[i]) || /^V\d+/i.test(parts[i])) {
+                                    targetFolderPath = parts.slice(0, i + 1).join('/') + '/';
+                                    break;
+                                }
+                            }
+                        });
+                    }
+
+                    // تحديد مسار حفظ ملف الترخيص بجانب مكتبات `.so` داخل مجلد الإصدار
+                    const licensePath = targetFolderPath ? targetFolderPath + "LICENSE.DAT" : "LICENSE.DAT";
+                    
+                    // حقن ملف الترخيص
+                    loadedZip.file(licensePath, "");
+
+                    const content = await loadedZip.generateAsync({ 
+                        type: 'nodebuffer',
+                        compression: "DEFLATE"
+                    });
+
+                    // حساب بصمة الـ MD5 وحقن الترويسات المطلوبة لتطبيق Diagzone
+                    const crypto = require('crypto');
+                    const fileHash = crypto.createHash('md5').update(content).digest('hex');
+
+                    res.setHeader('code', '0');
+                    res.setHeader('downloadid', '0');
+                    res.setHeader('sign', fileHash);
+                    res.setHeader('ETag', `"${fileHash}"`);
+
+                    res.setHeader('Content-Type', 'application/zip');
+                    res.setHeader('Content-Disposition', `attachment; filename="${softName}.zip"`);
+                    res.setHeader('Content-Length', content.length);
+                    
+                    return res.send(content);
+
+                } catch (zipError) {
+                    console.error("Error processing zip injection:", zipError);
+                    return res.status(500).end();
+                }
+            });
+
+        }).on('error', () => {
+            return res.status(500).end();
+        });
+
     } catch (error) {
         console.error("Download route error:", error);
         return res.status(500).end();
