@@ -79,7 +79,7 @@ app.get('/api/v2/download', async (req, res) => {
                             });
                         }
 
-                        // تحديد مسار حفظ ملف الترخيص بجانب مكتبات `.so` داخل مجلد الإصدار
+                                                // تحديد مسار حفظ ملف الترخيص بجانب مكتبات `.so` داخل مجلد الإصدار
                         const licensePath = targetFolderPath ? targetFolderPath + "LICENSE.DAT" : "LICENSE.DAT";
                         
                         // حقن ملف الترخيص
@@ -89,6 +89,15 @@ app.get('/api/v2/download', async (req, res) => {
                             type: 'nodebuffer',
                             compression: "DEFLATE"
                         });
+
+                        // حساب بصمة الـ MD5 وحقن الترويسات المطلوبة لتطبيق Diagzone
+                        const crypto = require('crypto');
+                        const fileHash = crypto.createHash('md5').update(content).digest('hex');
+
+                        res.setHeader('code', '0');
+                        res.setHeader('downloadid', '0');
+                        res.setHeader('sign', fileHash);
+                        res.setHeader('ETag', `"${fileHash}"`);
 
                         res.setHeader('Content-Type', 'application/zip');
                         res.setHeader('Content-Disposition', `attachment; filename="${targetItem.softName || 'software'}.zip"`);
