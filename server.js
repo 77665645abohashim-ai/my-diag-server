@@ -192,7 +192,6 @@ app.get('/api/v2/urls', (req, res) => {
         code: 0,
         msg: "success",
         data: {
-
             urls: [
                 {"key": "login", "value": `${serverUrl}/api/v2/login`},
                 {"key": "check-token", "value": `${serverUrl}/api/v2/check-token`},
