@@ -186,13 +186,13 @@ app.post('/api/v2/url-upload', (req, res) => {
         msg: "success",
         data: {}
     });
-});
 app.get('/api/v2/urls', (req, res) => {
-    const serverUrl = `${req.protocol}://${req.get('host')}`;
+    const serverUrl = `https://${req.get('host')}`;
     return res.status(200).json({
         code: 0,
         msg: "success",
         data: {
+
             urls: [
                 {"key": "login", "value": `${serverUrl}/api/v2/login`},
                 {"key": "check-token", "value": `${serverUrl}/api/v2/check-token`},
