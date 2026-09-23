@@ -187,7 +187,7 @@ app.post('/api/v2/url-upload', (req, res) => {
         data: {}
     });
 });
-app.get('/api/v2/config-urls', (req, res) => {
+app.get('/api/v2/urls', (req, res) => {
     const serverUrl = `${req.protocol}://${req.get('host')}`;
     return res.status(200).json({
         code: 0,
