@@ -8,17 +8,19 @@ const PORT = process.env.PORT || 10000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.get('/api/v2/download', async (req, res) => {
+App.get('/api/v2/download', async (req, res) => {
     const queryParam = req.query.versionDetailId || req.query.id || req.query.name || req.query.softPackageID;
 
     try {
         let cleanUrl = "";
         let softName = "software";
 
+        // === الشرط المنفصل لمعالجة رابط الـ Firmware المباشر من السيرفر الأصلي بدون الحاجة لملف softwares.json ===
         if (queryParam === '343730') {
             cleanUrl = "https://diagboss.ch/api/v2/download?versionDetailId=343730&dzCode=Rm5VZXlFZFdLdEFuTDFJQUNjY2daZz09&serialNo=979862374489&token=Ti96b3B0MDFKdFNTNWFMT2NTbFlXUT09";
             softName = "Firmware";
         } else {
+            // === الطريقة الاعتيادية: القراءة من softwares.json لباقي الملفات ===
             const rawData = fs.readFileSync(path.join(__dirname, 'softwares.json'), 'utf8');
             const jsonData = JSON.parse(rawData);
             const list = jsonData.data?.list || jsonData.list || jsonData.data || [];
@@ -68,41 +70,41 @@ app.get('/api/v2/download', async (req, res) => {
                     const zip = new JSZip();
                     const loadedZip = await zip.loadAsync(buffer);
 
+                    // البحث عن مسار مجلد الإصدار (مثل V15.68) بداخل ملف الـ ZIP
                     let targetFolderPath = "";
-                    
-                    // البحث الدقيق عن مجلد يحتوي على ملفات داخلية أو مجلد إصدار
                     loadedZip.forEach((relativePath, file) => {
-                        if (!file.dir && relativePath.includes('/')) {
-                            const lastSlashIndex = relativePath.lastIndexOf('/');
-                            const folder = relativePath.substring(0, lastSlashIndex + 1);
-                            if (!targetFolderPath && (folder.includes('V') || folder.includes('assets') || folder.includes('pro'))) {
-                                targetFolderPath = folder;
-                            }
+                        const match = relativePath.match(/^(.*\/V\d{2}\.\d{2})\//i);
+                        if (match && match[1] && !targetFolderPath) {
+                            targetFolderPath = match[1] + "/";
                         }
                     });
 
-                    // إذا لم يتم العثور على مجلد مناسب، نأخذ أول مجلد رئيسي في الأرشيف
+                    // احتياطياً: في حال اختلاف صيغة المجلد، البحث عن أي مجلد يبدأ بحرف V
                     if (!targetFolderPath) {
                         loadedZip.forEach((relativePath, file) => {
-                            if (file.dir && !targetFolderPath) {
-                                targetFolderPath = relativePath;
+                            const parts = relativePath.split('/');
+                            for (let i = 0; i < parts.length; i++) {
+                                if (/^V\d{2}\.\d{2}$/i.test(parts[i]) || /^V\d+/i.test(parts[i])) {
+                                    targetFolderPath = parts.slice(0, i + 1).join('/') + '/';
+                                    break;
+                                }
                             }
                         });
                     }
 
-                    // حقن الملف في المسار المكتشف وفي الجذر لضمان القراءة التامة
-                    const licenseContent = "DIAGZONE-ONLINE-V01";
+                    // تحديد مسار حفظ ملف الترخيص بجانب مكتبات `.so` داخل مجلد الإصدار
+                    const licensePath = targetFolderPath ? targetFolderPath + "LICENSE.DAT" : "LICENSE.DAT";
                     
-                    if (targetFolderPath) {
-                        loadedZip.file(targetFolderPath + "LICENSE.DAT", licenseContent);
-                    }
-                    loadedZip.file("LICENSE.DAT", licenseContent);
+                    // حقن ملف الترخيص
+                    loadedZip.file(licensePath, "");
 
                     const content = await loadedZip.generateAsync({ 
                         type: 'nodebuffer',
                         compression: "DEFLATE"
                     });
 
+                    // حساب بصمة الـ MD5 وحقن الترويسات المطلوبة لتطبيق Diagzone
+                    const crypto = require('crypto');
                     const fileHash = crypto.createHash('md5').update(content).digest('hex');
 
                     res.setHeader('code', '0');
@@ -131,7 +133,6 @@ app.get('/api/v2/download', async (req, res) => {
         return res.status(500).end();
     }
 });
-
 
 app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) => {
     try {
