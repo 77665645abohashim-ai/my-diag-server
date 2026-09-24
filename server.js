@@ -133,7 +133,6 @@ app.get('/api/v2/download', async (req, res) => {
         return res.status(500).end();
     }
 });
-
 app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) => {
     try {
         const requestBody = req.body || "";
@@ -218,6 +217,7 @@ app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) =>
         res.status(500).send("Server Error reading softwares file");
     }
 });
+
 
 app.post('/api/v2/url-upload', (req, res) => {
     res.json({
