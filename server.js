@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 10000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-App.get('/api/v2/download', async (req, res) => {
+app.get('/api/v2/download', async (req, res) => {
     const queryParam = req.query.versionDetailId || req.query.id || req.query.name || req.query.softPackageID;
 
     try {
