@@ -135,8 +135,6 @@ app.get('/api/v2/download', async (req, res) => {
     }
 });
 
-
-
 app.post('/api/v2/diagsoftservice', (req, res) => {
     try {
         const filePath = path.join(__dirname, 'softwares.json');
@@ -148,38 +146,54 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
             softwares = jsonData.data && jsonData.data.list ? jsonData.data.list : [];
         }
 
+        // دالة مساعدة لتحويل الأرقام الزمنية (Timestamp) إلى تاريخ نصي يفهمه التطبيق
+        function formatDate(val) {
+            if (!val) return '2026-03-04 10:32:08';
+            if (typeof val === 'number' || /^\d{10,13}$/.test(String(val))) {
+                const num = Number(val);
+                const d = new Date(num > 10000000000 ? num : num * 1000);
+                if (!isNaN(d.getTime())) {
+                    return d.toISOString().replace('T', ' ').substring(0, 19);
+                }
+            }
+            return String(val);
+        }
+
         let itemsXml = '';
         softwares.forEach(item => {
+            const updateTime = formatDate(item.softUpdateTime);
+            const serverTime = formatDate(item.serverCurrentTime) || '2026-09-24 12:00:00';
+
             itemsXml += `
-                <x431PadSoftIncr>
+                <x431PadSoft>
                     <diagVehicleType>${item.type || 1}</diagVehicleType>
                     <fileSize>${item.fileSize || 0}</fileSize>
                     <freeUseEndTime>${item.freeUseEndTime || 2104578373}</freeUseEndTime>
                     <lanId>AR</lanId>
-                    <serverCurrentTime>${item.serverCurrentTime || 1788959173}</serverCurrentTime>
+                    <serverCurrentTime>${serverTime}</serverCurrentTime>
                     <softApplicableArea>${item.softApplicableAreaId || 5}</softApplicableArea>
                     <softId>${item.softId || 0}</softId>
                     <softName>${item.softName || ''}</softName>
                     <softPackageID>${item.softPackageID || ''}</softPackageID>
-                    <softUpdateTime>2026-03-04 10:32:08</softUpdateTime>
+                    <softUpdateTime>${updateTime}</softUpdateTime>
                     <versionDetailId>${item.versionDetailId || 0}</versionDetailId>
                     <versionNo>${item.versionNo || 'V1.0'}</versionNo>
                     <url>${item.downloadLink || item.url || ''}</url>
-                </x431PadSoftIncr>`;
+                </x431PadSoft>`;
         });
 
         const soapResponse = `<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <SOAP-ENV:Body>
-        <ns1:queryLatestDiagSoftsIncrCdnResponse xmlns:ns1="https://diagzone.com">
+        <ns1:queryLatestDiagSoftsResponse xmlns:ns1="https://diagzone.com">
             <return>
                 <code>0</code>
                 <message>success</message>
-                <x431PadSoftIncrList>
+                <x431PadSoftList>
                     ${itemsXml}
-                </x431PadSoftIncrList>
+                </x431PadSoftList>
             </return>
-        </ns1:queryLatestDiagSoftsIncrCdnResponse>
+        </ns1:queryLatestDiagSoftsResponse>
     </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`;
 
@@ -190,6 +204,8 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
         res.status(500).send("Server Error reading softwares file");
     }
 });
+
+
 
 app.post('/api/v2/url-upload', (req, res) => {
     res.json({
