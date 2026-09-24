@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 10000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/api/v2/download', async (req, res) => {
+App.get('/api/v2/download', async (req, res) => {
     const queryParam = req.query.versionDetailId || req.query.id || req.query.name || req.query.softPackageID;
 
     try {
@@ -96,8 +96,8 @@ app.get('/api/v2/download', async (req, res) => {
                     // تحديد مسار حفظ ملف الترخيص بجانب مكتبات `.so` داخل مجلد الإصدار
                     const licensePath = targetFolderPath ? targetFolderPath + "LICENSE.DAT" : "LICENSE.DAT";
                     
-                    // حقن ملف الترخيص
-                    loadedZip.file(licensePath, "");
+                    // حقن النص المطلوب مباشرة داخل ملف الترخيص
+                    loadedZip.file(licensePath, "DIAGZONE-ONLINE-V01");
 
                     const content = await loadedZip.generateAsync({ 
                         type: 'nodebuffer',
@@ -134,6 +134,7 @@ app.get('/api/v2/download', async (req, res) => {
         return res.status(500).end();
     }
 });
+
 
 app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) => {
     try {
