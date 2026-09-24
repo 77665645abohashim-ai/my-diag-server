@@ -134,6 +134,90 @@ app.get('/api/v2/download', async (req, res) => {
     }
 });
 
+app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) => {
+    try {
+        const requestBody = req.body || "";
+        console.log("Received Diag Soft Service Request:", requestBody);
+
+        const filePath = path.join(__dirname, 'softwares.json');
+        let softwares = [];
+
+        if (fs.existsSync(filePath)) {
+            const rawData = fs.readFileSync(filePath, 'utf8');
+            const jsonData = JSON.parse(rawData);
+            softwares = jsonData.data && jsonData.data.list ? jsonData.data.list : [];
+        }
+
+        // دالة مساعدة لتحويل التواريخ أو الأرقام الزمنية بشكل صحيح
+        function formatDate(val) {
+            if (!val) return '2026-03-04 10:32:08';
+            if (typeof val === 'number' || /^\d{10,13}$/.test(String(val))) {
+                const num = Number(val);
+                const d = new Date(num > 10000000000 ? num : num * 1000);
+                if (!isNaN(d.getTime())) {
+                    return d.toISOString().replace('T', ' ').substring(0, 19);
+                }
+            }
+            return String(val);
+        }
+
+        let itemsXml = '';
+        softwares.forEach(item => {
+            const updateTime = formatDate(item.softUpdateTime);
+            const serverTime = formatDate(item.serverCurrentTime) || '2026-09-24 12:00:00';
+            
+            itemsXml += `
+                <x431PadSoft>
+                    <diagVehicleType>${item.type || 1}</diagVehicleType>
+                    <fileSize>${item.fileSize || 0}</fileSize>
+                    <freeUseEndTime>${item.freeUseEndTime || 2104578373}</freeUseEndTime>
+                    <lanId>AR</lanId>
+                    <serverCurrentTime>${serverTime}</serverCurrentTime>
+                    <softApplicableArea>${item.softApplicableAreaId || 5}</softApplicableArea>
+                    <softId>${item.softId || 0}</softId>
+                    <softName>${item.softName || ''}</softName>
+                    <softPackageID>${item.softPackageID || ''}</softPackageID>
+                    <softUpdateTime>${updateTime}</softUpdateTime>
+                    <versionDetailId>${item.versionDetailId || 0}</versionDetailId>
+                    <versionNo>${item.versionNo || 'V1.0'}</versionNo>
+                    <url>${item.downloadLink || item.url || ''}</url>
+                </x431PadSoft>`;
+        });
+
+        // نتحقق مما إذا كان الطلب يطلب صيغة الـ Incr لكي نرد عليه بالطريقتين معاً لتجنب أي مشاكل
+        const isIncRequest = requestBody.includes('Incr') || requestBody.includes('IncrCdn');
+        const responseTag = isIncRequest ? 'queryLatestDiagSoftsIncrCdnResponse' : 'queryLatestDiagSoftsResponse';
+        const listTag = isIncRequest ? 'x431PadSoftIncrList' : 'x431PadSoftList';
+        const itemTag = isIncRequest ? 'x431PadSoftIncr' : 'x431PadSoft';
+
+        // إذا كان مطلوب Incr نعدل الوسم الداخلي للعنصر
+        let finalItemsXml = itemsXml;
+        if (isIncRequest) {
+            finalItemsXml = itemsXml.replace(/<x431PadSoft>/g, '<x431PadSoftIncr>').replace(/<\/x431PadSoft>/g, '</x431PadSoftIncr>');
+        }
+
+        const soapResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Body>
+        <ns1:${responseTag} xmlns:ns1="https://diagzone.com">
+            <return>
+                <code>0</code>
+                <message>success</message>
+                <${listTag}>
+                    ${finalItemsXml}
+                </${listTag}>
+            </return>
+        </ns1:${responseTag}>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`;
+
+        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+        res.send(soapResponse);
+    } catch (error) {
+        console.error("Error reading softwares.json:", error);
+        res.status(500).send("Server Error reading softwares file");
+    }
+});
 
 app.post('/api/v2/url-upload', (req, res) => {
     res.json({
