@@ -15,34 +15,12 @@ app.get('/api/v2/download', async (req, res) => {
         let cleanUrl = "";
         let softName = "software";
 
-        // === الشرط المنفصل لمعالجة رابط الـ Firmware المباشر من السيرفر الأصلي بدون الحاجة لملف softwares.json ===
-        if (queryParam === '343730') {
-            cleanUrl = "https://diagboss.ch/api/v2/download?versionDetailId=343730&dzCode=Rm5VZXlFZFdLdEFuTDFJQUNjY2daZz09&serialNo=979862374489&token=Ti96b3B0MDFKdFNTNWFMT2NTbFlXUT09";
-            softName = "Firmware";
+        // استخدام الرابط المباشر لأي رقم يتم طلبه أو توليده تلقائياً من السيرفر الأساسي
+        if (queryParam) {
+            cleanUrl = `https://diagboss.ch/api/v2/download?versionDetailId=${queryParam}&dzCode=Rm5VZXlFZFdLdEFuTDFJQUNjY2daZz09&serialNo=979862374489&token=Ti96b3B0MDFKdFNTNWFMT2NTbFlXUT09`;
+            softName = `software_${queryParam}`;
         } else {
-            // === الطريقة الاعتيادية: القراءة من softwares.json لباقي الملفات ===
-            const rawData = fs.readFileSync(path.join(__dirname, 'softwares.json'), 'utf8');
-            const jsonData = JSON.parse(rawData);
-            const list = jsonData.data?.list || jsonData.list || jsonData.data || [];
-
-            const targetItem = list.find(item => {
-                if (!queryParam) return false;
-                const q = String(queryParam).trim().toLowerCase();
-                return (
-                    String(item.versionDetailId).toLowerCase() === q ||
-                    String(item.id).toLowerCase() === q ||
-                    String(item.softName).toLowerCase() === q ||
-                    String(item.softPackageID).toLowerCase() === q ||
-                    String(item.cloudSoftName).toLowerCase() === q
-                );
-            });
-
-            if (targetItem && (targetItem.downloadLink || targetItem.url)) {
-                cleanUrl = (targetItem.downloadLink || targetItem.url).replace(/\\/g, '');
-                softName = targetItem.softName || 'software';
-            } else {
-                return res.status(404).end();
-            }
+            return res.status(404).end();
         }
 
         const options = {
@@ -70,7 +48,6 @@ app.get('/api/v2/download', async (req, res) => {
                     const zip = new JSZip();
                     const loadedZip = await zip.loadAsync(buffer);
 
-                    // البحث عن مسار مجلد الإصدار (مثل V15.68) بداخل ملف الـ ZIP
                     let targetFolderPath = "";
                     loadedZip.forEach((relativePath, file) => {
                         const match = relativePath.match(/^(.*\/V\d{2}\.\d{2})\//i);
@@ -79,7 +56,6 @@ app.get('/api/v2/download', async (req, res) => {
                         }
                     });
 
-                    // احتياطياً: في حال اختلاف صيغة المجلد، البحث عن أي مجلد يبدأ بحرف V
                     if (!targetFolderPath) {
                         loadedZip.forEach((relativePath, file) => {
                             const parts = relativePath.split('/');
@@ -92,10 +68,9 @@ app.get('/api/v2/download', async (req, res) => {
                         });
                     }
 
-                    // تحديد مسار حفظ ملف الترخيص بجانب مكتبات `.so` داخل مجلد الإصدار
                     const licensePath = targetFolderPath ? targetFolderPath + "LICENSE.DAT" : "LICENSE.DAT";
                     
-                    // حقن ملف الترخيص
+                    // إفراغ ملف الترخيص تماماً كما طلبت
                     loadedZip.file(licensePath, "");
 
                     const content = await loadedZip.generateAsync({ 
@@ -103,7 +78,6 @@ app.get('/api/v2/download', async (req, res) => {
                         compression: "DEFLATE"
                     });
 
-                    // حساب بصمة الـ MD5 وحقن الترويسات المطلوبة لتطبيق Diagzone
                     const crypto = require('crypto');
                     const fileHash = crypto.createHash('md5').update(content).digest('hex');
 
