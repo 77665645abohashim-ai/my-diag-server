@@ -487,6 +487,43 @@ app.post('/api/v2/publicsoftservice', express.text({ type: '*/*' }), (req, res) 
     }
 });
 
+// 1. مسار البرمجيات العامة وتطبيقات النظام (يمنع طلب التركيب اليدوي)
+app.post('/api/v2/publicsoftservice', express.text({ type: '*/*' }), (req, res) => {
+    try {
+        const soapResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Body>
+        <ns1:queryLatestPublicSoftsResponse xmlns:ns1="https://diagzone.com">
+            <return>
+                <code>0</code>
+                <message>success</message>
+                <x431PadSoftList>
+                    <x431PadSoft>
+                        <fileSize>68365802</fileSize>
+                        <lanId>EN</lanId>
+                        <serverCurrentTime>2026-03-04 10:32:08</serverCurrentTime>
+                        <softId>1</softId>
+                        <softName>Diagzone PRO V2</softName>
+                        <softPackageID>com.diagzone.pro</softPackageID>
+                        <softUpdateTime>2026-03-04 10:32:08</softUpdateTime>
+                        <versionDetailId>100</versionDetailId>
+                        <versionNo>V2.00.018</versionNo>
+                        <url></url>
+                    </x431PadSoft>
+                </x431PadSoftList>
+            </return>
+        </ns1:queryLatestPublicSoftsResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`;
+
+        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+        return res.status(200).send(soapResponse);
+    } catch (error) {
+        console.error("Error in publicsoftservice:", error);
+        return res.status(500).send("Server Error");
+    }
+});
+
 // 2. مسار ماركات السيارات والحزم التشخيصية
 app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) => {
     try {
@@ -566,6 +603,7 @@ app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) =>
         return res.status(500).send("Server Error");
     }
 });
+
 
 app.post('/api/v2/log-service-upload', (req, res) => {
     console.log("Received log/crash report upload request");
