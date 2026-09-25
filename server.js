@@ -108,7 +108,7 @@ app.get('/api/v2/download', async (req, res) => {
                     const fileHash = crypto.createHash('md5').update(content).digest('hex');
 
                     res.setHeader('code', '0');
-                    res.setHeader('downloadid', '0');
+                    res.setHeader('downloadid', queryParam || '0'); // تم جعله مطابـقاً لـ versionDetailId
                     res.setHeader('sign', fileHash);
                     res.setHeader('ETag', `"${fileHash}"`);
 
@@ -133,6 +133,7 @@ app.get('/api/v2/download', async (req, res) => {
         return res.status(500).end();
     }
 });
+
 app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) => {
     try {
         const requestBody = req.body || "";
