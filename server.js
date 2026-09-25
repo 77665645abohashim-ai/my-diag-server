@@ -139,27 +139,6 @@ app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) =>
         const requestBody = req.body || "";
         console.log("Received Diag Soft Service Request:", requestBody);
 
-        // التحقق إذا كان الطلب يخص استعلام الحزم الفرعية للماركات
-        if (requestBody.includes('queryPDTDiagSoftSubPack')) {
-            const soapSubPackResponse = `<?xml version="1.0" encoding="UTF-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-    <SOAP-ENV:Body>
-        <ns1:queryPDTDiagSoftSubPackResponse xmlns:ns1="https://diagzone.com">
-            <return>
-                <code>0</code>
-                <message>success</message>
-                <pdtDiagSoftSubPackDTOList>
-                    <!-- يتم تفعيل جميع الماركات كحزم نشطة وغير منتهية -->
-                </pdtDiagSoftSubPackDTOList>
-            </return>
-        </ns1:queryPDTDiagSoftSubPackResponse>
-    </SOAP-ENV:Body>
-</SOAP-ENV:Envelope>`;
-            res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-            return res.status(200).send(soapSubPackResponse);
-        }
-
-        // الكود الحالي الخاص بـ queryLatestDiagSofts ...
         const filePath = path.join(__dirname, 'softwares.json');
         let softwares = [];
 
@@ -188,15 +167,12 @@ app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) =>
             
             itemsXml += `
                 <x431PadSoft>
-                    <diagVehicleType>${item.type || 1}</diagVehicleType>
-                    <fileSize>${item.fileSize || 0}</fileSize>
-                    <freeUseEndTime>${item.freeUseEndTime || 2104578373}</freeUseEndTime>
-                    <lanId>AR</lanId>
+                    <fileSize>${item.fileSize || 68365802}</fileSize>
+                    <lanId>${item.lanId || 'EN'}</lanId>
                     <serverCurrentTime>${serverTime}</serverCurrentTime>
-                    <softApplicableArea>${item.softApplicableAreaId || 5}</softApplicableArea>
                     <softId>${item.softId || 0}</softId>
                     <softName>${item.softName || ''}</softName>
-                    <softPackageID>${item.softPackageID || ''}</softPackageID>
+                    <softPackageID>${item.softPackageID || item.softName || ''}</softPackageID>
                     <softUpdateTime>${updateTime}</softUpdateTime>
                     <versionDetailId>${item.versionDetailId || 0}</versionDetailId>
                     <versionNo>${item.versionNo || 'V1.0'}</versionNo>
@@ -204,13 +180,14 @@ app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) =>
                 </x431PadSoft>`;
         });
 
-        const isIncRequest = requestBody.includes('Incr') || requestBody.includes('IncrCdn');
-        const responseTag = isIncRequest ? 'queryLatestDiagSoftsIncrCdnResponse' : 'queryLatestDiagSoftsResponse';
-        const listTag = isIncRequest ? 'x431PadSoftIncrList' : 'x431PadSoftList';
-
-        let finalItemsXml = itemsXml;
-        if (isIncRequest) {
-            finalItemsXml = itemsXml.replace(/<x431PadSoft>/g, '<x431PadSoftIncr>').replace(/<\/x431PadSoft>/g, '</x431PadSoftIncr>');
+        // تحديد وسم الاستجابة بناءً على الدالة التي طلبتها التطبيق في الـ Request
+        let responseTag = 'queryLatestSoftsResponse';
+        if (requestBody.includes('queryLatestDiagSoftsIncrCdn')) {
+            responseTag = 'queryLatestDiagSoftsIncrCdnResponse';
+        } else if (requestBody.includes('queryPDTDiagSoftSubPack')) {
+            responseTag = 'queryPDTDiagSoftSubPackResponse';
+        } else if (requestBody.includes('queryLatestSofts')) {
+            responseTag = 'queryLatestSoftsResponse';
         }
 
         const soapResponse = `<?xml version="1.0" encoding="UTF-8"?>
@@ -220,19 +197,19 @@ app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) =>
             <return>
                 <code>0</code>
                 <message>success</message>
-                <${listTag}>
-                    ${finalItemsXml}
-                </${listTag}>
+                <x431PadSoftList>
+                    ${itemsXml}
+                </x431PadSoftList>
             </return>
         </ns1:${responseTag}>
     </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>`;
 
         res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-        res.send(soapResponse);
+        return res.status(200).send(soapResponse);
     } catch (error) {
-        console.error("Error reading softwares.json:", error);
-        res.status(500).send("Server Error reading softwares file");
+        console.error("Error in diagsoftservice:", error);
+        return res.status(500).send("Server Error");
     }
 });
 
