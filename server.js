@@ -437,12 +437,74 @@ app.post('/api/v2/statistics', express.urlencoded({ extended: true }), (req, res
     });
 });
 app.post('/api/v2/publicsoftservice', express.text({ type: '*/*' }), (req, res) => {
-    const requestBody = req.body || "";
-    console.log("Received Public Soft Service Request:", requestBody);
+    try {
+        const requestBody = req.body || "";
+        console.log("Received Public Soft Service Request:", requestBody);
 
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryLatestPublicSofts><return><code>0</code><message>success</message><x431PadSoftList><x431PadSoft><fileSize>68365802</fileSize><lanId>EN</lanId><serverCurrentTime>2026-09-10</serverCurrentTime><softId>1015</softId><softName>Diagzone PRO V2</softName><softPackageID>Diagzone_PRO_V2</softPackageID><softUpdateTime>2025-03-08 00:00:00</softUpdateTime><versionDetailId>359638</versionDetailId><versionNo>V2.00.033</versionNo></x431PadSoft><x431PadSoft><fileSize>327680</fileSize><lanId>EN</lanId><serverCurrentTime>2026-09-10</serverCurrentTime><softId>873</softId><softName>Firmware</softName><softPackageID>DOWNLOAD</softPackageID><softUpdateTime>2022-11-15 00:00:00</softUpdateTime><versionDetailId>343730</versionDetailId><versionNo>V12.00</versionNo></x431PadSoft><x431PadSoft><fileSize>6166636</fileSize><lanId>EN</lanId><serverCurrentTime>2026-09-10</serverCurrentTime><softId>880</softId><softName>VIN Recognition App</softName><softPackageID>VIN_RECOGNITION_APP</softPackageID><softUpdateTime>2024-05-02 00:00:00</softUpdateTime><versionDetailId>354411</versionDetailId><versionNo>V1.01.006</versionNo></x431PadSoft></x431PadSoftList></return></ns1:queryLatestPublicSofts></SOAP-ENV:Body></SOAP-ENV:Envelope>`);
+        const filePath = path.join(__dirname, 'softwares.json');
+        let softwares = [];
+
+        if (fs.existsSync(filePath)) {
+            const rawData = fs.readFileSync(filePath, 'utf8');
+            const jsonData = JSON.parse(rawData);
+            softwares = jsonData.data && jsonData.data.list ? jsonData.data.list : [];
+        }
+
+        function formatDate(val) {
+            if (!val) return '2026-03-04 10:32:08';
+            if (typeof val === 'number' || /^\d{10,13}$/.test(String(val))) {
+                const num = Number(val);
+                const d = new Date(num > 10000000000 ? num : num * 1000);
+                if (!isNaN(d.getTime())) {
+                    return d.toISOString().replace('T', ' ').substring(0, 19);
+                }
+            }
+            return String(val);
+        }
+
+        let itemsXml = '';
+        softwares.forEach(item => {
+            const updateTime = formatDate(item.softUpdateTime);
+            const serverTime = formatDate(item.serverCurrentTime) || '2026-09-24 12:00:00';
+            
+            itemsXml + = `
+                <x431PadSoft>
+                    <fileSize>${item.fileSize || 68365802}</fileSize>
+                    <lanId>${item.lanId || 'EN'}</lanId>
+                    <serverCurrentTime>${serverTime}</serverCurrentTime>
+                    <softId>${item.softId || 0}</softId>
+                    <softName>${item.softName || ''}</softName>
+                    <softPackageID>${item.softPackageID || item.softName || ''}</softPackageID>
+                    <softUpdateTime>${updateTime}</softUpdateTime>
+                    <versionDetailId>${item.versionDetailId || 0}</versionDetailId>
+                    <versionNo>${item.versionNo || 'V1.0'}</versionNo>
+                    <url>${item.downloadLink || item.url || ''}</url>
+                </x431PadSoft>`;
+        });
+
+        const soapResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Body>
+        <ns1:queryLatestPublicSoftsResponse xmlns:ns1="https://diagzone.com">
+            <return>
+                <code>0</code>
+                <message>success</message>
+                <x431PadSoftList>
+                    ${itemsXml}
+                </x431PadSoftList>
+            </return>
+        </ns1:queryLatestPublicSoftsResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`;
+
+        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+        return res.status(200).send(soapResponse);
+    } catch (error) {
+        console.error("Error in publicsoftservice:", error);
+        return res.status(500).send("Server Error");
+    }
 });
+
 app.post('/api/v2/log-service-upload', (req, res) => {
     console.log("Received log/crash report upload request");
     
