@@ -467,7 +467,7 @@ app.post('/api/v2/publicsoftservice', express.text({ type: '*/*' }), (req, res) 
             const updateTime = formatDate(item.softUpdateTime);
             const serverTime = formatDate(item.serverCurrentTime) || '2026-09-24 12:00:00';
             
-            itemsXml + = `
+            itemsXml += `
                 <x431PadSoft>
                     <fileSize>${item.fileSize || 68365802}</fileSize>
                     <lanId>${item.lanId || 'EN'}</lanId>
