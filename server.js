@@ -139,6 +139,27 @@ app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) =>
         const requestBody = req.body || "";
         console.log("Received Diag Soft Service Request:", requestBody);
 
+        // التحقق إذا كان الطلب يخص استعلام الحزم الفرعية للماركات
+        if (requestBody.includes('queryPDTDiagSoftSubPack')) {
+            const soapSubPackResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Body>
+        <ns1:queryPDTDiagSoftSubPackResponse xmlns:ns1="https://diagzone.com">
+            <return>
+                <code>0</code>
+                <message>success</message>
+                <pdtDiagSoftSubPackDTOList>
+                    <!-- يتم تفعيل جميع الماركات كحزم نشطة وغير منتهية -->
+                </pdtDiagSoftSubPackDTOList>
+            </return>
+        </ns1:queryPDTDiagSoftSubPackResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>`;
+            res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+            return res.status(200).send(soapSubPackResponse);
+        }
+
+        // الكود الحالي الخاص بـ queryLatestDiagSofts ...
         const filePath = path.join(__dirname, 'softwares.json');
         let softwares = [];
 
@@ -148,7 +169,6 @@ app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) =>
             softwares = jsonData.data && jsonData.data.list ? jsonData.data.list : [];
         }
 
-        // دالة مساعدة لتحويل التواريخ أو الأرقام الزمنية بشكل صحيح
         function formatDate(val) {
             if (!val) return '2026-03-04 10:32:08';
             if (typeof val === 'number' || /^\d{10,13}$/.test(String(val))) {
@@ -184,13 +204,10 @@ app.post('/api/v2/diagsoftservice', express.text({ type: '*/*' }), (req, res) =>
                 </x431PadSoft>`;
         });
 
-        // نتحقق مما إذا كان الطلب يطلب صيغة الـ Incr لكي نرد عليه بالطريقتين معاً لتجنب أي مشاكل
         const isIncRequest = requestBody.includes('Incr') || requestBody.includes('IncrCdn');
         const responseTag = isIncRequest ? 'queryLatestDiagSoftsIncrCdnResponse' : 'queryLatestDiagSoftsResponse';
         const listTag = isIncRequest ? 'x431PadSoftIncrList' : 'x431PadSoftList';
-        const itemTag = isIncRequest ? 'x431PadSoftIncr' : 'x431PadSoft';
 
-        // إذا كان مطلوب Incr نعدل الوسم الداخلي للعنصر
         let finalItemsXml = itemsXml;
         if (isIncRequest) {
             finalItemsXml = itemsXml.replace(/<x431PadSoft>/g, '<x431PadSoftIncr>').replace(/<\/x431PadSoft>/g, '</x431PadSoftIncr>');
