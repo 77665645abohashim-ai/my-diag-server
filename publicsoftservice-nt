@@ -1,0 +1,33 @@
+HTTP/1.1 200 OK
+
+Date: Mon, 28 Sep 2026 17:55:55 GMT
+
+Content-Type: text/html; charset=UTF-8
+
+Transfer-Encoding: chunked
+
+Connection: close
+
+Server: cloudflare
+
+Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+Cache-Control: post-check=0, pre-check=0
+
+pragma: no-cache
+
+cf-cache-status: DYNAMIC
+
+Nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+
+Report-To: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=A7HIbGq9Ern%2FNk6bQxecJsKjhy7Z3YHuQ%2FL8zNKLeKk6XJaKxHwXxhphTLNvFLdu%2B7X%2FVVauKD%2BcLB4sYEphVnXe6qfECk2iG4EZlw%2F%2FyBUuimQkIe0ymQ7TepXzxA%3D%3D"}]}
+
+Content-Encoding: gzip
+
+CF-RAY: a4249f2d6a78946d-LHR
+
+alt-svc: h3=":443"; ma=86400
+
+
+
+<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>
