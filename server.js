@@ -30,8 +30,8 @@ app.all('*', async (req, res) => {
             validateStatus: () => true
         });
 
-        // طباعة الاستجابة إذا كان الطلب يخص url-upload أو diagsoftservice
-        if (req.url.includes('url-upload') || req.url.includes('diagsoftservice')) {
+        // طباعة استجابة أي مسار يطلبه التطبيق باستثناء الصفحة الرئيسية
+        if (req.url !== '/') {
             console.log(`=== Response for ${req.url} [Status: ${response.status}] ===`, response.data);
         }
 
