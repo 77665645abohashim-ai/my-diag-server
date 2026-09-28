@@ -9,9 +9,15 @@ const TARGET_SERVER = 'https://diagboss.ch';
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// طباعة تفاصيل أي طلب وارد وبياناته بالكامل
+// طباعة تفاصيل أي طلب وارد وبياناته بالكامل، مع تمييز خاص لمسار diagsoftservice
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] Incoming ${req.method} request for: ${req.url}`);
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] Incoming ${req.method} request for: ${req.url}`);
+    
+    if (req.url.includes('/api/v2/diagsoftservice')) {
+        console.log('>>> [DIAG SOFT SERVICE REQUEST DETECTED] <<<');
+    }
+
     if (req.body && Object.keys(req.body).length > 0) {
         console.log('Request Body:', JSON.stringify(req.body, null, 2));
     }
