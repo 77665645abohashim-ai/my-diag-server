@@ -5,7 +5,11 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 const TARGET_SERVER = 'https://diagboss.ch';
 
-// طباعة تفاصيل أي طلب وارد
+// تفعيل قراءة بيانات الـ JSON والـ URL-encoded من الطلبات
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// طباعة تفاصيل أي طلب وارد وبياناته بالكامل
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] Incoming ${req.method} request for: ${req.url}`);
     if (req.body && Object.keys(req.body).length > 0) {
