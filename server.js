@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-// إضافة دعم لقراءة بيانات الـ XML القادمة من طلبات الـ SOAP
+// دعم استقبال بيانات الـ XML لطلبات الـ SOAP
 app.use(express.text({ type: ['text/xml', 'application/xml'] }));
 
 app.get('/', (req, res) => {
@@ -79,14 +79,13 @@ app.post('/api/v2/url-upload', (req, res) => {
     }
 });
 
-// مسار الـ publicsoftservice (يتعامل مع طلبات SOAP/XML)
+// مسار الـ publicsoftservice (SOAP/XML)
 app.post('/api/v2/publicsoftservice', (req, res) => {
     console.log('تم استلام طلب publicsoftservice (SOAP)');
 
     const filePath = path.join(__dirname, 'publicsoftservice');
 
     if (fs.existsSync(filePath)) {
-        // الرد يجب أن يكون بنوع XML لأن التطبيق يتوقع SOAP response
         res.setHeader('Content-Type', 'text/xml; charset=utf-8');
         res.sendFile(filePath);
     } else {
@@ -96,6 +95,29 @@ app.post('/api/v2/publicsoftservice', (req, res) => {
                     <v:Fault>
                         <faultcode>Server</faultcode>
                         <faultstring>publicsoftservice file not found on server</faultstring>
+                    </v:Fault>
+                </v:Body>
+            </v:Envelope>
+        `);
+    }
+});
+
+// مسار الـ publicsoftservice-nt الجديد (SOAP/XML)
+app.post('/api/v2/publicsoftservice-nt', (req, res) => {
+    console.log('تم استلام طلب publicsoftservice-nt (SOAP)');
+
+    const filePath = path.join(__dirname, 'publicsoftservice-nt');
+
+    if (fs.existsSync(filePath)) {
+        res.setHeader('Content-Type', 'text/xml; charset=utf-8');
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send(`
+            <v:Envelope xmlns:v="http://schemas.xmlsoap.org/soap/envelope/">
+                <v:Body>
+                    <v:Fault>
+                        <faultcode>Server</faultcode>
+                        <faultstring>publicsoftservice-nt file not found on server</faultstring>
                     </v:Fault>
                 </v:Body>
             </v:Envelope>
