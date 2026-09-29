@@ -41,7 +41,7 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار تسجيل الدخول (Login) الجديد
+// مسار تسجيل الدخول (Login)
 app.post('/api/v2/login', (req, res) => {
     console.log('تم استلام طلب تسجيل الدخول (Login)');
 
@@ -54,6 +54,24 @@ app.post('/api/v2/login', (req, res) => {
         res.status(404).json({
             code: 1,
             msg: 'Login file not found on server',
+            data: null
+        });
+    }
+});
+
+// مسار رفع الروابط الجديد (url-upload)
+app.post('/api/v2/url-upload', (req, res) => {
+    console.log('تم استلام طلب الـ url-upload');
+
+    const filePath = path.join(__dirname, 'url-upload');
+
+    if (fs.existsSync(filePath)) {
+        res.setHeader('Content-Type', 'application/json');
+        res.sendFile(filePath);
+    } else {
+        res.status(404).json({
+            code: 1,
+            msg: 'url-upload file not found on server',
             data: null
         });
     }
