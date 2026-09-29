@@ -8,51 +8,53 @@ const TARGET_SERVER = 'https://diagboss.ch';
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// إعداد الـ Proxy متوافق مع الإصدار v3.0.0
 app.use('/', createProxyMiddleware({
     target: TARGET_SERVER,
     changeOrigin: true,
     secure: true,
     xfwd: true,
-    selfHandleResponse: true, // للسماح لنا بالتحكم بالرد وتعديله
+    selfHandleResponse: true, // مهم جداً للتحكم بالاستجابة
     on: {
         proxyReq: (proxyReq, req, res) => {
-            console.log(`[Proxy] Forwarding ${req.method} request to original server: ${req.url}`);
+            console.log(`[Proxy] Forwarding ${req.method} request to: ${req.url}`);
         },
         proxyRes: (proxyRes, req, res) => {
             let originalBody = Buffer.from([]);
 
-            // جمع البيانات القادمة من السيرفر الأصلي
             proxyRes.on('data', (chunk) => {
                 originalBody = Buffer.concat([originalBody, chunk]);
             });
 
-            // عند اكتمال استلام الرد
             proxyRes.on('end', () => {
                 const responseString = originalBody.toString('utf8');
                 let modifiedResponse = responseString;
 
-                // إذا كان الطلب هو مسار تسجيل الدخول، قم بتعديل الرد
-                if (req.url.includes('/api/v2/login')) {
-                    console.log('>>> [Intercepted Login Response from Original Server] <<<');
+                // إذا كان الطلب يخص تسجيل الدخول أو جلب معلومات الحساب
+                if (req.url.includes('/api/v2/login') || req.url.includes('/api/v2/user')) {
+                    console.log('>>> [Intercepted User/Login Response - Modifying to VIP/Annual] <<<');
                     try {
                         let jsonResponse = JSON.parse(responseString);
                         
-                        // تعديل بيانات الصلاحية والتفعيل
+                        // تعديل بيانات الاشتراك والصلاحيات بناءً على الرد الحقيقي الذي ظهر لديك
                         if (jsonResponse.data) {
-                            jsonResponse.data.status = "active";
-                            jsonResponse.data.expireDate = "2099-12-31";
+                            // تفعيل الاشتراك السنوي
+                            jsonResponse.data.is_365 = true; 
+                            
+                            if (jsonResponse.data.user) {
+                                // رفع صلاحيات المستخدم إلى مستوى مشرف أو حساب مفعل بالكامل إذا لزم
+                                jsonResponse.data.user.roles = "9"; // أو الصلاحية المناسبة
+                                jsonResponse.data.user.tech_status = "1"; // حالة فني نشط
+                            }
                         }
-                        jsonResponse.success = true;
                         
                         modifiedResponse = JSON.stringify(jsonResponse);
-                        console.log('>>> [Response Modified Successfully] <<<');
+                        console.log('>>> [Response Modified Successfully: Annual Subscription Active] <<<');
                     } catch (e) {
                         console.log('Error parsing JSON response:', e.message);
                     }
                 }
 
-                // إرسال الرد المعدل إلى التطبيق
+                // تمرير الهيدرز والرد (سواء تم تعديله أو كما هو) للتطبيق
                 res.writeHead(proxyRes.statusCode, proxyRes.headers);
                 res.end(modifiedResponse);
             });
@@ -60,7 +62,6 @@ app.use('/', createProxyMiddleware({
     }
 }));
 
-// ربط السيرفر بالمنفذ المخصص مع 0.0.0.0 لضمان عمله على Render
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Intercepting Proxy Server is running on port ${PORT}`);
 });
