@@ -8,6 +8,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+// دعم استقبال بيانات الفورم (url-encoded)
+app.use(express.urlencoded({ extended: true }));
 // دعم استقبال بيانات الـ XML لطلبات الـ SOAP
 app.use(express.text({ type: ['text/xml', 'application/xml'] }));
 
@@ -148,7 +150,7 @@ app.post('/api/v2/product-service', (req, res) => {
     }
 });
 
-// مسار الـ diagnosticLog الجديد (SOAP/XML)
+// مسار الـ diagnosticLog (SOAP/XML)
 app.post('/api/v2/diagnosticLog', (req, res) => {
     console.log('تم استلام طلب diagnosticLog (SOAP)');
 
@@ -168,6 +170,24 @@ app.post('/api/v2/diagnosticLog', (req, res) => {
                 </v:Body>
             </v:Envelope>
         `);
+    }
+});
+
+// مسار الـ statistics الجديد
+app.post('/api/v2/statistics', (req, res) => {
+    console.log('تم استلام طلب statistics');
+
+    const filePath = path.join(__dirname, 'statistics');
+
+    if (fs.existsSync(filePath)) {
+        res.setHeader('Content-Type', 'application/json');
+        res.sendFile(filePath);
+    } else {
+        res.status(404).json({
+            code: 1,
+            msg: 'statistics file not found on server',
+            data: null
+        });
     }
 });
 
