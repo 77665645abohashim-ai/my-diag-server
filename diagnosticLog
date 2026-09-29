@@ -1,0 +1,33 @@
+HTTP/1.1 200 OK
+
+Date: Tue, 29 Sep 2026 18:17:50 GMT
+
+Content-Type: text/html; charset=UTF-8
+
+Transfer-Encoding: chunked
+
+Connection: close
+
+Server: cloudflare
+
+Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+Cache-Control: post-check=0, pre-check=0
+
+pragma: no-cache
+
+cf-cache-status: DYNAMIC
+
+Nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+
+Report-To: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=0A8uz8fsgOMQFQxaHuQVK9Pj6pa4BiGC1SqZvdc4SHF6Uq0H3xpwg7zAsdBjbw%2BlBPsXmfaVHy0wBkXiX0rMt7bwyGT0je9pifpRitBjgCM%2FgDL%2FRRp8yAhV%2FpXHyw%3D%3D"}]}
+
+Content-Encoding: gzip
+
+CF-RAY: a42cfcaa2f427e47-AMS
+
+alt-svc: h3=":443"; ma=86400
+
+
+
+<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:queryDiagnosticLogBasic><return><code>0</code><message>success</message><diagLogBasicDTOList></diagLogBasicDTOList></return></ns1:queryDiagnosticLogBasic></SOAP-ENV:Body></SOAP-ENV:Envelope>
