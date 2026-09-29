@@ -13,17 +13,15 @@ app.get('/', (req, res) => {
     res.status(200).json({ status: 'success', message: 'Server is running!' });
 });
 
-// المسار الذي يطلبه التطبيق
+// المسار الذي يطلبه التطبيق للروابط
 app.get('/api/v2/urls', (req, res) => {
     const configNo = req.query.config_no;
     const appId = req.query.app_id;
 
     console.log(`طلب الروابط - config_no: ${configNo}, app_id: ${appId}`);
 
-    // محاولة قراءة الملف الذي يحتوي على اسم بالرموز، أو البحث عن بدائل مثل softwares.json
     let filePath = path.join(__dirname, 'urls?config_no=0&app_id=3');
     
-    // إذا لم يجد الملف بالاسم الطويل، جرب البحث في softwares.json أو ملف باسم urls
     if (!fs.existsSync(filePath)) {
         filePath = path.join(__dirname, 'softwares.json');
     }
@@ -38,6 +36,24 @@ app.get('/api/v2/urls', (req, res) => {
         res.status(404).json({
             code: 1,
             msg: 'File not found on server',
+            data: null
+        });
+    }
+});
+
+// مسار تسجيل الدخول (Login) الجديد
+app.post('/api/v2/login', (req, res) => {
+    console.log('تم استلام طلب تسجيل الدخول (Login)');
+
+    const filePath = path.join(__dirname, 'login');
+
+    if (fs.existsSync(filePath)) {
+        res.setHeader('Content-Type', 'application/json');
+        res.sendFile(filePath);
+    } else {
+        res.status(404).json({
+            code: 1,
+            msg: 'Login file not found on server',
             data: null
         });
     }
