@@ -8,6 +8,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+// إضافة دعم لقراءة بيانات الـ XML القادمة من طلبات الـ SOAP
+app.use(express.text({ type: ['text/xml', 'application/xml'] }));
 
 app.get('/', (req, res) => {
     res.status(200).json({ status: 'success', message: 'Server is running!' });
@@ -59,7 +61,7 @@ app.post('/api/v2/login', (req, res) => {
     }
 });
 
-// مسار رفع الروابط الجديد (url-upload)
+// مسار رفع الروابط (url-upload)
 app.post('/api/v2/url-upload', (req, res) => {
     console.log('تم استلام طلب الـ url-upload');
 
@@ -74,6 +76,30 @@ app.post('/api/v2/url-upload', (req, res) => {
             msg: 'url-upload file not found on server',
             data: null
         });
+    }
+});
+
+// مسار الـ publicsoftservice (يتعامل مع طلبات SOAP/XML)
+app.post('/api/v2/publicsoftservice', (req, res) => {
+    console.log('تم استلام طلب publicsoftservice (SOAP)');
+
+    const filePath = path.join(__dirname, 'publicsoftservice');
+
+    if (fs.existsSync(filePath)) {
+        // الرد يجب أن يكون بنوع XML لأن التطبيق يتوقع SOAP response
+        res.setHeader('Content-Type', 'text/xml; charset=utf-8');
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send(`
+            <v:Envelope xmlns:v="http://schemas.xmlsoap.org/soap/envelope/">
+                <v:Body>
+                    <v:Fault>
+                        <faultcode>Server</faultcode>
+                        <faultstring>publicsoftservice file not found on server</faultstring>
+                    </v:Fault>
+                </v:Body>
+            </v:Envelope>
+        `);
     }
 });
 
