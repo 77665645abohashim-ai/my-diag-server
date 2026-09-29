@@ -173,7 +173,7 @@ app.post('/api/v2/diagnosticLog', (req, res) => {
     }
 });
 
-// مسار الـ statistics الجديد
+// مسار الـ statistics
 app.post('/api/v2/statistics', (req, res) => {
     console.log('تم استلام طلب statistics');
 
@@ -188,6 +188,40 @@ app.post('/api/v2/statistics', (req, res) => {
             msg: 'statistics file not found on server',
             data: null
         });
+    }
+});
+
+// مسار الـ diagsoftservice (الفصل بين الطلبين بناءً على اختيارك للملفات)
+app.post('/api/v2/diagsoftservice', (req, res) => {
+    const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '');
+    let targetFileName = 'diagsoftservice1'; // افتراضي
+
+    if (requestBody.includes('queryLatestDiagSofts')) {
+        console.log('تم استلام طلب diagsoftservice -> [queryLatestDiagSofts] سيتم قراءة الملف: diagsoftservice1');
+        targetFileName = 'diagsoftservice1';
+    } else if (requestBody.includes('queryPDTDiagSoftSubPack')) {
+        console.log('تم استلام طلب diagsoftservice -> [queryPDTDiagSoftSubPack] سيتم قراءة الملف: diagsoftservice2');
+        targetFileName = 'diagsoftservice2';
+    } else {
+        console.log('تم استلام طلب diagsoftservice -> نوع غير معروف، استخدام الملف الافتراضي: diagsoftservice1');
+    }
+
+    const filePath = path.join(__dirname, targetFileName);
+
+    if (fs.existsSync(filePath)) {
+        res.setHeader('Content-Type', 'text/xml; charset=utf-8');
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send(`
+            <v:Envelope xmlns:v="http://schemas.xmlsoap.org/soap/envelope/">
+                <v:Body>
+                    <v:Fault>
+                        <faultcode>Server</faultcode>
+                        <faultstring>${targetFileName} file not found on server</faultstring>
+                    </v:Fault>
+                </v:Body>
+            </v:Envelope>
+        `);
     }
 });
 
