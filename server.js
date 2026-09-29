@@ -16,6 +16,8 @@ app.use('/', createProxyMiddleware({
     selfHandleResponse: true, // مهم جداً للتحكم بالاستجابة
     on: {
         proxyReq: (proxyReq, req, res) => {
+            // إزالة هيدر الضغط لكي يرسل السيرفر الأصلي البيانات كنصوص واضحة غير مشفرة بـ Gzip
+            proxyReq.removeHeader('accept-encoding');
             console.log(`[Proxy] Forwarding ${req.method} request to: ${req.url}`);
         },
         proxyRes: (proxyRes, req, res) => {
@@ -35,14 +37,14 @@ app.use('/', createProxyMiddleware({
                     try {
                         let jsonResponse = JSON.parse(responseString);
                         
-                        // تعديل بيانات الاشتراك والصلاحيات بناءً على الرد الحقيقي الذي ظهر لديك
+                        // تعديل بيانات الاشتراك والصلاحيات بناءً على الرد الحقيقي
                         if (jsonResponse.data) {
                             // تفعيل الاشتراك السنوي
                             jsonResponse.data.is_365 = true; 
                             
                             if (jsonResponse.data.user) {
                                 // رفع صلاحيات المستخدم إلى مستوى مشرف أو حساب مفعل بالكامل إذا لزم
-                                jsonResponse.data.user.roles = "9"; // أو الصلاحية المناسبة
+                                jsonResponse.data.user.roles = "9"; 
                                 jsonResponse.data.user.tech_status = "1"; // حالة فني نشط
                             }
                         }
@@ -54,7 +56,10 @@ app.use('/', createProxyMiddleware({
                     }
                 }
 
-                // تمرير الهيدرز والرد (سواء تم تعديله أو كما هو) للتطبيق
+                // حذف هيدر الـ content-encoding طالما قمنا بفك البيانات وإرسالها كنص صريح
+                delete proxyRes.headers['content-encoding'];
+
+                // تمرير الهيدرز والرد للتطبيق
                 res.writeHead(proxyRes.statusCode, proxyRes.headers);
                 res.end(modifiedResponse);
             });
