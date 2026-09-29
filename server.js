@@ -102,7 +102,7 @@ app.post('/api/v2/publicsoftservice', (req, res) => {
     }
 });
 
-// مسار الـ publicsoftservice-nt الجديد (SOAP/XML)
+// مسار الـ publicsoftservice-nt (SOAP/XML)
 app.post('/api/v2/publicsoftservice-nt', (req, res) => {
     console.log('تم استلام طلب publicsoftservice-nt (SOAP)');
 
@@ -118,6 +118,29 @@ app.post('/api/v2/publicsoftservice-nt', (req, res) => {
                     <v:Fault>
                         <faultcode>Server</faultcode>
                         <faultstring>publicsoftservice-nt file not found on server</faultstring>
+                    </v:Fault>
+                </v:Body>
+            </v:Envelope>
+        `);
+    }
+});
+
+// مسار الـ product-service الجديد (SOAP/XML)
+app.post('/api/v2/product-service', (req, res) => {
+    console.log('تم استلام طلب product-service (SOAP)');
+
+    const filePath = path.join(__dirname, 'product-service');
+
+    if (fs.existsSync(filePath)) {
+        res.setHeader('Content-Type', 'text/xml; charset=utf-8');
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send(`
+            <v:Envelope xmlns:v="http://schemas.xmlsoap.org/soap/envelope/">
+                <v:Body>
+                    <v:Fault>
+                        <faultcode>Server</faultcode>
+                        <faultstring>product-service file not found on server</faultstring>
                     </v:Fault>
                 </v:Body>
             </v:Envelope>
