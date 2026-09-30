@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const AdmZip = require('adm-zip');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,50 +47,75 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل (Download) المعدل لإعادة التوجيه (Redirect) مباشرة للرابط الخارجي
-app.get('/api/v2/download', (req, res) => {
+// مسار التحميل (Download) مع حقن ملف LICENSE.DAT فارغ على الطائر داخل ملف الـ zip
+app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
 
-    console.log(`تم استلام طلب التحميل (Download) - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
+    console.log(`تم استلام طلب التحميل وحقن الترخيص - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
 
     const filePath = path.join(__dirname, 'download');
 
-    if (fs.existsSync(filePath)) {
-        try {
-            const rawData = fs.readFileSync(filePath, 'utf8');
-            const downloadData = JSON.parse(rawData);
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({
+            code: 1,
+            msg: 'download file not found on server',
+            data: null
+        });
+    }
 
-            // التحقق مما إذا كان versionDetailId موجوداً داخل كائن الـ JSON
-            if (versionDetailId && downloadData[versionDetailId]) {
-                const targetUrl = downloadData[versionDetailId].downloadUrl;
+    try {
+        const rawData = fs.readFileSync(filePath, 'utf8');
+        const downloadData = JSON.parse(rawData);
 
-                if (targetUrl) {
-                    console.log(`إعادة توجيه الطلب مباشرة إلى الرابط الخارجي: ${targetUrl}`);
-                    // التوجيه الفوري لكي يبدأ تحميل الملف المضغوط
-                    return res.redirect(302, targetUrl);
-                }
-            }
-
-            console.log(`لم يتم العثور على رابط صالح للـ ID: ${versionDetailId}`);
+        if (!versionDetailId || !downloadData[versionDetailId]) {
+            console.log(`لم يتم العثور على ID: ${versionDetailId} في ملف download`);
             return res.status(404).json({
                 code: 1,
-                msg: `Download URL not found for version ID ${versionDetailId}`,
-                data: null
-            });
-
-        } catch (err) {
-            console.error('خطأ في تحليل ملف download كـ JSON:', err);
-            return res.status(500).json({
-                code: 1,
-                msg: 'Server error parsing download file',
+                msg: `Version ID ${versionDetailId} not found`,
                 data: null
             });
         }
-    } else {
-        res.status(404).json({
+
+        const targetUrl = downloadData[versionDetailId].downloadUrl;
+        console.log(`جلب ملف الـ zip الأصلي من الرابط الخارجي: ${targetUrl}`);
+
+        // 1. جلب ملف الـ zip الأصلي من الرابط الخارجي
+        const response = await axios.get(targetUrl, { responseType: 'arraybuffer' });
+        const zip = new AdmZip(response.data);
+
+        // 2. البحث عن مسار مجلد الإصدار داخل محتويات الـ Zip المطابق لنمط الـ Smali
+        const zipEntries = zip.getEntries();
+        let targetFolderPath = "";
+
+        zipEntries.forEach(entry => {
+            const entryName = entry.entryName;
+            // مطابقة النمط الذي يبحث عنه التطبيق: مجلد يحتوي على مجلد فرعي بصيغة Vxx.xx
+            const match = entryName.match(/^([\S\s]*?\/([Vv]\d{2}\.\d{2}))\//);
+            if (match && !targetFolderPath) {
+                targetFolderPath = match[1];
+            }
+        });
+
+        // تحديد مسار الملف داخل الأرشيف (إذا وُجد المجلد يتم وضعه بداخله، وإلا في الجذر)
+        const licenseInternalPath = targetFolderPath ? `${targetFolderPath}/LICENSE.DAT` : 'LICENSE.DAT';
+
+        // 3. حقن ملف LICENSE.DAT "فارغ تماماً" (بحجم 0 بايت) على الطائر
+        zip.addFile(licenseInternalPath, Buffer.alloc(0));
+        console.log(`تم حقن ملف LICENSE.DAT فارغ بنجاح في المسار: ${licenseInternalPath}`);
+
+        // 4. إرسال ملف الـ Zip المعدل مباشرة للتطبيق
+        const modifiedZipBuffer = zip.toBuffer();
+
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', `attachment; filename=brand_${versionDetailId}.zip`);
+        return res.send(modifiedZipBuffer);
+
+    } catch (err) {
+        console.error('خطأ أثناء معالجة وحقن ملف الـ Zip:', err);
+        return res.status(500).json({
             code: 1,
-            msg: 'download file not found on server',
+            msg: 'Server error processing zip file',
             data: null
         });
     }
