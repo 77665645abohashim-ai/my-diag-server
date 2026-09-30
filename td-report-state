@@ -1,0 +1,29 @@
+HTTP/2 200
+
+date: Wed, 30 Sep 2026 11:39:57 GMT
+
+content-type: application/json
+
+server: cloudflare
+
+cache-control: no-store, no-cache, must-revalidate, max-age=0
+
+cache-control: post-check=0, pre-check=0
+
+pragma: no-cache
+
+cf-cache-status: DYNAMIC
+
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=B0haRd2BJ%2BC610QoNyWAtUPhnTzuc%2BWQUvGIfi%2FbK2Fkq5zWfHOk4L7iDtYB78yGNudjWQiLRI5FyK4qiDd8AkyrjHiH9yAqkI%2F2TLPGzTU%2B1sUQL2P4dejPFZA3eQ%3D%3D"}]}
+
+content-encoding: gzip
+
+cf-ray: a432f332fd9a8d4f-FRA
+
+alt-svc: h3=":443"; ma=86400
+
+
+
+{"code":0,"message":"OK"}
