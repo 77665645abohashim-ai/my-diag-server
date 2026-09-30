@@ -25,7 +25,7 @@
       "is_agree_clause": "0",
       "pub_id": "",
       "face_url": null,
-      "is_365": false,
+      "is_365": true,
       "tech_status": "-1",
       "country": "MA",
       "province": null,
