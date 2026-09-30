@@ -45,6 +45,28 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
+// مسار التحميل (Download) الجديد المضاف
+app.get('/api/v2/download', (req, res) => {
+    const versionDetailId = req.query.versionDetailId;
+    const dzCode = req.query.dzCode;
+
+    console.log(`تم استلام طلب التحميل (Download) - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
+
+    const filePath = path.join(__dirname, 'download');
+
+    if (fs.existsSync(filePath)) {
+        // يمكنك تعديل الـ Content-Type حسب نوع الملف (تطبيق/ملف مضغوط أو بايتات)
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.sendFile(filePath);
+    } else {
+        res.status(404).json({
+            code: 1,
+            msg: 'download file not found on server',
+            data: null
+        });
+    }
+});
+
 // مسار تسجيل الدخول (Login)
 app.post('/api/v2/login', (req, res) => {
     console.log('تم استلام طلب تسجيل الدخول (Login)');
@@ -191,7 +213,7 @@ app.post('/api/v2/statistics', (req, res) => {
     }
 });
 
-// مسار الـ diagsoftservice (الفصل بين الطلبين بناءً على اختيارك للملفات)
+// مسار الـ diagsoftservice
 app.post('/api/v2/diagsoftservice', (req, res) => {
     const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '');
     let targetFileName = 'diagsoftservice1'; // افتراضي
