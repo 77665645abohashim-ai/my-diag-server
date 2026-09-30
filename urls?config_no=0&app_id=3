@@ -81,7 +81,7 @@
       },
       {
         "key": "publicsoft_breakpoint_action",
-        "value": "https://my-diag-server.onrender.com/api/v2/download"
+        "value": "https://diagboss.ch/api/v2/download"
       },
       {
         "key": "diagsoft_breakpoint_action",
@@ -97,7 +97,7 @@
       },
       {
         "key": "activation",
-        "value": "https://my-diag-server.onrender.com/api/v2/activation"
+        "value": "https://diagboss.ch/api/v2/activation"
       },
       {
         "key": "log.upload",
@@ -105,7 +105,7 @@
       },
       {
         "key": "report_list",
-        "value": "https://my-diag-server.onrender.com/api/v2/httapi-report-list"
+        "value": "https://diagboss.ch/api/v2/httapi-report-list"
       },
       {
         "key": "getAutoCodeByVin",
@@ -121,19 +121,19 @@
       },
       {
         "key": "td.query-state",
-        "value": "https://my-diag-server.onrender.com/api/v2/td-query-state"
+        "value": "https://diagboss.ch/api/v2/td-query-state"
       },
       {
         "key": "td.report-state",
-        "value": "https://my-diag-server.onrender.com/api/v2/td-report-state"
+        "value": "https://diagboss.ch/api/v2/td-report-state"
       },
       {
         "key": "td.upload-cert",
-        "value": "https://my-diag-server.onrender.com/api/v2/td-upload-cert"
+        "value": "https://diagboss.ch/api/v2/td-upload-cert"
       },
       {
         "key": "td.check-locked",
-        "value": "https://my-diag-server.onrender.com/api/v2/td-check-locked"
+        "value": "https://diagboss.ch/api/v2/td-check-locked"
       },
       {
         "key": "td2.flasher",
@@ -361,7 +361,7 @@
       },
       {
         "key": "query_adas_product",
-        "value": "https://my-diag-server.onrender.com/api/v2/query-adas-product"
+        "value": "https://diagboss.ch/api/v2/query-adas-product"
       },
       {
         "key": "query_adas_soft_file",
