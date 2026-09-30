@@ -1,17 +1,12 @@
-HTTP/1.1 200 OK
-Date: Tue, 29 Sep 2026 18:17:48 GMT
-Content-Type: text/html; charset=UTF-8
-Transfer-Encoding: chunked
-Connection: close
-Server: cloudflare
-Cache-Control: no-store, no-cache, must-revalidate, max-age=0
-Cache-Control: post-check=0, pre-check=0
-pragma: no-cache
-cf-cache-status: DYNAMIC
-Nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
-Report-To: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=dFE87u1ddFzXZqkv9iBi7PVLkYa03Phdcjh204BCZpCsApoI%2Fh814y4QnIHWJ3cAW95TO7lrVZ%2FFHjJdUmkPNDNcfUEB4ftXe17fkiSqvE0r33BprY8F%2BIx89Jej7w%3D%3D"}]}
-Content-Encoding: gzip
-CF-RAY: a42cfc9fedcb49a9-LHR
-alt-svc: h3=":443"; ma=86400
-
-<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getMaxVersionForMobileAppCDN><return><code>0</code><message>success</message><appSoftSoftMaxVersion></appSoftSoftMaxVersion></return></ns1:getMaxVersionForMobileAppCDN></SOAP-ENV:Body></SOAP-ENV:Envelope>
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://diagzone.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP-ENV:Body>
+        <ns1:getMaxVersionForMobileAppCDN>
+            <return>
+                <code>0</code>
+                <message>success</message>
+                <appSoftSoftMaxVersion>29.16</appSoftSoftMaxVersion>
+            </return>
+        </ns1:getMaxVersionForMobileAppCDN>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
