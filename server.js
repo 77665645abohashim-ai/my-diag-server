@@ -45,7 +45,7 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل (Download) المعدل ليطابق versionDetailId مع ملف الـ JSON
+// مسار التحميل (Download) المعدل لإعادة التوجيه (Redirect) مباشرة للرابط الخارجي
 app.get('/api/v2/download', (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
@@ -61,22 +61,29 @@ app.get('/api/v2/download', (req, res) => {
 
             // التحقق مما إذا كان versionDetailId موجوداً داخل كائن الـ JSON
             if (versionDetailId && downloadData[versionDetailId]) {
-                console.log(`تم العثور على بيانات التحميل للـ ID: ${versionDetailId}`);
-                res.setHeader('Content-Type', 'application/json');
-                return res.status(200).json(downloadData[versionDetailId]);
-            } else {
-                console.log(`لم يتم العثور على ID: ${versionDetailId} في ملف download`);
-                return res.status(404).json({
-                    code: 1,
-                    msg: `Version ID ${versionDetailId} not found`,
-                    data: null
-                });
+                const targetUrl = downloadData[versionDetailId].downloadUrl;
+
+                if (targetUrl) {
+                    console.log(`إعادة توجيه الطلب مباشرة إلى الرابط الخارجي: ${targetUrl}`);
+                    // التوجيه الفوري لكي يبدأ تحميل الملف المضغوط
+                    return res.redirect(302, targetUrl);
+                }
             }
+
+            console.log(`لم يتم العثور على رابط صالح للـ ID: ${versionDetailId}`);
+            return res.status(404).json({
+                code: 1,
+                msg: `Download URL not found for version ID ${versionDetailId}`,
+                data: null
+            });
+
         } catch (err) {
             console.error('خطأ في تحليل ملف download كـ JSON:', err);
-            // إرسال الملف كاملاً كخيار احتياطي في حال فشل القراءة كـ JSON
-            res.setHeader('Content-Type', 'application/json');
-            return res.sendFile(filePath);
+            return res.status(500).json({
+                code: 1,
+                msg: 'Server error parsing download file',
+                data: null
+            });
         }
     } else {
         res.status(404).json({
