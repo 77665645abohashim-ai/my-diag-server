@@ -45,7 +45,7 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل (Download) الجديد المضاف
+// مسار التحميل (Download) المعدل ليطابق versionDetailId مع ملف الـ JSON
 app.get('/api/v2/download', (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
@@ -55,9 +55,29 @@ app.get('/api/v2/download', (req, res) => {
     const filePath = path.join(__dirname, 'download');
 
     if (fs.existsSync(filePath)) {
-        // يمكنك تعديل الـ Content-Type حسب نوع الملف (تطبيق/ملف مضغوط أو بايتات)
-        res.setHeader('Content-Type', 'application/octet-stream');
-        res.sendFile(filePath);
+        try {
+            const rawData = fs.readFileSync(filePath, 'utf8');
+            const downloadData = JSON.parse(rawData);
+
+            // التحقق مما إذا كان versionDetailId موجوداً داخل كائن الـ JSON
+            if (versionDetailId && downloadData[versionDetailId]) {
+                console.log(`تم العثور على بيانات التحميل للـ ID: ${versionDetailId}`);
+                res.setHeader('Content-Type', 'application/json');
+                return res.status(200).json(downloadData[versionDetailId]);
+            } else {
+                console.log(`لم يتم العثور على ID: ${versionDetailId} في ملف download`);
+                return res.status(404).json({
+                    code: 1,
+                    msg: `Version ID ${versionDetailId} not found`,
+                    data: null
+                });
+            }
+        } catch (err) {
+            console.error('خطأ في تحليل ملف download كـ JSON:', err);
+            // إرسال الملف كاملاً كخيار احتياطي في حال فشل القراءة كـ JSON
+            res.setHeader('Content-Type', 'application/json');
+            return res.sendFile(filePath);
+        }
     } else {
         res.status(404).json({
             code: 1,
