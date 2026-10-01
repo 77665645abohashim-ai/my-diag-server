@@ -35,7 +35,7 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل المعدل لجلب الـ etag وتحويله إلى sign وإرساله كـ JSON
+// مسار التحميل بإعادة التوجيه (302) مع إرفاق الـ sign والـ code في الـ Headers
 app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
@@ -57,30 +57,27 @@ app.get('/api/v2/download', async (req, res) => {
         }
 
         const targetUrl = downloadData[versionDetailId].downloadUrl;
-        let etagSign = "64d4a15d3c4ed9da4f500b8f43dfd33e"; // قيمة افتراضية آمنة احتياطية
+        let etagSign = "64d4a15d3c4ed9da4f500b8f43dfd33e"; // قيمة افتراضية آمنة
 
         try {
-            // جلب الـ etag من الرابط الخارجي بدون تحميل الملف بالكامل
+            // محاولة جلب الـ etag لاستخدامه كـ sign في الترويسات
             const headResponse = await axios.head(targetUrl);
             const remoteEtag = headResponse.headers['etag'];
             if (remoteEtag) {
-                etagSign = remoteEtag.replace(/["']/g, ""); // تنظيفه من علامات التنصيص
-                console.log(`تم استخراج الـ etag وتحويله إلى sign بنجاح: ${etagSign}`);
+                etagSign = remoteEtag.replace(/["']/g, "");
+                console.log(`تم استخراج الـ etag ووضع كـ sign في الـ Headers: ${etagSign}`);
             }
         } catch (e) {
             console.log('ملاحظة: تعذر جلب الـ etag الخارجي، سيتم استخدام القيمة الافتراضية.');
         }
 
-        console.log(`إرسال استجابة التحميل مع الـ sign إلى الرابط: ${targetUrl}`);
+        // وضع الـ sign والرموز في ترويسات الاستجابة (Headers) لكي يقرأها التطبيق أثناء التحميل
+        res.setHeader('code', '0');
+        res.setHeader('downloadid', '0');
+        res.setHeader('sign', etagSign);
 
-        res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        return res.status(200).json({
-            code: 0,
-            downloadid: 0,
-            msg: "success",
-            sign: etagSign,
-            downloadUrl: targetUrl
-        });
+        console.log(`إعادة توجيه الطلب (302) إلى الرابط: ${targetUrl}`);
+        return res.redirect(302, targetUrl);
 
     } catch (err) {
         console.error('خطأ أثناء قراءة ملف الـ download:', err);
