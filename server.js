@@ -35,7 +35,7 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل بإعادة التوجيه (302) مع إرفاق الـ sign والـ code في الـ Headers
+// مسار التحميل التلقائي لجلب الetag وتحويله إلى sign في الـ Headers ثم عمل Redirect
 app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
@@ -56,27 +56,37 @@ app.get('/api/v2/download', async (req, res) => {
             return res.status(404).json({ code: 1, msg: `Version ID ${versionDetailId} not found`, data: null });
         }
 
-        const targetUrl = downloadData[versionDetailId].downloadUrl;
-        let etagSign = "64d4a15d3c4ed9da4f500b8f43dfd33e"; // قيمة افتراضية آمنة
+        // استخراج الرابط الخارجي (سواء كان مخزناً كنص مباشر أو داخل كائن)
+        const item = downloadData[versionDetailId];
+        const targetUrl = typeof item === 'string' ? item : item.downloadUrl;
+
+        let extractedSign = "64d4a15d3c4ed9da4f500b8f43dfd33e"; // قيمة افتراضية احتياطية
 
         try {
-            // محاولة جلب الـ etag لاستخدامه كـ sign في الترويسات
-            const headResponse = await axios.head(targetUrl);
-            const remoteEtag = headResponse.headers['etag'];
+            console.log(`فحص الرابط الخارجي لجلب الـ etag تلقائياً: ${targetUrl}`);
+            // إرسال طلب HEAD لجلب الترويسات فقط دون تحميل الملف
+            const headResponse = await axios.head(targetUrl, { timeout: 8000 });
+            
+            // البحث عن الـ etag في الترويسات القادمة من السيرفر الخارجي (سواء كان بـحروف صغيرة أو كبيرة)
+            const remoteEtag = headResponse.headers['etag'] || headResponse.headers['ETag'];
+
             if (remoteEtag) {
-                etagSign = remoteEtag.replace(/["']/g, "");
-                console.log(`تم استخراج الـ etag ووضع كـ sign في الـ Headers: ${etagSign}`);
+                // إزالة علامات التنصيص المزدوجة أو الأحادية (مثل المتحققة في صورتك: "B3B286843...")
+                extractedSign = remoteEtag.replace(/["']/g, "").trim();
+                console.log(`نجاح! تم تحويل الـ etag القادم من السيرفر إلى sign: ${extractedSign}`);
+            } else {
+                console.log('تنبيه: السيرفر الخارجي لم يرسل etag، سيتم استخدام القيمة الاحتياطية.');
             }
         } catch (e) {
-            console.log('ملاحظة: تعذر جلب الـ etag الخارجي، سيتم استخدام القيمة الافتراضية.');
+            console.error('خطأ أثناء الاتصال بالسيرفر الخارجي لجلب الـ etag:', e.message);
         }
 
-        // وضع الـ sign والرموز في ترويسات الاستجابة (Headers) لكي يقرأها التطبيق أثناء التحميل
+        // تعيين الروؤس (Headers) المطلوبة تماماً كما يتوقعها التطبيق
         res.setHeader('code', '0');
         res.setHeader('downloadid', '0');
-        res.setHeader('sign', etagSign);
+        res.setHeader('sign', extractedSign);
 
-        console.log(`إعادة توجيه الطلب (302) إلى الرابط: ${targetUrl}`);
+        console.log(`إعادة توجيه الطلب (302) للرابط مع الـ sign الناتج: ${targetUrl}`);
         return res.redirect(302, targetUrl);
 
     } catch (err) {
