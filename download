@@ -10,8 +10,8 @@
     "downloadUrl": "https://diagboss.ch/api/v2/download?versionDetailId=366146&dzCode=ZGV1L01jcXNKYWd5WTlNaVdmYjlTQT09&serialNo=979862374489&token=aE82dnN1ZFcrMklQTXR3QkhreENkdz09"
   
 },
-  "366146": {
+  "362272": {
     "code": 0,
     "msg": "success",
-    "downloadUrl": "https://diagboss.ch/api/v2/download?versionDetailId=366146&dzCode=ZGV1L01jcXNKYWd5WTlNaVdmYjlTQT09&serialNo=979862374489&token=aE82dnN1ZFcrMklQTXR3QkhreENkdz09" 
+    "downloadUrl": "https://my-diag-server.onrender.com/api/v2/download?versionDetailId=362272&dzCode=ZGV1L01jcXNKYWd5WTlNaVdmYjlTQT09&serialNo=979862374489&token=aE82dnN1ZFcrMklQTXR3QkhreENkdz09" 
 } 
