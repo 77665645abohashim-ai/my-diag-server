@@ -36,12 +36,12 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل مع حقن ملف LICENSE.DAT فارغ على الطائر باستخدام jszip
+// مسار التحميل الداعم لإعادة التوجيه (302) وحقن الترخيص
 app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
 
-    console.log(`تم استلام طلب التحميل وحقن الترخيص - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
+    console.log(`تم استلام طلب التحميل - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
 
     const filePath = path.join(__dirname, 'download');
 
@@ -67,7 +67,7 @@ app.get('/api/v2/download', async (req, res) => {
         const zip = new JSZip();
         const loadedZip = await zip.loadAsync(response.data);
 
-        // 3. البحث عن مسار مجلد الإصدار المتوافق مع نمط الـ Smali
+        // 3. البحث عن مسار مجلد الإصدار المتوافق
         let targetFolderPath = "";
         
         loadedZip.forEach((relativePath, zipEntry) => {
@@ -80,22 +80,32 @@ app.get('/api/v2/download', async (req, res) => {
         // تحديد مسار ملف الترخيص الفارغ داخلياً
         const licenseInternalPath = targetFolderPath ? `${targetFolderPath}/LICENSE.DAT` : 'LICENSE.DAT';
 
-        // 4. إضافة ملف LICENSE.DAT فارغ (بحجم 0 بايت) داخل الـ Zip
+        // 4. إضافة ملف LICENSE.DAT فارغ داخل الـ Zip
         loadedZip.file(licenseInternalPath, "");
         console.log(`تم حقن ملف LICENSE.DAT فارغ بنجاح في المسار: ${licenseInternalPath}`);
 
-        // 5. توليد الملف المضغوط الجديد وإرساله للتطبيق
+        // 5. توليد الملف المضغوط الجديد وحفظه مؤخراً على السيرفر لتوفيره عبر رابط مباشر للـ 302
         const modifiedZipBuffer = await loadedZip.generateAsync({ type: 'nodebuffer' });
+        const modifiedFileName = `brand_${versionDetailId}.zip`;
+        const savedModifiedPath = path.join(__dirname, modifiedFileName);
+        
+        fs.writeFileSync(savedModifiedPath, modifiedZipBuffer);
 
-        res.setHeader('Content-Type', 'application/zip');
-        res.setHeader('Content-Disposition', `attachment; filename=brand_${versionDetailId}.zip`);
-        return res.send(modifiedZipBuffer);
+        // 6. إرجاع كود 302 مع رابط الملف المعدل على سيرفرك لكي يقوم التطبيق بتحميله بالشكل السليم
+        const hostUrl = `${req.protocol}://${req.get('host')}`;
+        const redirectTarget = `${hostUrl}/${modifiedFileName}`;
+        
+        console.log(`إرسال توجيه (302) إلى الرابط: ${redirectTarget}`);
+        return res.redirect(302, redirectTarget);
 
     } catch (err) {
         console.error('خطأ أثناء معالجة وحقن ملف الـ Zip:', err);
         return res.status(500).json({ code: 1, msg: 'Server error processing zip file', data: null });
     }
 });
+
+// مسار للسماح بتحميل الملفات المؤقتة الناتجة عن التعديل (مثل الـ zip المعدل)
+app.use(express.static(__dirname));
 
 // باقي المسارات (Login, SOAP, إلخ...)
 app.post('/api/v2/login', (req, res) => {
