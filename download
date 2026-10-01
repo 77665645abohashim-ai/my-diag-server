@@ -8,10 +8,10 @@
     "code": 0,
     "msg": "success",
     "downloadUrl": "https://diagboss.ch/api/v2/download?versionDetailId=366146&dzCode=ZGV1L01jcXNKYWd5WTlNaVdmYjlTQT09&serialNo=979862374489&token=aE82dnN1ZFcrMklQTXR3QkhreENkdz09"
-  
-},
+  },
   "362272": {
     "code": 0,
     "msg": "success",
-    "downloadUrl": "https://downloadapp.mythinkcar.com/app_soft/EOBD2/2/V10.28/English/EOBD2_THINKDIAG_V10.28_EN.zip" 
-} 
+    "downloadUrl": "https://downloadapp.mythinkcar.com/app_soft/EOBD2/2/V10.28/English/EOBD2_THINKDIAG_V10.28_EN.zip"
+  }
+}
