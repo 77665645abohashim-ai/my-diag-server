@@ -62,23 +62,28 @@ app.get('/api/v2/download', async (req, res) => {
 
         let extractedSign = "64d4a15d3c4ed9da4f500b8f43dfd33e"; // قيمة افتراضية احتياطية
 
-        try {
-            console.log(`فحص الرابط الخارجي لجلب الـ etag تلقائياً: ${targetUrl}`);
-            // إرسال طلب HEAD لجلب الترويسات فقط دون تحميل الملف
-            const headResponse = await axios.head(targetUrl, { timeout: 8000 });
-            
-            // البحث عن الـ etag في الترويسات القادمة من السيرفر الخارجي
-            const remoteEtag = headResponse.headers['etag'] || headResponse.headers['ETag'];
+        // إذا كان الرابط يشير لسيرفرنا المحلي (لحل حلقة التكرار)، نتجاوز فحص الـ etag الخارجي ونستخدم القيمة المباشرة
+        if (targetUrl && targetUrl.includes('/api/v2/download')) {
+            console.log('رابط داخلي، سيتم استجابة التوجيه المباشر بدون فحص خارجي.');
+        } else {
+            try {
+                console.log(`فحص الرابط الخارجي لجلب الـ etag تلقائياً: ${targetUrl}`);
+                // إرسال طلب HEAD لجلب الترويسات فقط دون تحميل الملف
+                const headResponse = await axios.head(targetUrl, { timeout: 8000 });
+                
+                // البحث عن الـ etag في الترويسات القادمة من السيرفر الخارجي
+                const remoteEtag = headResponse.headers['etag'] || headResponse.headers['ETag'];
 
-            if (remoteEtag) {
-                // استخدام قيمة الـ etag الحرفية كما هي تماماً دون أي تعديل أو إزالة لعلامات التنصيص
-                extractedSign = remoteEtag;
-                console.log(`نجاح! تم نسخ الـ etag بحرفيته إلى sign: ${extractedSign}`);
-            } else {
-                console.log('تنبيه: السيرفر الخارجي لم يرسل etag، سيتم استخدام القيمة الاحتياطية.');
+                if (remoteEtag) {
+                    // استخدام قيمة الـ etag الحرفية كما هي تماماً دون أي تعديل
+                    extractedSign = remoteEtag;
+                    console.log(`نجاح! تم نسخ الـ etag بحرفيته إلى sign: ${extractedSign}`);
+                } else {
+                    console.log('تنبيه: السيرفر الخارجي لم يرسل etag، سيتم استخدام القيمة الاحتياطية.');
+                }
+            } catch (e) {
+                console.error('خطأ أثناء الاتصال بالسيرفر الخارجي لجلب الـ etag:', e.message);
             }
-        } catch (e) {
-            console.error('خطأ أثناء الاتصال بالسيرفر الخارجي لجلب الـ etag:', e.message);
         }
 
         // تعيين الروؤس (Headers) المطلوبة تماماً كما يتوقعها التطبيق
