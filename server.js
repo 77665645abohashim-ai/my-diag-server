@@ -35,7 +35,7 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل التلقائي لجلب الetag وتحويله إلى sign في الـ Headers ثم عمل Redirect
+// مسار التحميل: أخذ الـ etag كاملاً بحرفيته ووضعه في الـ sign دون تغيير قيمته
 app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
@@ -67,13 +67,13 @@ app.get('/api/v2/download', async (req, res) => {
             // إرسال طلب HEAD لجلب الترويسات فقط دون تحميل الملف
             const headResponse = await axios.head(targetUrl, { timeout: 8000 });
             
-            // البحث عن الـ etag في الترويسات القادمة من السيرفر الخارجي (سواء كان بـحروف صغيرة أو كبيرة)
+            // البحث عن الـ etag في الترويسات القادمة من السيرفر الخارجي
             const remoteEtag = headResponse.headers['etag'] || headResponse.headers['ETag'];
 
             if (remoteEtag) {
-                // إزالة علامات التنصيص المزدوجة أو الأحادية (مثل المتحققة في صورتك: "B3B286843...")
-                extractedSign = remoteEtag.replace(/["']/g, "").trim();
-                console.log(`نجاح! تم تحويل الـ etag القادم من السيرفر إلى sign: ${extractedSign}`);
+                // استخدام قيمة الـ etag الحرفية كما هي تماماً دون أي تعديل أو إزالة لعلامات التنصيص
+                extractedSign = remoteEtag;
+                console.log(`نجاح! تم نسخ الـ etag بحرفيته إلى sign: ${extractedSign}`);
             } else {
                 console.log('تنبيه: السيرفر الخارجي لم يرسل etag، سيتم استخدام القيمة الاحتياطية.');
             }
