@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,8 +35,8 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل بإعادة التوجيه المباشرة (302 Redirect)
-app.get('/api/v2/download', (req, res) => {
+// مسار التحميل المعدل لجلب الـ etag وتحويله إلى sign وإرساله كـ JSON
+app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
 
@@ -56,9 +57,30 @@ app.get('/api/v2/download', (req, res) => {
         }
 
         const targetUrl = downloadData[versionDetailId].downloadUrl;
-        console.log(`إعادة توجيه الطلب (302) إلى الرابط: ${targetUrl}`);
+        let etagSign = "64d4a15d3c4ed9da4f500b8f43dfd33e"; // قيمة افتراضية آمنة احتياطية
 
-        return res.redirect(302, targetUrl);
+        try {
+            // جلب الـ etag من الرابط الخارجي بدون تحميل الملف بالكامل
+            const headResponse = await axios.head(targetUrl);
+            const remoteEtag = headResponse.headers['etag'];
+            if (remoteEtag) {
+                etagSign = remoteEtag.replace(/["']/g, ""); // تنظيفه من علامات التنصيص
+                console.log(`تم استخراج الـ etag وتحويله إلى sign بنجاح: ${etagSign}`);
+            }
+        } catch (e) {
+            console.log('ملاحظة: تعذر جلب الـ etag الخارجي، سيتم استخدام القيمة الافتراضية.');
+        }
+
+        console.log(`إرسال استجابة التحميل مع الـ sign إلى الرابط: ${targetUrl}`);
+
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        return res.status(200).json({
+            code: 0,
+            downloadid: 0,
+            msg: "success",
+            sign: etagSign,
+            downloadUrl: targetUrl
+        });
 
     } catch (err) {
         console.error('خطأ أثناء قراءة ملف الـ download:', err);
