@@ -35,12 +35,12 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل: قراءة الـ sign مباشرة من ملف download المكتوب يدوياً
-app.get('/api/v2/download', (req, res) => {
+// مسار التحميل المحدث: جلب الملف وبثه مباشرة (Streaming Proxy) ليعطي 200 OK وتفريغ الـ PK
+app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
 
-    console.log(`تم استلام طلب التحميل - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
+    console.log(`تم استلام طلب التحميل (Streaming) - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
 
     const filePath = path.join(__dirname, 'download');
 
@@ -59,20 +59,37 @@ app.get('/api/v2/download', (req, res) => {
         const item = downloadData[versionDetailId];
         const targetUrl = typeof item === 'string' ? item : item.downloadUrl;
         
-        // قراءة الـ sign مباشرة من الكائن داخل ملف download، أو وضع قيمة احتياطية إن لمשتجد
+        // قراءة الـ sign من الملف أو وضع قيمة افتراضية
         const fileSign = (typeof item === 'object' && item.sign) ? item.sign : "64d4a15d3c4ed9da4f500b8f43dfd33e";
 
-        // تعيين الترويسات (Headers) وإرسالها مع رد الـ 302
+        console.log(`جاري جلب الملف من المصدر وبثه للتطبيق: ${targetUrl}`);
+
+        // طلب الملف من السيرفر الخارجي على شكل Stream
+        const remoteResponse = await axios({
+            method: 'get',
+            url: targetUrl,
+            responseType: 'stream',
+            timeout: 30000
+        });
+
+        // تعيين الترويسات (Headers) التي يتوقعها التطبيق
         res.setHeader('code', '0');
         res.setHeader('downloadid', '0');
         res.setHeader('sign', fileSign);
+        res.setHeader('content-type', remoteResponse.headers['content-type'] || 'application/octet-stream');
+        
+        if (remoteResponse.headers['content-length']) {
+            res.setHeader('content-length', remoteResponse.headers['content-length']);
+        }
 
-        console.log(`إعادة توجيه الطلب (302) للرابط مع الـ sign المباشر: ${fileSign}`);
-        return res.redirect(302, targetUrl);
+        // ضخ البيانات مباشرة للتطبيق (يعطي استجابة 200 OK مع ملف الـ PK)
+        remoteResponse.data.pipe(res);
 
     } catch (err) {
-        console.error('خطأ أثناء قراءة ملف الـ download:', err);
-        return res.status(500).json({ code: 1, msg: 'Server error processing download request', data: null });
+        console.error('خطأ أثناء بث ملف التحميل:', err.message);
+        if (!res.headersSent) {
+            return res.status(500).json({ code: 1, msg: 'Server error processing download stream', data: null });
+        }
     }
 });
 
