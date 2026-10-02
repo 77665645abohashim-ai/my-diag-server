@@ -35,7 +35,7 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل المحدث: جلب الملف وبثه مباشرة (Streaming Proxy) ليعطي 200 OK وتفريغ الـ PK
+// مسار التحميل المحدث: بث مباشر (Streaming Proxy) بدون تشويه الترميز لضمان ظهور الـ PK
 app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
@@ -59,30 +59,31 @@ app.get('/api/v2/download', async (req, res) => {
         const item = downloadData[versionDetailId];
         const targetUrl = typeof item === 'string' ? item : item.downloadUrl;
         
-        // قراءة الـ sign من الملف أو وضع قيمة افتراضية
+        // قراءة الـ sign من الملف أو وضع القيمة الافتراضية
         const fileSign = (typeof item === 'object' && item.sign) ? item.sign : "64d4a15d3c4ed9da4f500b8f43dfd33e";
 
         console.log(`جاري جلب الملف من المصدر وبثه للتطبيق: ${targetUrl}`);
 
-        // طلب الملف من السيرفر الخارجي على شكل Stream
+        // طلب الملف من السيرفر الخارجي على شكل Stream مع مهلة زمنية أطول للملفات الكبيرة
         const remoteResponse = await axios({
             method: 'get',
             url: targetUrl,
             responseType: 'stream',
-            timeout: 30000
+            timeout: 60000
         });
 
-        // تعيين الترويسات (Headers) التي يتوقعها التطبيق
+        // ضبط الترويسات بدقة لملفات الـ ZIP الثنائية بدون أي ترميز نصي زائد
+        res.status(200);
         res.setHeader('code', '0');
         res.setHeader('downloadid', '0');
         res.setHeader('sign', fileSign);
-        res.setHeader('content-type', remoteResponse.headers['content-type'] || 'application/octet-stream');
+        res.setHeader('content-type', 'application/octet-stream');
         
         if (remoteResponse.headers['content-length']) {
             res.setHeader('content-length', remoteResponse.headers['content-length']);
         }
 
-        // ضخ البيانات مباشرة للتطبيق (يعطي استجابة 200 OK مع ملف الـ PK)
+        // ضخ البيانات مباشرة للتطبيق (Streaming)
         remoteResponse.data.pipe(res);
 
     } catch (err) {
