@@ -3,7 +3,7 @@
     "code": 0,
     "msg": "success",
     "downloadUrl": "https://diagboss.ch/api/v2/download?versionDetailId=365206&dzCode=ZGV1L01jcXNKYWd5WTlNaVdmYjlTQT09&serialNo=979862374489&token=aE82dnN1ZFcrMklQTXR3QkhreENkdz09",
-    "sign": "\"d4bbd166a9b9b22040c0d4ed8975dc00\""
+    "sign":"d4bbd166a9b9b22040c0d4ed8975dc00"
   },
   "366146": {
     "code": 0,
