@@ -35,8 +35,8 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل: أخذ الـ etag كاملاً بحرفيته ووضعه في الـ sign دون تغيير قيمته
-app.get('/api/v2/download', async (req, res) => {
+// مسار التحميل: قراءة الـ sign مباشرة من ملف download المكتوب يدوياً
+app.get('/api/v2/download', (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
 
@@ -56,42 +56,18 @@ app.get('/api/v2/download', async (req, res) => {
             return res.status(404).json({ code: 1, msg: `Version ID ${versionDetailId} not found`, data: null });
         }
 
-        // استخراج الرابط الخارجي (سواء كان مخزناً كنص مباشر أو داخل كائن)
         const item = downloadData[versionDetailId];
         const targetUrl = typeof item === 'string' ? item : item.downloadUrl;
+        
+        // قراءة الـ sign مباشرة من الكائن داخل ملف download، أو وضع قيمة احتياطية إن لمשتجد
+        const fileSign = (typeof item === 'object' && item.sign) ? item.sign : "64d4a15d3c4ed9da4f500b8f43dfd33e";
 
-        let extractedSign = "64d4a15d3c4ed9da4f500b8f43dfd33e"; // قيمة افتراضية احتياطية
-
-        // إذا كان الرابط يشير لسيرفرنا المحلي (لحل حلقة التكرار)، نتجاوز فحص الـ etag الخارجي ونستخدم القيمة المباشرة
-        if (targetUrl && targetUrl.includes('/api/v2/download')) {
-            console.log('رابط داخلي، سيتم استجابة التوجيه المباشر بدون فحص خارجي.');
-        } else {
-            try {
-                console.log(`فحص الرابط الخارجي لجلب الـ etag تلقائياً: ${targetUrl}`);
-                // إرسال طلب HEAD لجلب الترويسات فقط دون تحميل الملف
-                const headResponse = await axios.head(targetUrl, { timeout: 8000 });
-                
-                // البحث عن الـ etag في الترويسات القادمة من السيرفر الخارجي
-                const remoteEtag = headResponse.headers['etag'] || headResponse.headers['ETag'];
-
-                if (remoteEtag) {
-                    // استخدام قيمة الـ etag الحرفية كما هي تماماً دون أي تعديل
-                    extractedSign = remoteEtag;
-                    console.log(`نجاح! تم نسخ الـ etag بحرفيته إلى sign: ${extractedSign}`);
-                } else {
-                    console.log('تنبيه: السيرفر الخارجي لم يرسل etag، سيتم استخدام القيمة الاحتياطية.');
-                }
-            } catch (e) {
-                console.error('خطأ أثناء الاتصال بالسيرفر الخارجي لجلب الـ etag:', e.message);
-            }
-        }
-
-        // تعيين الروؤس (Headers) المطلوبة تماماً كما يتوقعها التطبيق
+        // تعيين الترويسات (Headers) وإرسالها مع رد الـ 302
         res.setHeader('code', '0');
         res.setHeader('downloadid', '0');
-        res.setHeader('sign', extractedSign);
+        res.setHeader('sign', fileSign);
 
-        console.log(`إعادة توجيه الطلب (302) للرابط مع الـ sign الناتج: ${targetUrl}`);
+        console.log(`إعادة توجيه الطلب (302) للرابط مع الـ sign المباشر: ${fileSign}`);
         return res.redirect(302, targetUrl);
 
     } catch (err) {
