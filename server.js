@@ -35,12 +35,12 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل المحدث: بث مباشر (Streaming Proxy) بدون تشويه الترميز لضمان ظهور الـ PK
+// مسار التحميل المحدث: يقوم بجلب الملف وحقن توقيع Diagzone والرقم التسلسلي الثابت طائرياً
 app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
 
-    console.log(`تم استلام طلب التحميل (Streaming) - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
+    console.log(`طلب تحميل مع الحقن - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
 
     const filePath = path.join(__dirname, 'download');
 
@@ -59,37 +59,59 @@ app.get('/api/v2/download', async (req, res) => {
         const item = downloadData[versionDetailId];
         const targetUrl = typeof item === 'string' ? item : item.downloadUrl;
         
-        // قراءة الـ sign من الملف أو وضع القيمة الافتراضية
+        // استخراج اسم الماركة والإصدار ديناميكياً من الكائن أو المعاملات
+        const brandName = (typeof item === 'object' && item.brand) ? item.brand : (dzCode || "ECUAID");
+        const version = (typeof item === 'object' && item.version) ? item.version : "12.11";
         const fileSign = (typeof item === 'object' && item.sign) ? item.sign : "64d4a15d3c4ed9da4f500b8f43dfd33e";
 
-        console.log(`جاري جلب الملف من المصدر وبثه للتطبيق: ${targetUrl}`);
+        console.log(`جاري جلب الملف وحقن التوقيع للماركة: ${brandName}`);
 
-        // طلب الملف من السيرفر الخارجي على شكل Stream مع مهلة زمنية أطول للملفات الكبيرة
+        // جلب الملف كـ ArrayBuffer للتعديل على بايتات ذيل الـ ZIP
         const remoteResponse = await axios({
             method: 'get',
             url: targetUrl,
-            responseType: 'stream',
+            responseType: 'arraybuffer',
             timeout: 60000
         });
 
-        // ضبط الترويسات بدقة لملفات الـ ZIP الثنائية بدون أي ترميز نصي زائد
+        let zipBuffer = Buffer.from(remoteResponse.data);
+
+        // الرقم التسلسلي الثابت الخاص بك
+        const serialNumber = '979862374489';
+
+        // صياغة نص توقيع Diagzone المطلوب بدقة
+        const commentText = `FrmDZX431-X431+1+English+${brandName}+${brandName}+${version}+${serialNumber}+%DIAGZONE-ONLINE-V01+073`;
+        const commentBuffer = Buffer.from(commentText, 'utf-8');
+
+        // البحث عن توقيع نهاية الـ ZIP القياسي (EOCD signature: 50 4B 05 06)
+        const eocdSignature = Buffer.from([0x50, 0x4b, 0x05, 0x06]);
+        const eocdIndex = zipBuffer.lastIndexOf(eocdSignature);
+
+        if (eocdIndex !== -1) {
+            // تحديث طول حقل التعليق (Comment Length) في ترويسة EOCD (عند الموقع + 20)
+            zipBuffer.writeUInt16LE(commentBuffer.length, eocdIndex + 20);
+            
+            // دمج الـ ZIP الأصلي مع نص التوقيع الجديد في الذيل
+            zipBuffer = Buffer.concat([zipBuffer.slice(0, eocdIndex + 22), commentBuffer]);
+            console.log(`تم حقن التوقيع بنجاح في ذيل ملف الـ ZIP للماركة: ${brandName}`);
+        } else {
+            console.log('تحذير: لم يتم العثور على توقيع EOCD في ملف الـ ZIP، تم تجنب الحقن.');
+        }
+
+        // ضبط الترويسات وإرسال الملف المعدل
         res.status(200);
         res.setHeader('code', '0');
         res.setHeader('downloadid', '0');
         res.setHeader('sign', fileSign);
         res.setHeader('content-type', 'application/octet-stream');
-        
-        if (remoteResponse.headers['content-length']) {
-            res.setHeader('content-length', remoteResponse.headers['content-length']);
-        }
+        res.setHeader('content-length', zipBuffer.length);
 
-        // ضخ البيانات مباشرة للتطبيق (Streaming)
-        remoteResponse.data.pipe(res);
+        res.send(zipBuffer);
 
     } catch (err) {
-        console.error('خطأ أثناء بث ملف التحميل:', err.message);
+        console.error('خطأ أثناء معالجة ملف التحميل:', err.message);
         if (!res.headersSent) {
-            return res.status(500).json({ code: 1, msg: 'Server error processing download stream', data: null });
+            return res.status(500).json({ code: 1, msg: 'Server error processing download', data: null });
         }
     }
 });
