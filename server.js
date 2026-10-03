@@ -12,6 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text({ type: ['text/xml', 'application/xml'] }));
 
+// Root Route
 app.get('/', (req, res) => {
     res.status(200).json({ status: 'success', message: 'Server is running!' });
 });
@@ -35,7 +36,7 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل المحدث: يقوم بجلب الملف وحقن توقيع Diagzone والرقم التسلسلي الثابت طائرياً
+// مسار التحميل المحدث: مطابقة ذكية للـ versionDetailId وفك تشفير dzCode وحقن توقيع Diagzone
 app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
@@ -58,13 +59,50 @@ app.get('/api/v2/download', async (req, res) => {
 
         const item = downloadData[versionDetailId];
         const targetUrl = typeof item === 'string' ? item : item.downloadUrl;
-        
-        // استخراج اسم الماركة والإصدار ديناميكياً من الكائن أو المعاملات
-        const brandName = (typeof item === 'object' && item.brand) ? item.brand : (dzCode || "ECUAID");
-        const version = (typeof item === 'object' && item.version) ? item.version : "12.11";
+
+        // قاموس المطابقة الذكي للربط بناءً على ردود SOAP الخاصة بالتطبيق
+        const softMapping = {
+            "380901": { brand: "Demo", version: "V15.68" },
+            "367837": { brand: "BMS_DEMO", version: "V15.55" },
+            "381744": { brand: "EV_DEMO", version: "V15.68" },
+            "363814": { brand: "MT_DEMO", version: "V10.11" },
+            "366146": { brand: "ECUAID", version: "V12.11" },
+            "362272": { brand: "EOBD2", version: "V10.28" },
+            "365206": { brand: "AUTOSEARCH", version: "V11.15" },
+            "362469": { brand: "HD_AUTOSEARCH", version: "V10.85" }
+        };
+
+        // محاولة فك تشفير dzCode في حال ورد كـ Base64
+        let decodedDzCode = dzCode;
+        if (dzCode && dzCode.length > 10 && !dzCode.includes(' ')) {
+            try {
+                const buff = Buffer.from(dzCode, 'base64');
+                const tempDecoded = buff.toString('utf-8');
+                if (/^[a-zA-Z0-9_\-]+$/.test(tempDecoded)) {
+                    decodedDzCode = tempDecoded;
+                }
+            } catch (e) {
+                // في حال حدوث خطأ أثناء الفك يتم الاحتفاظ بالقيم الافتراضية
+            }
+        }
+
+        // تحديد اسم الماركة والإصدار والتوقيع بدقة
+        let brandName = "EOBD2";
+        let version = "12.11";
+
+        if (softMapping[versionDetailId]) {
+            brandName = softMapping[versionDetailId].brand;
+            version = softMapping[versionDetailId].version;
+        } else if (typeof item === 'object' && item.brand) {
+            brandName = item.brand;
+            version = item.version || "12.11";
+        } else if (decodedDzCode && decodedDzCode.length <= 20) {
+            brandName = decodedDzCode;
+        }
+
         const fileSign = (typeof item === 'object' && item.sign) ? item.sign : "64d4a15d3c4ed9da4f500b8f43dfd33e";
 
-        console.log(`جاري جلب الملف وحقن التوقيع للماركة: ${brandName}`);
+        console.log(`جاري جلب الملف وحقن التوقيع للماركة: ${brandName} (إصدار: ${version})`);
 
         // جلب الملف كـ ArrayBuffer للتعديل على بايتات ذيل الـ ZIP
         const remoteResponse = await axios({
@@ -76,7 +114,7 @@ app.get('/api/v2/download', async (req, res) => {
 
         let zipBuffer = Buffer.from(remoteResponse.data);
 
-        // الرقم التسلسلي الثابت الخاص بك
+        // الرقم التسلسلي الثابت
         const serialNumber = '979862374489';
 
         // صياغة نص توقيع Diagzone المطلوب بدقة
