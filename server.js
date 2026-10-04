@@ -3,6 +3,7 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,12 +37,12 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل بدون حقن: جلب الملف وإرساله بصورته الأصلية
+// مسار التحميل مع حساب البصمة تلقائياً
 app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
 
-    console.log(`طلب تحميل بدون حقن - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
+    console.log(`طلب تحميل - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
 
     const filePath = path.join(__dirname, 'download');
 
@@ -59,9 +60,8 @@ app.get('/api/v2/download', async (req, res) => {
 
         const item = downloadData[versionDetailId];
         const targetUrl = typeof item === 'string' ? item : item.downloadUrl;
-        const fileSign = (typeof item === 'object' && item.sign) ? item.sign : "64d4a15d3c4ed9da4f500b8f43dfd33e";
 
-        console.log(`جاري جلب وإرسال الملف الأصلي من الرابط: ${targetUrl}`);
+        console.log(`جاري جلب وإرسال الملف من الرابط: ${targetUrl}`);
 
         const remoteResponse = await axios({
             method: 'get',
@@ -72,11 +72,13 @@ app.get('/api/v2/download', async (req, res) => {
 
         const zipBuffer = Buffer.from(remoteResponse.data);
 
-        // ضبط الترويسات وإرسال الملف كما هو دون أي تعديل على بايتات الـ ZIP
+        // حساب بصمة MD5 الحقيقية للملف لتتوافق مع التطبيق
+        const calculatedSign = crypto.createHash('md5').update(zipBuffer).digest('hex');
+
         res.status(200);
         res.setHeader('code', '0');
         res.setHeader('downloadid', '0');
-        res.setHeader('sign', fileSign);
+        res.setHeader('sign', calculatedSign);
         res.setHeader('content-type', 'application/octet-stream');
         res.setHeader('content-length', zipBuffer.length);
 
