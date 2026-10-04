@@ -14,7 +14,7 @@
   "362272": {
     "code": 0,
     "msg": "success",
-    "downloadUrl": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/EOBD2_THINKDIAG_V10.28_FT.zip",
+    "downloadUrl": "https://release-assets.githubusercontent.com/github-production-release-asset/1279828417/bfdaa6f3-9a83-4dc4-857f-e5d1b3670bf2?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-10-04T16%3A27%3A47Z&rscd=attachment%3B+filename%3DEOBD2_THINKDIAG_V10.28_EN.zip&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-10-04T15%3A27%3A40Z&ske=2026-10-04T16%3A27%3A47Z&sks=b&skv=2018-11-09&sig=gtpc5hLBY4DpkakOE86btL9pbnQ0%2FMyMxmJhuQsj89c%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5MTEyNzk2MCwibmJmIjoxNzkxMTI3NjYwLCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.u1FVhBf2AGJOQ187ynIu8wepNDxAtv9lLG2SgCjbcJo&response-content-disposition=attachment%3B%20filename%3DEOBD2_THINKDIAG_V10.28_EN.zip&response-content-type=application%2Foctet-stream",
     "sign": "B3B2868437CEDA72DF2D15EF294467E5"
   }
 }
