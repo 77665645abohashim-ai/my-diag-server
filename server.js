@@ -1,52 +1,29 @@
 const express = require('express');
-const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
-const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.text({ type: ['text/xml', 'application/xml'] }));
 
-// Root Route
+// مسار رئيسي للتأكد من عمل السيرفر
 app.get('/', (req, res) => {
-    res.status(200).json({ status: 'success', message: 'Server is running!' });
+    res.json({ status: 'Server is running successfully', time: new Date() });
 });
 
-// مسار الروابط
-app.get('/api/v2/urls', (req, res) => {
-    const configNo = req.query.config_no;
-    const appId = req.query.app_id;
-
-    console.log(`طلب الروابط - config_no: ${configNo}, app_id: ${appId}`);
-
-    let filePath = path.join(__dirname, 'urls?config_no=0&app_id=3');
-    if (!fs.existsSync(filePath)) filePath = path.join(__dirname, 'softwares.json');
-    if (!fs.existsSync(filePath)) filePath = path.join(__dirname, 'urls');
-
-    if (fs.existsSync(filePath)) {
-        res.setHeader('Content-Type', 'application/json');
-        res.sendFile(filePath);
-    } else {
-        res.status(404).json({ code: 1, msg: 'File not found on server', data: null });
-    }
-});
-
-// مسار التحميل مع حساب البصمة تلقائياً
-app.get('/api/v2/download', async (req, res) => {
+// مسار التحميل المعدل (توجيه مباشر سريع إلى GitHub)
+app.get('/api/v2/download', (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
 
-    console.log(`طلب تحميل - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
+    console.log(`طلب تحميل جديد - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
 
     const filePath = path.join(__dirname, 'download');
 
     if (!fs.existsSync(filePath)) {
+        console.error('ملف البيانات غير موجود على السيرفر');
         return res.status(404).json({ code: 1, msg: 'download file not found on server', data: null });
     }
 
@@ -55,85 +32,45 @@ app.get('/api/v2/download', async (req, res) => {
         const downloadData = JSON.parse(rawData);
 
         if (!versionDetailId || !downloadData[versionDetailId]) {
+            console.error(`رقم الإصدار غير موجود: ${versionDetailId}`);
             return res.status(404).json({ code: 1, msg: `Version ID ${versionDetailId} not found`, data: null });
         }
 
         const item = downloadData[versionDetailId];
         const targetUrl = typeof item === 'string' ? item : item.downloadUrl;
 
-        console.log(`جاري جلب وإرسال الملف من الرابط: ${targetUrl}`);
+        if (!targetUrl) {
+            return res.status(404).json({ code: 1, msg: 'Download URL is missing', data: null });
+        }
 
-        const remoteResponse = await axios({
-            method: 'get',
-            url: targetUrl,
-            responseType: 'arraybuffer',
-            timeout: 60000
-        });
+        console.log(`إعادة توجيه فورية (Redirect) إلى رابط GitHub: ${targetUrl}`);
 
-        const zipBuffer = Buffer.from(remoteResponse.data);
-
-        // حساب بصمة MD5 الحقيقية للملف لتتوافق مع التطبيق
-        const calculatedSign = crypto.createHash('md5').update(zipBuffer).digest('hex');
-
-        res.status(200);
-        res.setHeader('code', '0');
-        res.setHeader('downloadid', '0');
-        res.setHeader('sign', calculatedSign);
-        res.setHeader('content-type', 'application/octet-stream');
-        res.setHeader('content-length', zipBuffer.length);
-
-        res.send(zipBuffer);
+        // إعادة توجيه التطبيق مباشرة إلى رابط GitHub لتحميل الملف بأقصى سرعة
+        return res.redirect(302, targetUrl);
 
     } catch (err) {
-        console.error('خطأ أثناء معالجة ملف التحميل:', err.message);
+        console.error('خطأ أثناء قراءة ملف الـ JSON أو معالجة التوجيه:', err.message);
         if (!res.headersSent) {
             return res.status(500).json({ code: 1, msg: 'Server error processing download', data: null });
         }
     }
 });
 
-// باقي المسارات
-app.post('/api/v2/login', (req, res) => {
-    const filePath = path.join(__dirname, 'login');
-    if (fs.existsSync(filePath)) res.sendFile(filePath);
-    else res.status(404).json({ code: 1, msg: 'Login file not found' });
-});
-
-app.post('/api/v2/url-upload', (req, res) => {
-    const filePath = path.join(__dirname, 'url-upload');
-    if (fs.existsSync(filePath)) res.sendFile(filePath);
-    else res.status(404).json({ code: 1, msg: 'url-upload file not found' });
-});
-
-app.post(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt', '/api/v2/product-service', '/api/v2/diagnosticLog'], (req, res) => {
-    const endpoint = req.path.split('/').pop();
-    const filePath = path.join(__dirname, endpoint);
-    if (fs.existsSync(filePath)) {
-        res.setHeader('Content-Type', 'text/xml; charset=utf-8');
-        res.sendFile(filePath);
-    } else {
-        res.status(404).send('<v:Envelope><v:Body><v:Fault><faultcode>Server</faultcode><faultstring>Not found</faultstring></v:Fault></v:Body></v:Envelope>');
-    }
-});
-
-app.post('/api/v2/statistics', (req, res) => {
-    const filePath = path.join(__dirname, 'statistics');
-    if (fs.existsSync(filePath)) res.sendFile(filePath);
-    else res.status(404).json({ code: 1, msg: 'Not found' });
-});
-
-app.post('/api/v2/diagsoftservice', (req, res) => {
-    const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '');
-    const targetFileName = requestBody.includes('queryPDTDiagSoftSubPack') ? 'diagsoftservice2' : 'diagsoftservice1';
-    const filePath = path.join(__dirname, targetFileName);
-    if (fs.existsSync(filePath)) {
-        res.setHeader('Content-Type', 'text/xml; charset=utf-8');
-        res.sendFile(filePath);
-    } else {
-        res.status(404).send('<v:Envelope><v:Body><v:Fault><faultcode>Server</faultcode><faultstring>Not found</faultstring></v:Fault></v:Body></v:Envelope>');
+// مسارات أخرى لدعم التطبيق إذا كانت مطلوبة (مثل جلب قائمة الإصدارات أو التفاصيل)
+app.get('/api/v2/get_updates', (req, res) => {
+    try {
+        const filePath = path.join(__dirname, 'download');
+        if (fs.existsSync(filePath)) {
+            const rawData = fs.readFileSync(filePath, 'utf8');
+            const downloadData = JSON.parse(rawData);
+            return res.json({ code: 0, msg: 'success', data: downloadData });
+        }
+        return res.status(404).json({ code: 1, msg: 'Data not found', data: null });
+    } catch (e) {
+        return res.status(500).json({ code: 1, msg: e.message, data: null });
     }
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`السيرفر يعمل الآن على البورت ${PORT}`);
 });
