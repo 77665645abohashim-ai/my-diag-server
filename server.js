@@ -18,15 +18,21 @@ app.get('/', (req, res) => {
     res.json({ status: 'Server is running successfully', time: new Date() });
 });
 
-// مسار الروابط
+// مسار الروابط (مع التعديل ليتطابق مع اسم الملف الموجود في المجلد)
 app.get('/api/v2/urls', (req, res) => {
-    const configNo = req.query.config_no;
-    const appId = req.query.app_id;
+    const configNo = req.query.config_no || '0';
+    const appId = req.query.app_id || '3';
 
     console.log(`طلب الروابط - config_no: ${configNo}, app_id: ${appId}`);
 
-    let filePath = path.join(__dirname, 'urls');
-    if (!fs.existsSync(filePath)) filePath = path.join(__dirname, 'urls?config_no=0&app_id=3');
+    // بناء اسم الملف بناءً على المتغيرات القادمة أو استخدام الملف الموجود لديك
+    const fileName = `urls?config_no=${configNo}&app_id=${appId}`;
+    let filePath = path.join(__dirname, fileName);
+
+    // كحتياط: إذا لم يجد الملف بالمتغيرات المحددة، يبحث عن الملف الافتراضي
+    if (!fs.existsSync(filePath)) {
+        filePath = path.join(__dirname, 'urls?config_no=0&app_id=3');
+    }
 
     if (fs.existsSync(filePath)) {
         res.setHeader('Content-Type', 'application/json');
@@ -60,7 +66,7 @@ app.get('/api/v2/download', async (req, res) => {
         const item = downloadData[versionDetailId];
         const targetUrl = typeof item === 'string' ? item : item.downloadUrl;
         
-        // جلب البصمة المخزنة إذا وجدت، أو حسابها لاحقاً
+        // جلب البصمة المخزنة إذا وجدت، أو استخدام البصمة الافتراضية
         const fileSign = (typeof item === 'object' && item.sign) ? item.sign : "64d4a15d3c4ed9da4f500b8f43dfd33e";
 
         console.log(`جاري جلب الملف من المصدر وإرساله للتطبيق: ${targetUrl}`);
