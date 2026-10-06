@@ -26,7 +26,7 @@ app.get('/api/v2/urls', (req, res) => {
     console.log(`طلب الروابط - config_no: ${configNo}, app_id: ${appId}`);
 
     let filePath = path.join(__dirname, 'urls');
-    if (!fs.existsSync(filePath)) filePath = path.join(__dirname, 'softwares.json');
+    if (!fs.existsSync(filePath)) filePath = path.join(__dirname, 'urls?config_no=0&app_id=3');
 
     if (fs.existsSync(filePath)) {
         res.setHeader('Content-Type', 'application/json');
