@@ -14,7 +14,7 @@
   "362272": {
     "code": 0,
     "msg": "success",
-    "downloadUrl": "https://github.com/77665645abohashim-ai/my-diag-server/releases/download/v1/EOBD2_THINKDIAG_V10.28_EN.zip",
+    "downloadUrl": "https://diagboss.ch/api/v2/download?versionDetailId=362272&dzCode=R2M5cnFBMVoybHhwb0xUcmNacTNFdz09&serialNo=979862374489&token=aE82dnN1ZFcrMklQTXR3QkhreENkdz09",
     "sign": "B3B2868437CEDA72DF2D15EF294467E5"
   }
 }
