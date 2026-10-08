@@ -38,7 +38,8 @@
                         <diagVehicleType>1</diagVehicleType>
                         <fileSize>6656601</fileSize>
                         <freeUseEndTime>2099-01-01</freeUseEndTime>
-                        <lanId>AR</lanId><serverCurrentTime>2026-09-30</serverCurrentTime>
+                        <lanId>AR</lanId>
+                        <serverCurrentTime>2026-09-30</serverCurrentTime>
                         <softApplicableArea>5</softApplicableArea>
                         <softId>1366</softId>
                         <softName>Demo (EV)</softName>
@@ -115,8 +116,23 @@
                         <softName>VINSCAN Service (HD)</softName>
                         <softPackageID>HD_AUTOSEARCH</softPackageID>
                         <softUpdateTime>2025-08-06 09:32:58</softUpdateTime>
-                        <versionDetailId>362469</versionDetailId><versionNo>V10.85</versionNo>
+                        <versionDetailId>362469</versionDetailId>
+                        <versionNo>V10.85</versionNo>
                         <tab>HD</tab>
+                    </x431PadSoftIncr>
+                    <x431PadSoftIncr>
+                        <diagVehicleType>1</diagVehicleType>
+                        <fileSize>125489620</fileSize>
+                        <freeUseEndTime>2099-01-01</freeUseEndTime>
+                        <lanId>AR</lanId>
+                        <serverCurrentTime>2026-09-30</serverCurrentTime>
+                        <softApplicableArea>5</softApplicableArea>
+                        <softId>105</softId>
+                        <softName>Toyota</softName>
+                        <softPackageID>TOYOTA</softPackageID>
+                        <softUpdateTime>2026-05-15 14:20:10</softUpdateTime>
+                        <versionDetailId>385102</versionDetailId>
+                        <versionNo>V10.62</versionNo>
                     </x431PadSoftIncr>
                 </x431PadSoftIncrList>
             </return>
