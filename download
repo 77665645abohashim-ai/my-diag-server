@@ -8,13 +8,13 @@
   "366146": {
     "code": 0,
     "msg": "success",
-    "downloadUrl": "https://diagboss.ch/api/v2/download?versionDetailId=366146&dzCode=R2M5cnFBMVoybHhwb0xUcmNacTNFdz09&serialNo=979862374489&token=aE82dnN1ZFcrMklQTXR3QkhreENkdz09",
+    "downloadUrl": "https://downloadapp.mythinkcar.com/app_soft/DEMO/2/V10.66/Arabic/DEMO_THINKDIAG1_V10.66_AR.zip",
     "sign": "64d4a15d3c4ed9da4f500b8f43dfd33e"
   },
-  "362272": {
+  "380901": {
     "code": 0,
     "msg": "success",
-    "downloadUrl": "https://diagboss.ch/api/v2/download?versionDetailId=362272&dzCode=R2M5cnFBMVoybHhwb0xUcmNacTNFdz09&serialNo=979862374489&token=aE82dnN1ZFcrMklQTXR3QkhreENkdz09",
+    "downloadUrl": "https://downloadapp.mythinkcar.com/app_soft/DEMO/2/V10.66/Arabic/DEMO_THINKDIAG1_V10.66_AR.zip",
     "sign": "B3B2868437CEDA72DF2D15EF294467E5"
   }
 }
