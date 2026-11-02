@@ -259,7 +259,7 @@ app.get('/api/v2/urls', (req, res) => {
                 {"key": "diagsoft_breakpoint_action", "value": `${serverUrl}/api/v2/download`},
                 {"key": "dlDiagSoftPack.action", "value": `${serverUrl}/api/v2/download`},
                 {"key": "diagsoftservice.*", "value": `${serverUrl}/api/v2/diagsoftservice`},
-                {"key": "activation", "value": "https://diagboss.ch/api/v2/activation"},
+                {"key": "activation", "value": "https://my-diag-server.onrender.com/api/v2/activation"},
                 {"key": "log.upload", "value": `${serverUrl}/api/v2/log-service-upload`},
                 {"key": "report_list", "value": "https://diagboss.ch/api/v2/httapi-report-list"},
                 {"key": "getAutoCodeByVin", "value": `${serverUrl}/api/v2/getAutoCodeByVin`},
