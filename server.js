@@ -1,89 +1,137 @@
 const express = require('express');
+const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
+const crypto = require('crypto');
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.text({ type: ['text/xml', 'application/xml', '*/*'] }));
 
-// مسار ديناميكي عام يتعامل مع جميع الملفات بنفس كفاءة ملف login
-app.all('/api/v2/:endpoint', (req, res) => {
-    let endpointName = req.params.endpoint;
-    
-    if (endpointName === 'urls') {
-        endpointName = 'urls?config_no=0&app_id=3';
-    }
-    
-    const filePath = path.join(__dirname, endpointName);
-    
+// المسار الرئيسي
+app.get('/', (req, res) => {
+    res.json({ status: 'Server is running successfully', time: new Date() });
+});
+
+// 1. مسار الروابط (يحتوي على معاملات بحث query params)
+app.get('/api/v2/urls', (req, res) => {
+    const configNo = req.query.config_no || '0';
+    const appId = req.query.app_id || '3';
+
+    console.log(`طلب الروابط - config_no: ${configNo}, app_id: ${appId}`);
+
+    const fileName = `urls?config_no=${configNo}&app_id=${appId}`;
+    let filePath = path.join(__dirname, fileName);
+
     if (!fs.existsSync(filePath)) {
-        console.log(`[تنبيه] الملف غير موجود: ${endpointName}`);
-        return res.status(404).json({ code: -1, msg: `File ${endpointName} not found` });
+        filePath = path.join(__dirname, 'urls?config_no=0&app_id=3');
     }
+
+    if (fs.existsSync(filePath)) {
+        res.setHeader('Content-Type', 'application/json');
+        res.sendFile(filePath);
+    } else {
+        res.status(404).json({ code: 1, msg: 'Urls file not found on server', data: null });
+    }
+});
+
+// 2. مسار التحميل والبصمات (منطقه الخاص معالجة buffer و MD5)
+app.get('/api/v2/download', async (req, res) => {
+    const versionDetailId = req.query.versionDetailId;
+    const dzCode = req.query.dzCode;
+
+    console.log(`طلب تحميل وإرسال الملف - versionDetailId: ${versionDetailId}, dzCode: ${dzCode}`);
+
+    const filePath = path.join(__dirname, 'download');
+
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ code: 1, msg: 'download file not found on server', data: null });
+    }
+
+    try {
+        const rawData = fs.readFileSync(filePath, 'utf8');
+        const downloadData = JSON.parse(rawData);
+
+        if (!versionDetailId || !downloadData[versionDetailId]) {
+            return res.status(404).json({ code: 1, msg: `Version ID ${versionDetailId} not found`, data: null });
+        }
+
+        const item = downloadData[versionDetailId];
+        const targetUrl = typeof item === 'string' ? item : item.downloadUrl;
+        
+        console.log(`جاري جلب الملف من المصدر وإرساله للتطبيق: ${targetUrl}`);
+
+        const remoteResponse = await axios({
+            method: 'get',
+            url: targetUrl,
+            responseType: 'arraybuffer',
+            timeout: 60000
+        });
+
+        const zipBuffer = Buffer.from(remoteResponse.data);
+        const calculatedSign = crypto.createHash('md5').update(zipBuffer).digest('hex');
+
+        res.status(200);
+        res.setHeader('code', '0');
+        res.setHeader('downloadid', '0');
+        res.setHeader('sign', calculatedSign);
+        res.setHeader('content-type', 'application/octet-stream');
+        res.setHeader('content-length', zipBuffer.length);
+
+        return res.send(zipBuffer);
+
+    } catch (err) {
+        console.error('خطأ أثناء معالجة وإرسال ملف التحميل:', err.message);
+        if (!res.headersSent) {
+            return res.status(500).json({ code: 1, msg: 'Server error processing download', data: null });
+        }
+    }
+});
+
+// 3. مسار الخدمات البرمجية الذكي (Diagsoftservice 1 & 2)
+app.post('/api/v2/diagsoftservice', (req, res) => {
+    const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '');
+    const targetFileName = requestBody.includes('queryPDTDiagSoftSubPack') ? 'diagsoftservice2' : 'diagsoftservice1';
+    const filePath = path.join(__dirname, targetFileName);
     
-    console.log(`طلب وارد -> قراءة ملف الهيدرات والبيانات: ${endpointName}`);
-    
-    fs.readFile(filePath, 'utf8', (err, rawData) => {
-        if (err) {
-            console.error(`خطأ في قراءة الملف ${endpointName}:`, err);
-            return res.status(500).json({ code: -1, msg: "Read file error" });
+    if (fs.existsSync(filePath)) {
+        res.setHeader('Content-Type', 'text/xml; charset=utf-8');
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send('<v:Envelope><v:Body><v:Fault><faultcode>Server</faultcode><faultstring>Not found</faultstring></v:Fault></v:Body></v:Envelope>');
+    }
+});
+
+// =========================================================================
+// 4. مسار ديناميكي عام لأي ملف آخر (login, statistics, url-upload, xml services)
+// =========================================================================
+app.post('/api/v2/:endpoint', (req, res) => {
+    const endpoint = req.params.endpoint;
+    const filePath = path.join(__dirname, endpoint);
+
+    console.log(`طلب وارد إلى المسار: /api/v2/${endpoint} -> البحث عن الملف محلياً`);
+
+    if (fs.existsSync(filePath)) {
+        // تحديد نوع الترويسة تلقائياً بناءً على امتداد الملف أو طبيعته
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        
+        if (fileContent.trim().startsWith('<')) {
+            res.setHeader('Content-Type', 'text/xml; charset=utf-8');
+        } else {
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
         }
         
-        const lines = rawData.split(/\r?\n/);
-        let bodyStartIndex = 0;
-        const extractedHeaders = {};
-        
-        // 1. استخراج الهيدرات من أعلى الملف (مثل ما حدث مع ملف login تماماً)
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
-            
-            // إذا وصلنا إلى بداية الـ JSON (يبدأ بـ { أو [) نتوقف عن قراءة الهيدرات
-            if (line.startsWith('{') || line.startsWith('[')) {
-                bodyStartIndex = i;
-                break;
-            }
-            
-            // التقاط الهيدرات التي تحتوي على نقطتين رأسيتين
-            if (line.includes(':') && !line.startsWith('HTTP/')) {
-                const colonIndex = line.indexOf(':');
-                const key = line.substring(0, colonIndex).trim();
-                const value = line.substring(colonIndex + 1).trim();
-                
-                // استبعاد الهيدرات الخاصة بسيرفر السحابي القديم لتجنب التعارض
-                if (!['server', 'content-encoding', 'transfer-encoding', 'alt-svc', 'cf-ray', 'cf-cache-status', 'connection'].includes(key.toLowerCase())) {
-                    extractedHeaders[key] = value;
-                }
-            }
-        }
-        
-        // 2. تجميع جسم الـ JSON من الأسفل
-        const jsonBody = lines.slice(bodyStartIndex).join('\n');
-        
-        // 3. تطبيق الهيدرات المستخرجة على الاستجابة الحالية
-        for (const [key, value] of Object.entries(extractedHeaders)) {
-            try {
-                res.setHeader(key, value);
-            } catch (e) {
-                // تجاهل أي هيدر غير مدعوم
-            }
-        }
-        
-        // فرض الهيدرات الإجبارية لمنع التخزين المؤقت
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-        res.setHeader('Pragma', 'no-cache');
-        
-        // التأكد من أن نوع المحتوى application/json دائماً إذا كان البودي JSON
-        if (jsonBody.trim().startsWith('{') || jsonBody.trim().startsWith('[')) {
-            if (!res.getHeader('Content-Type') || res.getHeader('Content-Type').includes('text/html')) {
-                res.setHeader('Content-Type', 'application/json; charset=utf-8');
-            }
-        }
-        
-        // 4. إرسال المحتوى كاملاً كما تم التقاطه من ملفه المخصص
-        return res.status(200).send(jsonBody);
-    });
+        return res.sendFile(filePath);
+    } else {
+        console.log(`الملف غير موجود في المجلد: ${endpoint}`);
+        // الرد بصيغة JSON أو XML بناءً على نوع الطلب المتوقع
+        return res.status(404).json({ code: 1, msg: `Endpoint file '${endpoint}' not found`, data: null });
+    }
 });
 
 app.listen(PORT, () => {
