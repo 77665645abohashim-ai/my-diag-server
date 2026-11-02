@@ -414,7 +414,7 @@ app.post('/api/v2/statistics', express.urlencoded({ extended: true }), (req, res
         "code": 0,
         "msg": null,
         "data": {
-            "user_id": GBV4NMU5,
+            "user_id":"GBV4NMU5",
             "bool": "1"
         }
     });
