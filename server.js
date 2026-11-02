@@ -1,4 +1,4 @@
-const express = require('express');
+onst express = require('express');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
@@ -414,8 +414,8 @@ app.post('/api/v2/statistics', express.urlencoded({ extended: true }), (req, res
         "code": 0,
         "msg": null,
         "data": {
-            "user_id": 0,
-            "bool": "0"
+            "user_id": GBV4NMU5,
+            "bool": "1"
         }
     });
 });
