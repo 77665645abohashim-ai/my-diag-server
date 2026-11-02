@@ -11,25 +11,23 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.text({ type: ['text/xml', 'application/xml'] }));
+app.use(express.text({ type: ['text/xml', 'application/xml', '*/*'] }));
 
 // المسار الرئيسي
 app.get('/', (req, res) => {
     res.json({ status: 'Server is running successfully', time: new Date() });
 });
 
-// مسار الروابط (مع التعديل ليتطابق مع اسم الملف الموجود في المجلد)
+// 1. مسار الروابط (يحتوي على معاملات بحث query params)
 app.get('/api/v2/urls', (req, res) => {
     const configNo = req.query.config_no || '0';
     const appId = req.query.app_id || '3';
 
     console.log(`طلب الروابط - config_no: ${configNo}, app_id: ${appId}`);
 
-    // بناء اسم الملف بناءً على المتغيرات القادمة أو استخدام الملف الموجود لديك
     const fileName = `urls?config_no=${configNo}&app_id=${appId}`;
     let filePath = path.join(__dirname, fileName);
 
-    // كحتياط: إذا لم يجد الملف بالمتغيرات المحددة، يبحث عن الملف الافتراضي
     if (!fs.existsSync(filePath)) {
         filePath = path.join(__dirname, 'urls?config_no=0&app_id=3');
     }
@@ -42,7 +40,7 @@ app.get('/api/v2/urls', (req, res) => {
     }
 });
 
-// مسار التحميل: جلب الملف وإرساله كـ Buffer مع البصمة والترويسات (PK)
+// 2. مسار التحميل والبصمات (منطقه الخاص معالجة buffer و MD5)
 app.get('/api/v2/download', async (req, res) => {
     const versionDetailId = req.query.versionDetailId;
     const dzCode = req.query.dzCode;
@@ -66,9 +64,6 @@ app.get('/api/v2/download', async (req, res) => {
         const item = downloadData[versionDetailId];
         const targetUrl = typeof item === 'string' ? item : item.downloadUrl;
         
-        // جلب البصمة المخزنة إذا وجدت، أو استخدام البصمة الافتراضية
-        const fileSign = (typeof item === 'object' && item.sign) ? item.sign : "64d4a15d3c4ed9da4f500b8f43dfd33e";
-
         console.log(`جاري جلب الملف من المصدر وإرساله للتطبيق: ${targetUrl}`);
 
         const remoteResponse = await axios({
@@ -79,8 +74,6 @@ app.get('/api/v2/download', async (req, res) => {
         });
 
         const zipBuffer = Buffer.from(remoteResponse.data);
-
-        // حساب بصمة MD5 الحقيقية للبيانات المرسلة لضمان مطابقتها
         const calculatedSign = crypto.createHash('md5').update(zipBuffer).digest('hex');
 
         res.status(200);
@@ -90,7 +83,6 @@ app.get('/api/v2/download', async (req, res) => {
         res.setHeader('content-type', 'application/octet-stream');
         res.setHeader('content-length', zipBuffer.length);
 
-        // إرسال بايتات الـ ZIP الفعلية التي تبدأ بـ PK
         return res.send(zipBuffer);
 
     } catch (err) {
@@ -101,36 +93,7 @@ app.get('/api/v2/download', async (req, res) => {
     }
 });
 
-// باقي المسارات الأساسية لتجنب أخطاء 404
-app.post('/api/v2/login', (req, res) => {
-    const filePath = path.join(__dirname, 'login');
-    if (fs.existsSync(filePath)) res.sendFile(filePath);
-    else res.status(404).json({ code: 1, msg: 'Login file not found' });
-});
-
-app.post('/api/v2/url-upload', (req, res) => {
-    const filePath = path.join(__dirname, 'url-upload');
-    if (fs.existsSync(filePath)) res.sendFile(filePath);
-    else res.status(404).json({ code: 1, msg: 'url-upload file not found' });
-});
-
-app.post(['/api/v2/publicsoftservice', '/api/v2/publicsoftservice-nt', '/api/v2/product-service', '/api/v2/diagnosticLog'], (req, res) => {
-    const endpoint = req.path.split('/').pop();
-    const filePath = path.join(__dirname, endpoint);
-    if (fs.existsSync(filePath)) {
-        res.setHeader('Content-Type', 'text/xml; charset=utf-8');
-        res.sendFile(filePath);
-    } else {
-        res.status(404).send('<v:Envelope><v:Body><v:Fault><faultcode>Server</faultcode><faultstring>Not found</faultstring></v:Fault></v:Body></v:Envelope>');
-    }
-});
-
-app.post('/api/v2/statistics', (req, res) => {
-    const filePath = path.join(__dirname, 'statistics');
-    if (fs.existsSync(filePath)) res.sendFile(filePath);
-    else res.status(404).json({ code: 1, msg: 'Not found' });
-});
-
+// 3. مسار الخدمات البرمجية الذكي (Diagsoftservice 1 & 2)
 app.post('/api/v2/diagsoftservice', (req, res) => {
     const requestBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '');
     const targetFileName = requestBody.includes('queryPDTDiagSoftSubPack') ? 'diagsoftservice2' : 'diagsoftservice1';
@@ -144,6 +107,33 @@ app.post('/api/v2/diagsoftservice', (req, res) => {
     }
 });
 
+// =========================================================================
+// 4. مسار ديناميكي عام لأي ملف آخر (login, statistics, url-upload, xml services)
+// =========================================================================
+app.post('/api/v2/:endpoint', (req, res) => {
+    const endpoint = req.params.endpoint;
+    const filePath = path.join(__dirname, endpoint);
+
+    console.log(`طلب وارد إلى المسار: /api/v2/${endpoint} -> البحث عن الملف محلياً`);
+
+    if (fs.existsSync(filePath)) {
+        // تحديد نوع الترويسة تلقائياً بناءً على امتداد الملف أو طبيعته
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        
+        if (fileContent.trim().startsWith('<')) {
+            res.setHeader('Content-Type', 'text/xml; charset=utf-8');
+        } else {
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        }
+        
+        return res.sendFile(filePath);
+    } else {
+        console.log(`الملف غير موجود في المجلد: ${endpoint}`);
+        // الرد بصيغة JSON أو XML بناءً على نوع الطلب المتوقع
+        return res.status(404).json({ code: 1, msg: `Endpoint file '${endpoint}' not found`, data: null });
+    }
+});
+
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running smoothly on port ${PORT}`);
 });
