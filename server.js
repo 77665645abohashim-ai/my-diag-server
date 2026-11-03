@@ -436,7 +436,7 @@ app.post('/api/v2/log-service-upload', (req, res) => {
     });
 });
 app.post('/api/v2/td-check-locked', (req, res) => {
-    const filePath = path.join(__dirname, 'response.json');
+    const filePath = path.join(__dirname, 'td-check-locked');
     
     fs.readFile(filePath, 'utf8', (err, fileContent) => {
         if (err) {
