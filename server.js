@@ -435,6 +435,22 @@ app.post('/api/v2/log-service-upload', (req, res) => {
         "data": ""
     });
 });
+app.post('/api/v2/td-check-locked', (req, res) => {
+    const filePath = path.join(__dirname, 'response.json');
+    
+    fs.readFile(filePath, 'utf8', (err, fileContent) => {
+        if (err) {
+            return res.status(500).json({
+                "code": 500,
+                "message": "Error reading response file",
+                "data": null
+            });
+        }
+        
+        res.setHeader('Content-Type', 'application/json');
+        res.send(fileContent);
+    });
+});
 
 // تشغيل السيرفر
 app.listen(PORT, () => {
