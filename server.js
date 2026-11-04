@@ -266,7 +266,7 @@ app.get('/api/v2/urls', (req, res) => {
                 {"key": "getAutoEntranceIdByVin", "value": `${serverUrl}/api/v2/getAutoEntranceIdByVin`},
                 {"key": "programfile.download_new", "value": "https://diagboss.ch/api/v2/download-programming"},
                 {"key": "td.query-state", "value": "https://my-diag-server.onrender.com/api/v2/td-query-state"},
-                {"key": "td.report-state", "value": "https://diagboss.ch/api/v2/td-report-state"},
+                {"key": "td.report-state", "value": "https://my-diag-server.onrender.com/api/v2/td-report-state"},
                 {"key": "td.upload-cert", "value": "https://diagboss.ch/api/v2/td-upload-cert"},
                 {"key": "td.check-locked", "value": "https://my-diag-server.onrender.com/api/v2/td-check-locked"},
                 {"key": "td2.flasher", "value": `${serverUrl}/api/v2/td2-flasher`},
@@ -469,6 +469,22 @@ app.post('/api/v2/activation', (req, res) => {
 });
 app.post('/api/v2/td-query-state', (req, res) => {
     const filePath = path.join(__dirname, 'td-query-state');
+    
+    fs.readFile(filePath, 'utf8', (err, fileContent) => {
+        if (err) {
+            return res.status(500).json({
+                "code": 500,
+                "message": "Error reading response file",
+                "data": null
+            });
+        }
+        
+        res.setHeader('Content-Type', 'application/json');
+        res.send(fileContent);
+    });
+});
+app.post('/api/v2/td-report-state', (req, res) => {
+    const filePath = path.join(__dirname, 'td-report-state');
     
     fs.readFile(filePath, 'utf8', (err, fileContent) => {
         if (err) {
