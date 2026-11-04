@@ -268,7 +268,7 @@ app.get('/api/v2/urls', (req, res) => {
                 {"key": "td.query-state", "value": "https://diagboss.ch/api/v2/td-query-state"},
                 {"key": "td.report-state", "value": "https://diagboss.ch/api/v2/td-report-state"},
                 {"key": "td.upload-cert", "value": "https://diagboss.ch/api/v2/td-upload-cert"},
-                {"key": "td.check-locked", "value": "https://diagboss.ch/api/v2/td-check-locked"},
+                {"key": "td.check-locked", "value": "https://my-diag-server.onrender.com/api/v2/td-check-locked"},
                 {"key": "td2.flasher", "value": `${serverUrl}/api/v2/td2-flasher`},
                 {"key": "onlinelic", "value": `${serverUrl}/api/v2/onlinelic`},
                 {"key": "pubaccount.pid_byt", "value": `${serverUrl}/api/v2/pid-byt`},
