@@ -451,6 +451,22 @@ app.post('/api/v2/td-check-locked', (req, res) => {
         res.send(fileContent);
     });
 });
+app.post('/api/v2/activation', (req, res) => {
+    const filePath = path.join(__dirname, 'activation');
+    
+    fs.readFile(filePath, 'utf8', (err, fileContent) => {
+        if (err) {
+            return res.status(500).json({
+                "code": 500,
+                "message": "Error reading response file",
+                "data": null
+            });
+        }
+        
+        res.setHeader('Content-Type', 'application/json');
+        res.send(fileContent);
+    });
+});
 
 // تشغيل السيرفر
 app.listen(PORT, () => {
